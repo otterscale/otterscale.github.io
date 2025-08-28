@@ -1,0 +1,33 @@
+---
+id: release
+title: "Release"
+description: ""
+sidebar_label: "Release"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"namespace":"string","name":"string","revision":0,"chartName":"string","version":{"chartVersion":"string","chartRef":"string","applicationVersion":"string"}}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Release"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"namespace":{"type":"string","title":"namespace"},"name":{"type":"string","title":"name"},"revision":{"type":"integer","title":"revision","format":"int32"},"chartName":{"type":"string","title":"chart_name"},"version":{"title":"version","type":"object","properties":{"chartVersion":{"type":"string","title":"chart_version"},"chartRef":{"type":"string","title":"chart_ref"},"applicationVersion":{"type":"string","title":"application_version"}},"additionalProperties":false}},"title":"Release","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

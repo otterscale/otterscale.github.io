@@ -1,0 +1,33 @@
+---
+id: chart
+title: "Chart"
+description: ""
+sidebar_label: "Chart"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"string","icon":"string","description":"string","deprecated":true,"tags":"string","keywords":["string"],"license":"string","verified":true,"home":"string","sources":["string"],"maintainers":[{"name":"string","email":"string","url":"string"}],"dependencies":[{"name":"string","version":"string","condition":"string"}],"versions":[{"chartVersion":"string","chartRef":"string","applicationVersion":"string"}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Chart"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"name":{"type":"string","title":"name"},"icon":{"type":"string","title":"icon"},"description":{"type":"string","title":"description"},"deprecated":{"type":"boolean","title":"deprecated"},"tags":{"type":"string","title":"tags"},"keywords":{"type":"array","items":{"type":"string"},"title":"keywords"},"license":{"type":"string","title":"license"},"verified":{"type":"boolean","title":"verified"},"home":{"type":"string","title":"home"},"sources":{"type":"array","items":{"type":"string"},"title":"sources"},"maintainers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","title":"name"},"email":{"type":"string","title":"email"},"url":{"type":"string","title":"url"}},"title":"Maintainer","additionalProperties":false},"title":"maintainers"},"dependencies":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","title":"name"},"version":{"type":"string","title":"version"},"condition":{"type":"string","title":"condition"}},"title":"Dependency","additionalProperties":false},"title":"dependencies"},"versions":{"type":"array","items":{"type":"object","properties":{"chartVersion":{"type":"string","title":"chart_version"},"chartRef":{"type":"string","title":"chart_ref"},"applicationVersion":{"type":"string","title":"application_version"}},"title":"Version","additionalProperties":false},"title":"versions"}},"title":"Chart","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

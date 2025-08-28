@@ -1,0 +1,33 @@
+---
+id: updatevlanrequest
+title: "UpdateVLANRequest"
+description: ""
+sidebar_label: "UpdateVLANRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"fabricId":0,"vid":0,"name":"string","mtu":0,"description":"string","dhcpOn":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"UpdateVLANRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"fabricId":{"type":["integer","string"],"title":"fabric_id","format":"int64"},"vid":{"type":["integer","string"],"title":"vid","format":"int64"},"name":{"type":"string","title":"name"},"mtu":{"type":["integer","string"],"title":"mtu","format":"int64"},"description":{"type":"string","title":"description"},"dhcpOn":{"type":"boolean","title":"dhcp_on"}},"title":"UpdateVLANRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

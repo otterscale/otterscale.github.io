@@ -1,0 +1,33 @@
+---
+id: constraint
+title: "Constraint"
+description: ""
+sidebar_label: "Constraint"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"architecture":"string","cpuCores":0,"memoryMb":0,"tags":["string"]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Constraint"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"architecture":{"type":"string","title":"architecture"},"cpuCores":{"type":["integer","string"],"title":"cpu_cores","format":"int64"},"memoryMb":{"type":["integer","string"],"title":"memory_mb","format":"int64"},"tags":{"type":"array","items":{"type":"string"},"title":"tags"}},"title":"Constraint","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

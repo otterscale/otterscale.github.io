@@ -1,0 +1,33 @@
+---
+id: latency
+title: "Latency"
+description: ""
+sidebar_label: "Latency"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"minNanoseconds":0,"maxNanoseconds":0,"meanNanoseconds":0}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Latency"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"minNanoseconds":{"type":["integer","string"],"title":"min_nanoseconds","format":"int64"},"maxNanoseconds":{"type":["integer","string"],"title":"max_nanoseconds","format":"int64"},"meanNanoseconds":{"type":"number","title":"mean_nanoseconds","format":"double"}},"title":"Latency","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

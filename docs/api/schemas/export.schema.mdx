@@ -1,0 +1,33 @@
+---
+id: export
+title: "Export"
+description: ""
+sidebar_label: "Export"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"ip":"string","path":"string","clients":["string"],"command":"string"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Export"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"ip":{"type":"string","title":"ip"},"path":{"type":"string","title":"path"},"clients":{"type":"array","items":{"type":"string"},"title":"clients"},"command":{"type":"string","title":"command"}},"title":"Export","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

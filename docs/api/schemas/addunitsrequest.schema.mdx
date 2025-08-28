@@ -1,0 +1,33 @@
+---
+id: addunitsrequest
+title: "AddUnitsRequest"
+description: ""
+sidebar_label: "AddUnitsRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"type":"UNSPECIFIED","scopeUuid":"string","name":"string","number":0,"machineIds":["string"],"force":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"AddUnitsRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"type":{"title":"type","type":"string","enum":["UNSPECIFIED","KUBERNETES","CEPH"]},"scopeUuid":{"type":"string","title":"scope_uuid"},"name":{"type":"string","title":"name"},"number":{"type":"integer","title":"number","format":"int32"},"machineIds":{"type":"array","items":{"type":"string"},"title":"machine_ids"},"force":{"type":"boolean","title":"force"}},"title":"AddUnitsRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

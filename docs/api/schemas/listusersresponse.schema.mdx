@@ -1,0 +1,33 @@
+---
+id: listusersresponse
+title: "ListUsersResponse"
+description: ""
+sidebar_label: "ListUsersResponse"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"users":[{"id":"string","name":"string","suspended":true,"keys":[{"accessKey":"string","secretKey":"string"}]}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ListUsersResponse"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"users":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","title":"id"},"name":{"type":"string","title":"name"},"suspended":{"type":"boolean","title":"suspended"},"keys":{"type":"array","items":{"type":"object","properties":{"accessKey":{"type":"string","title":"access_key"},"secretKey":{"type":"string","title":"secret_key"}},"title":"Key","additionalProperties":false},"title":"keys"}},"title":"User","additionalProperties":false},"title":"users"}},"title":"ListUsersResponse","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

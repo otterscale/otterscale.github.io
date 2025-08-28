@@ -1,0 +1,33 @@
+---
+id: liststatusesresponse
+title: "ListStatusesResponse"
+description: ""
+sidebar_label: "ListStatusesResponse"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"statuses":[{"level":"INFO","message":"string","details":"string"}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ListStatusesResponse"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"statuses":{"type":"array","items":{"type":"object","properties":{"level":{"title":"level","type":"string","enum":["INFO","LOW","MEDIUM","HIGH","CRITICAL"]},"message":{"type":"string","title":"message"},"details":{"type":"string","title":"details"}},"title":"Status","additionalProperties":false},"title":"statuses"}},"title":"ListStatusesResponse","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

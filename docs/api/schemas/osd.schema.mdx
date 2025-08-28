@@ -1,0 +1,33 @@
+---
+id: osd
+title: "OSD"
+description: ""
+sidebar_label: "OSD"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":0,"name":"string","up":true,"in":true,"exists":true,"deviceClass":"string","sizeBytes":0,"usedBytes":0,"placementGroupCount":0,"machine":{"id":"string","hostname":"string"}}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"OSD"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"name":{"type":"string","title":"name"},"up":{"type":"boolean","title":"up"},"in":{"type":"boolean","title":"in"},"exists":{"type":"boolean","title":"exists"},"deviceClass":{"type":"string","title":"device_class"},"sizeBytes":{"type":["integer","string"],"title":"size_bytes","format":"int64"},"usedBytes":{"type":["integer","string"],"title":"used_bytes","format":"int64"},"placementGroupCount":{"type":["integer","string"],"title":"placement_group_count","format":"int64"},"machine":{"title":"machine","type":"object","properties":{"id":{"type":"string","title":"id"},"hostname":{"type":"string","title":"hostname"}},"additionalProperties":false}},"title":"OSD","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

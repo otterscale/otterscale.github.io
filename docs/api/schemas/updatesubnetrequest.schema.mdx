@@ -1,0 +1,33 @@
+---
+id: updatesubnetrequest
+title: "UpdateSubnetRequest"
+description: ""
+sidebar_label: "UpdateSubnetRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":0,"name":"string","cidr":"string","gatewayIp":"string","dnsServers":["string"],"description":"string","allowDnsResolution":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"UpdateSubnetRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"name":{"type":"string","title":"name"},"cidr":{"type":"string","title":"cidr"},"gatewayIp":{"type":"string","title":"gateway_ip"},"dnsServers":{"type":"array","items":{"type":"string"},"title":"dns_servers"},"description":{"type":"string","title":"description"},"allowDnsResolution":{"type":"boolean","title":"allow_dns_resolution"}},"title":"UpdateSubnetRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

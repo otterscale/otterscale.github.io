@@ -1,0 +1,33 @@
+---
+id: listscopesresponse
+title: "ListScopesResponse"
+description: ""
+sidebar_label: "ListScopesResponse"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"scopes":[{"uuid":"string","name":"string","type":"string","providerType":"string","life":"string","status":"string","agentVersion":"string","controller":true,"machineCount":0,"coreCount":0,"unitCount":0}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ListScopesResponse"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"scopes":{"type":"array","items":{"type":"object","properties":{"uuid":{"type":"string","title":"uuid"},"name":{"type":"string","title":"name"},"type":{"type":"string","title":"type"},"providerType":{"type":"string","title":"provider_type"},"life":{"type":"string","title":"life"},"status":{"type":"string","title":"status"},"agentVersion":{"type":"string","title":"agent_version"},"controller":{"type":"boolean","title":"controller"},"machineCount":{"type":["integer","string"],"title":"machine_count","format":"int64"},"coreCount":{"type":["integer","string"],"title":"core_count","format":"int64"},"unitCount":{"type":["integer","string"],"title":"unit_count","format":"int64"}},"title":"Scope","additionalProperties":false},"title":"scopes"}},"title":"ListScopesResponse","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

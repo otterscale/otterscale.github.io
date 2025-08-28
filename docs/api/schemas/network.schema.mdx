@@ -1,0 +1,33 @@
+---
+id: network
+title: "Network"
+description: ""
+sidebar_label: "Network"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"fabric":{"id":0,"name":"string"},"vlan":{"id":0,"vid":0,"name":"string","mtu":0,"description":"string","dhcpOn":true},"subnet":{"id":0,"name":"string","cidr":"string","gatewayIp":"string","dnsServers":["string"],"description":"string","managedAllocation":true,"activeDiscovery":true,"allowProxyAccess":true,"allowDnsResolution":true,"ipAddresses":[{"type":"string","ip":"string","user":"string","machineId":"string","nodeType":"string","hostname":"string"}],"ipRanges":[{"id":0,"type":"string","startIp":"string","endIp":"string","comment":"string"}],"statistics":{"available":0,"total":0,"usagePercent":"string","availablePercent":"string"}}}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Network"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"fabric":{"title":"fabric","type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"name":{"type":"string","title":"name"}},"additionalProperties":false},"vlan":{"title":"vlan","type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"vid":{"type":["integer","string"],"title":"vid","format":"int64"},"name":{"type":"string","title":"name"},"mtu":{"type":["integer","string"],"title":"mtu","format":"int64"},"description":{"type":"string","title":"description"},"dhcpOn":{"type":"boolean","title":"dhcp_on"}},"additionalProperties":false},"subnet":{"title":"subnet","type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"name":{"type":"string","title":"name"},"cidr":{"type":"string","title":"cidr"},"gatewayIp":{"type":"string","title":"gateway_ip"},"dnsServers":{"type":"array","items":{"type":"string"},"title":"dns_servers"},"description":{"type":"string","title":"description"},"managedAllocation":{"type":"boolean","title":"managed_allocation"},"activeDiscovery":{"type":"boolean","title":"active_discovery"},"allowProxyAccess":{"type":"boolean","title":"allow_proxy_access"},"allowDnsResolution":{"type":"boolean","title":"allow_dns_resolution"},"ipAddresses":{"type":"array","items":{"type":"object","properties":{"type":{"type":"string","title":"type"},"ip":{"type":"string","title":"ip"},"user":{"type":"string","title":"user"},"machineId":{"type":"string","title":"machine_id"},"nodeType":{"type":"string","title":"node_type"},"hostname":{"type":"string","title":"hostname"}},"title":"IPAddress","additionalProperties":false},"title":"ip_addresses"},"ipRanges":{"type":"array","items":{"type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"type":{"type":"string","title":"type"},"startIp":{"type":"string","title":"start_ip"},"endIp":{"type":"string","title":"end_ip"},"comment":{"type":"string","title":"comment"}},"title":"IPRange","additionalProperties":false},"title":"ip_ranges"},"statistics":{"title":"statistics","type":"object","properties":{"available":{"type":["integer","string"],"title":"available","format":"int64"},"total":{"type":["integer","string"],"title":"total","format":"int64"},"usagePercent":{"type":"string","title":"usage_percent"},"availablePercent":{"type":"string","title":"available_percent"}},"additionalProperties":false}},"additionalProperties":false}},"title":"Network","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            
