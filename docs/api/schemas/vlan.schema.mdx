@@ -1,0 +1,33 @@
+---
+id: vlan
+title: "VLAN"
+description: ""
+sidebar_label: "VLAN"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":0,"vid":0,"name":"string","mtu":0,"description":"string","dhcpOn":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"VLAN"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"vid":{"type":["integer","string"],"title":"vid","format":"int64"},"name":{"type":"string","title":"name"},"mtu":{"type":["integer","string"],"title":"mtu","format":"int64"},"description":{"type":"string","title":"description"},"dhcpOn":{"type":"boolean","title":"dhcp_on"}},"title":"VLAN","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

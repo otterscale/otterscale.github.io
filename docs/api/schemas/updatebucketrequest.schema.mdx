@@ -1,0 +1,33 @@
+---
+id: updatebucketrequest
+title: "UpdateBucketRequest"
+description: ""
+sidebar_label: "UpdateBucketRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"scopeUuid":"string","facilityName":"string","bucketName":"string","owner":"string","policy":"string","acl":"PRIVATE"}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"UpdateBucketRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"scopeUuid":{"type":"string","title":"scope_uuid"},"facilityName":{"type":"string","title":"facility_name"},"bucketName":{"type":"string","title":"bucket_name"},"owner":{"type":"string","title":"owner"},"policy":{"type":"string","title":"policy"},"acl":{"title":"acl","type":"string","enum":["PRIVATE","PUBLIC_READ","PUBLIC_READ_WRITE","AUTHENTICATED_READ"]}},"title":"UpdateBucketRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

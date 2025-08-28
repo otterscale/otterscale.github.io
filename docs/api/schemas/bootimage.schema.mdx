@@ -1,0 +1,33 @@
+---
+id: bootimage
+title: "BootImage"
+description: ""
+sidebar_label: "BootImage"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"source":"string","distroSeries":"string","name":"string","architectureStatusMap":{},"default":true}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"BootImage"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"source":{"type":"string","title":"source"},"distroSeries":{"type":"string","title":"distro_series"},"name":{"type":"string","title":"name"},"architectureStatusMap":{"type":"object","title":"architecture_status_map","additionalProperties":{"type":"string","title":"value"}},"default":{"type":"boolean","title":"default"}},"title":"BootImage","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

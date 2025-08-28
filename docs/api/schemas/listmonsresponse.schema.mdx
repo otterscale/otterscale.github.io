@@ -1,0 +1,33 @@
+---
+id: listmonsresponse
+title: "ListMONsResponse"
+description: ""
+sidebar_label: "ListMONsResponse"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"mons":[{"leader":true,"name":"string","rank":0,"publicAddress":"string","machine":{"id":"string","hostname":"string"}}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"ListMONsResponse"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"mons":{"type":"array","items":{"type":"object","properties":{"leader":{"type":"boolean","title":"leader"},"name":{"type":"string","title":"name"},"rank":{"type":["integer","string"],"title":"rank","format":"int64"},"publicAddress":{"type":"string","title":"public_address"},"machine":{"title":"machine","type":"object","properties":{"id":{"type":"string","title":"id"},"hostname":{"type":"string","title":"hostname"}},"additionalProperties":false}},"title":"MON","additionalProperties":false},"title":"mons"}},"title":"ListMONsResponse","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

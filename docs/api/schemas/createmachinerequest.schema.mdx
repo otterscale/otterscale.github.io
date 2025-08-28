@@ -1,0 +1,33 @@
+---
+id: createmachinerequest
+title: "CreateMachineRequest"
+description: ""
+sidebar_label: "CreateMachineRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"id":"string","enableSsh":true,"skipBmcConfig":true,"skipNetworking":true,"skipStorage":true,"scopeUuid":"string","tags":["string"]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"CreateMachineRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"id":{"type":"string","title":"id"},"enableSsh":{"type":"boolean","title":"enable_ssh"},"skipBmcConfig":{"type":"boolean","title":"skip_bmc_config"},"skipNetworking":{"type":"boolean","title":"skip_networking"},"skipStorage":{"type":"boolean","title":"skip_storage"},"scopeUuid":{"type":"string","title":"scope_uuid"},"tags":{"type":"array","items":{"type":"string"},"title":"tags"}},"title":"CreateMachineRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

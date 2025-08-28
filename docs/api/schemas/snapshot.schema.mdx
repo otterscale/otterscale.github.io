@@ -1,0 +1,33 @@
+---
+id: snapshot
+title: "Snapshot"
+description: ""
+sidebar_label: "Snapshot"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"string","protected":true,"quotaBytes":0,"usedBytes":0}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Snapshot"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"name":{"type":"string","title":"name"},"protected":{"type":"boolean","title":"protected"},"quotaBytes":{"type":["integer","string"],"title":"quota_bytes","format":"int64"},"usedBytes":{"type":["integer","string"],"title":"used_bytes","format":"int64"}},"title":"Snapshot","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

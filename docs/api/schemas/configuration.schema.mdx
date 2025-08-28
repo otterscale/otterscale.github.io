@@ -1,0 +1,33 @@
+---
+id: configuration
+title: "Configuration"
+description: ""
+sidebar_label: "Configuration"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"ntpServer":{"addresses":["string"]},"packageRepositories":[{"id":0,"name":"string","url":"string","enabled":true}],"bootImages":[{"source":"string","distroSeries":"string","name":"string","architectureStatusMap":{},"default":true}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Configuration"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"ntpServer":{"title":"ntp_server","type":"object","properties":{"addresses":{"type":"array","items":{"type":"string"},"title":"addresses"}},"additionalProperties":false},"packageRepositories":{"type":"array","items":{"type":"object","properties":{"id":{"type":["integer","string"],"title":"id","format":"int64"},"name":{"type":"string","title":"name"},"url":{"type":"string","title":"url"},"enabled":{"type":"boolean","title":"enabled"}},"title":"PackageRepository","additionalProperties":false},"title":"package_repositories"},"bootImages":{"type":"array","items":{"type":"object","properties":{"source":{"type":"string","title":"source"},"distroSeries":{"type":"string","title":"distro_series"},"name":{"type":"string","title":"name"},"architectureStatusMap":{"type":"object","title":"architecture_status_map","additionalProperties":{"type":"string","title":"value"}},"default":{"type":"boolean","title":"default"}},"title":"BootImage","additionalProperties":false},"title":"boot_images"}},"title":"Configuration","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            
