@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import styles from './styles.module.css';
@@ -11,38 +11,41 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Easy to Use',
+    title: 'Hyper-Converged Infrastructure',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        OtterScale unifies compute, storage, networking, and orchestration into
+        a single platform for simplified, scalable, enterprise-grade data center
+        operations.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Enterprise-Grade Features',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Built-in KVM/QEMU virtualization, Kubernetes orchestration, Ceph
+        distributed storage, and integrated monitoring with{' '}
+        <code>Prometheus</code> and <code>Grafana</code>.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'High Availability & Security',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Multi-node deployment with automatic failover, RBAC with LDAP/AD
+        integration, SSO support, and a curated application marketplace for
+        enterprise workloads.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
