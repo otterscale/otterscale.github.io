@@ -1,0 +1,33 @@
+---
+id: updatevirtualmachineservicerequest
+title: "UpdateVirtualMachineServiceRequest"
+description: ""
+sidebar_label: "UpdateVirtualMachineServiceRequest"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"scopeUuid":"string","facilityName":"string","namespace":"string","name":"string","ports":[{"port":0,"nodePort":0,"name":"string","protocol":"string","targetPort":"string"}]}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"UpdateVirtualMachineServiceRequest"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"scopeUuid":{"type":"string","title":"scope_uuid"},"facilityName":{"type":"string","title":"facility_name"},"namespace":{"type":"string","title":"namespace"},"name":{"type":"string","title":"name"},"ports":{"type":"array","items":{"type":"object","properties":{"port":{"type":"integer","title":"port","format":"int32"},"nodePort":{"type":"integer","title":"node_port","format":"int32"},"name":{"type":"string","title":"name"},"protocol":{"type":"string","title":"protocol"},"targetPort":{"type":"string","title":"target_port"}},"title":"Port","additionalProperties":false},"title":"ports"}},"title":"UpdateVirtualMachineServiceRequest","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

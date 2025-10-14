@@ -6,7 +6,7 @@ sidebar_label: "Essential"
 hide_title: true
 hide_table_of_contents: true
 schema: true
-sample: {"type":"UNSPECIFIED","name":"string","scopeUuid":"string","scopeName":"string","units":[{"name":"string","directive":"string"}]}
+sample: {"type":"UNKNOWN","name":"string","scopeUuid":"string","scopeName":"string","units":[{"name":"string","directive":"string"}]}
 custom_edit_url: null
 ---
 
@@ -25,7 +25,7 @@ import Heading from "@theme/Heading";
 
 
 <Schema
-  schema={{"type":"object","properties":{"type":{"title":"type","type":"string","enum":["UNSPECIFIED","KUBERNETES","CEPH"]},"name":{"type":"string","title":"name"},"scopeUuid":{"type":"string","title":"scope_uuid"},"scopeName":{"type":"string","title":"scope_name"},"units":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","title":"name"},"directive":{"type":"string","title":"directive"}},"title":"Unit","additionalProperties":false},"title":"units"}},"title":"Essential","additionalProperties":false}}
+  schema={{"type":"object","properties":{"type":{"title":"type","type":"string","enum":["UNKNOWN","KUBERNETES","CEPH"]},"name":{"type":"string","title":"name"},"scopeUuid":{"type":"string","title":"scope_uuid"},"scopeName":{"type":"string","title":"scope_name"},"units":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string","title":"name"},"directive":{"type":"string","title":"directive"}},"title":"Unit","additionalProperties":false},"title":"units"}},"title":"Essential","additionalProperties":false}}
   schemaType={"response"}
 >
   
