@@ -1,0 +1,33 @@
+---
+id: disk
+title: "Disk"
+description: ""
+sidebar_label: "Disk"
+hide_title: true
+hide_table_of_contents: true
+schema: true
+sample: {"name":"string","bus":"VIRTIO","bootOrder":0,"volume":{"name":"string","source":{"type":"UNKNOWN","data":"string"}}}
+custom_edit_url: null
+---
+
+import Schema from "@theme/Schema";
+import Heading from "@theme/Heading";
+
+<Heading
+  as={"h1"}
+  className={"openapi__heading"}
+  children={"Disk"}
+>
+</Heading>
+
+
+
+
+
+<Schema
+  schema={{"type":"object","properties":{"name":{"type":"string","title":"name"},"bus":{"title":"bus","type":"string","enum":["VIRTIO","SATA","SCSI","USB"]},"bootOrder":{"type":"integer","title":"boot_order"},"volume":{"title":"volume","type":"object","properties":{"name":{"type":"string","title":"name"},"source":{"title":"source","type":"object","properties":{"type":{"title":"type","type":"string","enum":["UNKNOWN","DATA_VOLUME","CLOUD_INIT_NO_CLOUD"]},"data":{"type":"string","title":"data"}},"additionalProperties":false}},"additionalProperties":false}},"title":"Disk","additionalProperties":false}}
+  schemaType={"response"}
+>
+  
+</Schema>
+            

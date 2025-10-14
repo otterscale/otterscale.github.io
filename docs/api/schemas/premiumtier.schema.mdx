@@ -6,7 +6,7 @@ sidebar_label: "PremiumTier"
 hide_title: true
 hide_table_of_contents: true
 schema: true
-sample: "BASIC"
+sample: {"level":"BASIC"}
 custom_edit_url: null
 ---
 
@@ -25,7 +25,7 @@ import Heading from "@theme/Heading";
 
 
 <Schema
-  schema={{"type":"string","title":"PremiumTier","enum":["BASIC","ADVANCED","ENTERPRISE"]}}
+  schema={{"type":"object","properties":{"level":{"title":"level","type":"string","enum":["BASIC","ADVANCED","ENTERPRISE"]}},"title":"PremiumTier","additionalProperties":false}}
   schemaType={"response"}
 >
   

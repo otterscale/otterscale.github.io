@@ -6,7 +6,7 @@ sidebar_label: "ListInternalObjectServicesRequest"
 hide_title: true
 hide_table_of_contents: true
 schema: true
-sample: {"scopeUuid":"string"}
+sample: {"scopeUuid":"string","kubernetesName":"string","cephName":"string"}
 custom_edit_url: null
 ---
 
@@ -25,7 +25,7 @@ import Heading from "@theme/Heading";
 
 
 <Schema
-  schema={{"type":"object","properties":{"scopeUuid":{"type":"string","title":"scope_uuid"}},"title":"ListInternalObjectServicesRequest","additionalProperties":false}}
+  schema={{"type":"object","properties":{"scopeUuid":{"type":"string","title":"scope_uuid"},"kubernetesName":{"type":"string","title":"kubernetes_name"},"cephName":{"type":"string","title":"ceph_name"}},"title":"ListInternalObjectServicesRequest","additionalProperties":false}}
   schemaType={"response"}
 >
   

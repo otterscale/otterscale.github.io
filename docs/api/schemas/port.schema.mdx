@@ -6,7 +6,7 @@ sidebar_label: "Port"
 hide_title: true
 hide_table_of_contents: true
 schema: true
-sample: {"port":0,"nodePort":0,"protocol":"string","targetPort":"string"}
+sample: {"port":0,"nodePort":0,"name":"string","protocol":"string","targetPort":"string"}
 custom_edit_url: null
 ---
 
@@ -25,7 +25,7 @@ import Heading from "@theme/Heading";
 
 
 <Schema
-  schema={{"type":"object","properties":{"port":{"type":"integer","title":"port","format":"int32"},"nodePort":{"type":"integer","title":"node_port","format":"int32"},"protocol":{"type":"string","title":"protocol"},"targetPort":{"type":"string","title":"target_port"}},"title":"Port","additionalProperties":false}}
+  schema={{"type":"object","properties":{"port":{"type":"integer","title":"port","format":"int32"},"nodePort":{"type":"integer","title":"node_port","format":"int32"},"name":{"type":"string","title":"name"},"protocol":{"type":"string","title":"protocol"},"targetPort":{"type":"string","title":"target_port"}},"title":"Port","additionalProperties":false}}
   schemaType={"response"}
 >
   
