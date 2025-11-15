@@ -1,9 +1,9 @@
-# Starlight Starter Kit: Basics
+# Starlight Starter Kit: Tailwind
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
 ```
-pnpm create astro@latest -- --template starlight
+pnpm create astro@latest -- --template starlight/tailwind
 ```
 
 > 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
@@ -19,6 +19,8 @@ Inside of your Astro + Starlight project, you'll see the following folders and f
 │   ├── assets/
 │   ├── content/
 │   │   └── docs/
+│   ├── styles/
+│   │   └── global.css
 │   └── content.config.ts
 ├── astro.config.mjs
 ├── package.json
@@ -31,13 +33,15 @@ Images can be added to `src/assets/` and embedded in Markdown with a relative li
 
 Static assets, like favicons, can be placed in the `public/` directory.
 
+The project includes [Tailwind CSS](https://starlight.astro.build/guides/css-and-tailwind/#tailwind-css) for styling. Customize your design by modifying `src/styles/global.css`.
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
+| Command                | Action                                           |
+| :--------------------- | :----------------------------------------------- |
+| `pnpm install`         | Installs dependencies                            |
 | `pnpm dev`             | Starts local dev server at `localhost:4321`      |
 | `pnpm build`           | Build your production site to `./dist/`          |
 | `pnpm preview`         | Preview your build locally, before deploying     |
