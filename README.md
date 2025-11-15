@@ -1,1 +1,0 @@
-# OtterScale Documentation
