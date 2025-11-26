@@ -1,3 +1,8 @@
+---
+title: Installation Guide
+description: A guide for installing Otterscale.
+---
+
 # OtterScale Installation Guide
 
 ## System Requirements
