@@ -36,12 +36,20 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
-					label: 'Guides',
-					items: [{ label: 'Getting Started', slug: 'guides/example' }]
+					label: 'Get Started',
+					slug: 'get-started'
 				},
 				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' }
+					label: 'Scope',
+					slug: 'scope'
+				},
+				{
+					label: '基礎',
+					autogenerate: { directory: 'basic' }
+				},
+				{
+					label: '服務',
+					autogenerate: { directory: 'service' }
 				},
 				...openAPISidebarGroups
 			],
