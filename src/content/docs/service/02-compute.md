@@ -1,19 +1,20 @@
 ---
-title: Compute (VM)
+title: Compute
 description: Manage Virtual Machines.
 ---
 
-The Compute section allows you to create and manage Virtual Machines (VMs).
+The Compute section allows you to create and manage Virtual Machines (Virtual Machines).
 
-## Creating a VM
+## Creating a Virtual Machine
 
-To create a new VM:
+To create a new Virtual Machine:
+
 1. Go to the Compute section.
-2. Click "Create VM".
+2. Click "Create Virtual Machine".
 3. Select the OS image, CPU, and RAM configuration.
 4. Configure networking and storage.
-5. Launch the VM.
+5. Launch the Virtual Machine.
 
-## Managing VMs
+## Managing Virtual Machines
 
-You can start, stop, restart, and delete VMs from this interface.
+You can start, stop, restart, and delete Virtual Machines from this interface.

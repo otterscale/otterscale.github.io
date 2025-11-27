@@ -1,7 +1,9 @@
 ---
-title: Get Started
-description: Get started with OtterScale.
+title: Introduction
+description: Overview of OtterScale.
 ---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
 OtterScale is a unified infrastructure management platform designed to simplify the deployment and operation of complex distributed systems. It integrates bare metal provisioning, container orchestration, and distributed storage into a single, cohesive interface.
 
@@ -33,6 +35,14 @@ The platform utilizes Ceph to provide a robust, self-healing storage fabric. Sto
 
 ## Next Steps
 
-- [Check Prerequisites](/getting-started/01-prerequisites)
-- [Create a Scope](/getting-started/03-scope)
-- [Explore Basic Features](/basic/machines)
+<CardGrid stagger>
+	<Card title="Check Prerequisites" icon="open-book">
+		[Get your environment ready](/getting-started/01-prerequisites)
+	</Card>
+	<Card title="Installation" icon="rocket">
+		[Install OtterScale](/getting-started/02-installation)
+	</Card>
+	<Card title="Create a Scope" icon="setting">
+		[Set up your first scope](/getting-started/03-scope)
+	</Card>
+</CardGrid>

@@ -1,5 +1,5 @@
 ---
-title: Models (LLM)
+title: Models
 description: Manage LLM models in OtterScale.
 ---
 
@@ -12,6 +12,7 @@ View available models, their status, and resource consumption.
 ## Deploying a Model
 
 To deploy a new model:
+
 1. Navigate to the Models section.
 2. Select "Deploy Model".
 3. Choose the model type and configuration.
