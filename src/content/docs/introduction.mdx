@@ -3,9 +3,15 @@ title: Introduction
 description: Overview of OtterScale.
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard, Steps, Aside } from '@astrojs/starlight/components';
 
-OtterScale is a unified infrastructure management platform designed to simplify the deployment and operation of complex distributed systems. It integrates bare metal provisioning, container orchestration, and distributed storage into a single, cohesive interface.
+OtterScale is a **Hyper-Converged Infrastructure (HCI)** platform that unifies compute, storage, networking, and virtualization into a single, software-defined system. By collapsing traditional infrastructure silos, OtterScale simplifies deployment and management while delivering the scalability needed for modern enterprise workloads.
+
+<Aside type="tip">
+	OtterScale is purpose-built for high-performance computing, offering robust **computation**
+	capabilities with GPU acceleration, scalable **storage**, and efficient **cluster** management,
+	making it an ideal foundation for AI/LLM/Data Center workloads.
+</Aside>
 
 ## System Architecture
 
@@ -13,10 +19,14 @@ OtterScale is built on a layered architecture that provides complete control fro
 
 ### Core Layers
 
+<Steps>
+
 1.  **Hardware Layer**: Manages physical resources including Compute nodes, Storage nodes, and GPU accelerators.
 2.  **Provisioning Layer (MAAS)**: Handles bare metal provisioning, OS deployment, and network configuration.
 3.  **Orchestration Layer (Juju & Kubernetes)**: Manages application lifecycles and container orchestration.
 4.  **Storage Layer (Ceph)**: Provides scalable, distributed storage for the cluster.
+
+</Steps>
 
 ### Node Provisioning & Management
 
@@ -28,21 +38,41 @@ The platform utilizes Ceph to provide a robust, self-healing storage fabric. Sto
 
 ## Key Features
 
-- **Scope Management**: logically isolate resources and manage access control for different teams or projects.
-- **AI/LLM Readiness**: Optimized for high-performance computing with support for GPU acceleration and high-speed networking (InfiniBand/RoCE).
-- **Multi-Tenancy**: Securely share infrastructure across multiple users while maintaining resource isolation.
-- **Unified Interface**: A single pane of glass for monitoring and managing the entire stack, from metal to service.
+<CardGrid>
+	<Card title="Scope Management" icon="setting">
+		Logically isolate resources and manage access control for different teams or projects.
+	</Card>
+	<Card title="AI/LLM Readiness" icon="rocket">
+		Optimized for high-performance computing with support for GPU acceleration and high-speed
+		networking (InfiniBand/RoCE).
+	</Card>
+	<Card title="Multi-Tenancy" icon="seti:lock">
+		Securely share infrastructure across multiple users while maintaining resource isolation.
+	</Card>
+	<Card title="Unified Interface" icon="laptop">
+		A single pane of glass for monitoring and managing the entire stack, from metal to service.
+	</Card>
+</CardGrid>
 
 ## Next Steps
 
 <CardGrid stagger>
-	<Card title="Check Prerequisites" icon="open-book">
-		[Get your environment ready](/getting-started/01-prerequisites)
-	</Card>
-	<Card title="Installation" icon="rocket">
-		[Install OtterScale](/getting-started/02-installation)
-	</Card>
-	<Card title="Create a Scope" icon="setting">
-		[Set up your first scope](/getting-started/03-scope)
-	</Card>
+	<LinkCard
+		title="Check Prerequisites"
+		href="/getting-started/01-prerequisites"
+		icon="open-book"
+		description="Get your environment ready"
+	/>
+	<LinkCard
+		title="Installation"
+		href="/getting-started/02-installation"
+		icon="rocket"
+		description="Install OtterScale"
+	/>
+	<LinkCard
+		title="Create a Scope"
+		href="/getting-started/03-scope"
+		icon="setting"
+		description="Set up your first scope"
+	/>
 </CardGrid>
