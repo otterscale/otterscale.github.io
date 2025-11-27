@@ -4,6 +4,11 @@ import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi';
 
+export const locales = {
+	root: { label: 'English', lang: 'en' },
+	'zh-hant': { label: '繁體中文', lang: 'zh-Hant' }
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://otterscale.com',
@@ -21,34 +26,38 @@ export default defineConfig({
 				}
 			],
 			defaultLocale: 'root',
-			locales: {
-				root: {
-					label: 'English',
-					lang: 'en'
-				},
-				'zh-hant': {
-					label: '繁體中文',
-					lang: 'zh-Hant'
-				}
-			},
+			locales,
 			editLink: {
 				baseUrl: 'https://github.com/otterscale/otterscale.github.io/edit/main/docs/'
 			},
 			sidebar: [
 				{
-					label: 'Get Started',
-					slug: 'get-started'
+					label: 'Introduction',
+					slug: 'introduction',
+					translations: {
+						'zh-Hant': '簡介'
+					}
 				},
 				{
-					label: 'Scope',
-					slug: 'scope'
+					label: 'Getting Started',
+					translations: {
+						'zh-Hant': '開始使用'
+					},
+					autogenerate: { directory: 'getting-started' }
 				},
+
 				{
-					label: '基礎',
+					label: 'basic',
+					translations: {
+						'zh-Hant': '基本'
+					},
 					autogenerate: { directory: 'basic' }
 				},
 				{
-					label: '服務',
+					label: 'service',
+					translations: {
+						'zh-Hant': '服務'
+					},
 					autogenerate: { directory: 'service' }
 				},
 				...openAPISidebarGroups
