@@ -3,6 +3,9 @@ title: Scope
 description: Manage scopes in OtterScale.
 ---
 
+import { Steps } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
 Scopes allow you to organize your resources and control access.
 
 ## Selecting a Scope
@@ -64,6 +67,8 @@ Fill in the following information to configure your new scope:
 
 Once you have filled in the details, click the **Create** button. The system will perform the following steps automatically:
 
+<Steps>
+
 1.  **Create Scope**: Initializes the scope record.
 2.  **Add Machine Tags**: Tags the selected machine.
 3.  **Commission Machine**: Configures the machine (SSH, networking, storage).
@@ -72,4 +77,9 @@ Once you have filled in the details, click the **Create** button. The system wil
 6.  **Wait for Agent**: Waits for the agent to start on the machine.
 7.  **Create Node**: Finalizes the node creation with network and storage settings.
 
-You will see a loading indicator and status messages during this process. Once complete, a success message will appear.
+</Steps>
+
+<Aside type="note">
+	You will see a loading indicator and status messages during this process. Once complete, a success
+	message will appear.
+</Aside>

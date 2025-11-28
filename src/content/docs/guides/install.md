@@ -8,13 +8,16 @@ description: A guide for installing Otterscale.
 ## System Requirements
 
 ### Operating System
+
 - **Ubuntu 24.04 LTS** (Required)
 
 ### Hardware Requirements
+
 - **Memory:** Minimum 8 GB RAM
 - **Disk Space:** Minimum 100 GB available storage
 
 ### Network Requirements
+
 - At least one network interface with external internet connectivity
 - The installation script will check for network bridge `br-otters`:
   - If the bridge exists, it will be used
@@ -27,6 +30,7 @@ The installation process requires access to various external services. Please en
 ### Canonical Services
 
 **TCP Port 443 (HTTPS):**
+
 - api.charmhub.io
 - api.jujucharms.com
 - changelogs.ubuntu.com
@@ -41,11 +45,13 @@ The installation process requires access to various external services. Please en
 - contracts.canonical.com
 
 **TCP Port 80 (HTTP):**
+
 - images.maas.io
 
 ### Snap Package Management
 
 **TCP Port 443 (HTTPS):**
+
 - snapcraft.io
 - api.snapcraft.io
 - storage.snapcraftcontent.com
@@ -57,6 +63,7 @@ The installation process requires access to various external services. Please en
 ### Ubuntu Package Repositories
 
 **TCP Ports 443 and 80 (HTTPS/HTTP):**
+
 - tw.archive.ubuntu.com
 - archive.ubuntu.com
 - ports.ubuntu.com
@@ -66,6 +73,7 @@ The installation process requires access to various external services. Please en
 ### GitHub and OtterScale
 
 **TCP Ports 443 and 80 (HTTPS/HTTP):**
+
 - otterscale.github.io
 - otterscale.com
 - raw.githubusercontent.com
@@ -74,11 +82,13 @@ The installation process requires access to various external services. Please en
 ### Istio Service Mesh
 
 **TCP Port 443 (HTTPS):**
+
 - istio.io
 
 ### Kubernetes and Container Registries
 
 **TCP Port 443 (HTTPS):**
+
 - registry.k8s.io
 - k8s.gcr.io
 - ghcr.io
@@ -88,6 +98,7 @@ The installation process requires access to various external services. Please en
 ### Docker Registry
 
 **TCP Port 443 (HTTPS):**
+
 - auth.docker.io
 - auth.docker.com
 - login.docker.com
@@ -102,16 +113,19 @@ The installation process requires access to various external services. Please en
 ### NVIDIA Container Registry
 
 **TCP Port 443 (HTTPS):**
+
 - nvcr.io
 
 ### Alternative Container Registries
 
 **TCP Port 443 (HTTPS):**
+
 - registry.cn-hangzhou.aliyuncs.com
 
 ### HuggingFace Model Repository
 
 **TCP Port 443 (HTTPS):**
+
 - huggingface.co
 - cdn-lfs.huggingface.co
 - cdn.huggingface.co
@@ -119,6 +133,7 @@ The installation process requires access to various external services. Please en
 ### Red Hat Registries
 
 **TCP Port 443 (HTTPS):**
+
 - registry.redhat.io
 - quay.io
 - registry.access.redhat.com
@@ -126,6 +141,7 @@ The installation process requires access to various external services. Please en
 ### Helm Chart Repositories
 
 **TCP Port 443 (HTTPS):**
+
 - charts.jetstack.io (Cert-manager)
 - charts.bitnami.com (Bitnami charts)
 - open-feature.github.io (OpenFeature operator)
