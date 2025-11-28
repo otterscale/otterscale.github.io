@@ -7,8 +7,7 @@ import { Card, CardGrid, LinkCard, Steps, Aside } from '@astrojs/starlight/compo
 import { Image } from 'astro:assets';
 import logo2 from '../../assets/logo2.png';
 
-<div class="flex gap-6 mb-4 items-start">
-	<Image src={logo2} alt="OtterScale Logo" width="200" height="200" />
+<div class="flex gap-6 mb-4 items-center">
 	<div>
 		<strong class="text-xl">OtterScale</strong> is a{' '}
 		<strong class="text-xl">Hyper-Converged Infrastructure (HCI)</strong>
@@ -16,8 +15,8 @@ import logo2 from '../../assets/logo2.png';
 		system. By collapsing traditional infrastructure silos, OtterScale simplifies deployment and management
 		while delivering the scalability needed for modern enterprise workloads.
 	</div>
+	<Image src={logo2} alt="OtterScale Logo" width="200" height="200" />
 </div>
-
 <Aside type="tip">
 	OtterScale is purpose-built for high-performance computing, offering robust **computation**
 	capabilities with GPU acceleration, scalable **storage**, and efficient **cluster** management,
