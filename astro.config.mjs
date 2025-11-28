@@ -18,6 +18,7 @@ export default defineConfig({
 			logo: {
 				src: './src/assets/logo.png'
 			},
+			favicon: '/logo.png',
 			social: [
 				{
 					icon: 'github',
