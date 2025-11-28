@@ -47,14 +47,14 @@ export default defineConfig({
 				},
 
 				{
-					label: 'basic',
+					label: 'Basic',
 					translations: {
 						'zh-Hant': '基本'
 					},
 					autogenerate: { directory: 'basic' }
 				},
 				{
-					label: 'service',
+					label: 'Service',
 					translations: {
 						'zh-Hant': '服務'
 					},
