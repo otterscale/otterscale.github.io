@@ -18,6 +18,7 @@ export default defineConfig({
 			logo: {
 				src: './src/assets/logo.png'
 			},
+			favicon: '/logo.png',
 			social: [
 				{
 					icon: 'github',
@@ -47,14 +48,14 @@ export default defineConfig({
 				},
 
 				{
-					label: 'basic',
+					label: 'Basic',
 					translations: {
 						'zh-Hant': '基本'
 					},
 					autogenerate: { directory: 'basic' }
 				},
 				{
-					label: 'service',
+					label: 'Service',
 					translations: {
 						'zh-Hant': '服務'
 					},

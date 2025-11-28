@@ -3,6 +3,8 @@ title: Prerequisites
 description: Hardware and network requirements for running OtterScale.
 ---
 
+import { Card, CardGrid, Aside, Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+
 ## System Requirements
 
 Before installing OtterScale, ensure your environment meets the following specifications.
@@ -13,7 +15,7 @@ Before installing OtterScale, ensure your environment meets the following specif
 | :-------- | :------------------------------ |
 | **OS**    | **Ubuntu 24.04 LTS** (Required) |
 
-### Hardware Specifications
+### Hardware
 
 | Resource       | Minimum Requirement      |
 | :------------- | :----------------------- |
@@ -33,16 +35,18 @@ Before installing OtterScale, ensure your environment meets the following specif
 
 The installation process requires outbound access to various external services. Please whitelist the following domains and ports.
 
-### Core Infrastructure
+<Tabs>
+  <TabItem label="Core Infrastructure">
 
-| Service Group           | Port(s)                            | Domains                                                                                                                                                                                                                                                      |
-| :---------------------- | :--------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Canonical Services**  | TCP 443 (HTTPS)<br>TCP 80 (HTTP)\* | `api.charmhub.io`, `api.jujucharms.com`, `changelogs.ubuntu.com`, `charmhub.io`, `cloud-images.ubuntu.com`, `maas.ubuntu.com`, `images.maas.io`\*, `juju.is`, `jaas.ai`, `streams.canonical.com`, `objects.githubusercontent.com`, `contracts.canonical.com` |
-| **Snap Store**          | TCP 443                            | `snapcraft.io`, `api.snapcraft.io`, `storage.snapcraftcontent.com`, `*.cdn.snapcraftcontent.com`                                                                                                                                                             |
-| **Ubuntu Repos**        | TCP 443, 80                        | `archive.ubuntu.com`, `security.ubuntu.com`, `esm.ubuntu.com`, `ports.ubuntu.com`, `tw.archive.ubuntu.com`                                                                                                                                                   |
-| **GitHub & OtterScale** | TCP 443, 80                        | `otterscale.github.io`, `otterscale.com`, `github.com`, `raw.githubusercontent.com`                                                                                                                                                                          |
+| Service Group           | Port(s)                             | Domains                                                                                                                                                                                                                                                      |
+| :---------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Canonical Services**  | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* | `api.charmhub.io`, `api.jujucharms.com`, `changelogs.ubuntu.com`, `charmhub.io`, `cloud-images.ubuntu.com`, `maas.ubuntu.com`, `images.maas.io`\*, `juju.is`, `jaas.ai`, `streams.canonical.com`, `objects.githubusercontent.com`, `contracts.canonical.com` |
+| **Snap Store**          | TCP 443                             | `snapcraft.io`, `api.snapcraft.io`, `storage.snapcraftcontent.com`, `*.cdn.snapcraftcontent.com`                                                                                                                                                             |
+| **Ubuntu Repos**        | TCP 443, 80                         | `archive.ubuntu.com`, `security.ubuntu.com`, `esm.ubuntu.com`, `ports.ubuntu.com`, `tw.archive.ubuntu.com`                                                                                                                                                   |
+| **GitHub & OtterScale** | TCP 443, 80                         | `otterscale.github.io`, `otterscale.com`, `github.com`, `raw.githubusercontent.com`                                                                                                                                                                          |
 
-### Container Registries & Images
+  </TabItem>
+  <TabItem label="Registries & Images">
 
 | Registry           | Port    | Domains                                                                                                                                   |
 | :----------------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,10 +56,14 @@ The installation process requires outbound access to various external services. 
 | **Red Hat / Quay** | TCP 443 | `registry.redhat.io`, `quay.io`, `registry.access.redhat.com`                                                                             |
 | **Others**         | TCP 443 | `registry.cn-hangzhou.aliyuncs.com`                                                                                                       |
 
-### AI & Helm Resources
+  </TabItem>
+  <TabItem label="AI & Helm Resources">
 
 | Category        | Port    | Domains                                                                                                                                                             |
 | :-------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **HuggingFace** | TCP 443 | `huggingface.co`, `cdn-lfs.huggingface.co`, `cdn.huggingface.co`                                                                                                    |
 | **Istio**       | TCP 443 | `istio.io`                                                                                                                                                          |
 | **Helm Charts** | TCP 443 | `charts.jetstack.io`, `charts.bitnami.com`, `open-feature.github.io`, `prometheus-community.github.io`, `project-hami.github.io`, `helm.ngc.nvidia.com`, `llm-d.ai` |
+
+  </TabItem>
+</Tabs>
