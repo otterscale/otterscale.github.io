@@ -4,8 +4,19 @@ description: Overview of OtterScale.
 ---
 
 import { Card, CardGrid, LinkCard, Steps, Aside } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import logo2 from '../../assets/logo2.png';
 
-OtterScale is a **Hyper-Converged Infrastructure (HCI)** platform that unifies compute, storage, networking, and virtualization into a single, software-defined system. By collapsing traditional infrastructure silos, OtterScale simplifies deployment and management while delivering the scalability needed for modern enterprise workloads.
+<div class="flex gap-6 mb-4 items-start">
+	<Image src={logo2} alt="OtterScale Logo" width="200" />
+	<div>
+		<span class="text-xl font-bold">OtterScale</span> is a{' '}
+		<span class="text-xl font-bold">Hyper-Converged Infrastructure (HCI)</span>
+		platform that unifies compute, storage, networking, and virtualization into a single, software-defined
+		system. By collapsing traditional infrastructure silos, OtterScale simplifies deployment and management
+		while delivering the scalability needed for modern enterprise workloads.
+	</div>
+</div>
 
 <Aside type="tip">
 	OtterScale is purpose-built for high-performance computing, offering robust **computation**
