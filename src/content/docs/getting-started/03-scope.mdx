@@ -5,6 +5,7 @@ description: Manage scopes in OtterScale.
 
 import { Steps } from '@astrojs/starlight/components';
 import { Aside } from '@astrojs/starlight/components';
+import { Icon } from '@astrojs/starlight/components';
 
 Scopes allow you to organize your resources and control access.
 
@@ -22,12 +23,12 @@ To create a new scope, navigate to the Scope management area and click on "Creat
 
     At the top of the form, you will see the details of the plan associated with the scope you are creating. Different plans support different features:
 
-    | Feature    | Standard    | Advanced   | Enterprise |
-    | :--------- | :---------- | :--------- | :--------- |
-    | Ceph       | ✅          | ✅         | ✅         |
-    | Kubernetes | ✅          | ✅         | ✅         |
-    | Cluster    | ❌          | ✅         | ✅         |
-    | Node       | Single-Node | Multi-Node | Multi-Node |
+    | Feature    | Standard                      | Advanced                      | Enterprise                    |
+    | :--------- | :---------------------------- | :---------------------------- | :---------------------------- |
+    | Ceph       | <Icon name="approve-check" /> | <Icon name="approve-check" /> | <Icon name="approve-check" /> |
+    | Kubernetes | <Icon name="approve-check" /> | <Icon name="approve-check" /> | <Icon name="approve-check" /> |
+    | Cluster    | <Icon name="close" />         | <Icon name="approve-check" /> | <Icon name="approve-check" /> |
+    | Node       | Single-Node                   | Multi-Node                    | Multi-Node                    |
 
 2.  **Configure Scope Details**
 
