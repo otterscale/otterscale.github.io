@@ -16,66 +16,107 @@ You can select a scope from the dropdown menu in the navigation bar. This will f
 
 To create a new scope, navigate to the Scope management area and click on "Create Scope". A side panel will appear with the creation form.
 
-### 1. Plan Selection
+<Steps>
 
-At the top of the form, you will see the details of the plan associated with the scope you are creating. Different plans support different features:
+1.  **Select a Plan**
 
-| Feature    | Standard    | Advanced   | Enterprise |
-| :--------- | :---------- | :--------- | :--------- |
-| Ceph       | ✅          | ✅         | ✅         |
-| Kubernetes | ✅          | ✅         | ✅         |
-| Cluster    | ❌          | ✅         | ✅         |
-| Node       | Single-Node | Multi-Node | Multi-Node |
+    At the top of the form, you will see the details of the plan associated with the scope you are creating. Different plans support different features:
 
-### 2. Scope Details
+    | Feature    | Standard    | Advanced   | Enterprise |
+    | :--------- | :---------- | :--------- | :--------- |
+    | Ceph       | ✅          | ✅         | ✅         |
+    | Kubernetes | ✅          | ✅         | ✅         |
+    | Cluster    | ❌          | ✅         | ✅         |
+    | Node       | Single-Node | Multi-Node | Multi-Node |
 
-Fill in the following information to configure your new scope:
+2.  **Configure Scope Details**
 
-#### Scope Name
+    Fill in the following information to configure your new scope:
 
-- **Label**: Scope Name <span style="color: #eab308">●</span>
-- **Description**: Enter a unique name for your scope.
-- **Input**: Text field (Required).
+    - **Scope Name**: Enter a unique name for your scope.
+    - **Machine**: Select the physical machine to assign to this scope.
+      <Aside type="tip">
+      	Hover over the info icon <span class="iconify" data-icon="ph:info"></span> next to a machine
+      	name to view detailed hardware specifications.
+      </Aside>
+    - **Storage Devices**: Select the block devices to be used. (Appears after selecting a machine).
+      <Aside type="tip">Hover over a device to see its model and capacity.</Aside>
+    - **Network Configuration** (Optional):
+      - **Calico CIDR**: The CIDR block for Calico networking (e.g., `192.168.0.0/16`).
+      - **Virtual IP**: The virtual IP address for the scope (e.g., `192.168.1.1`).
 
-#### Machine Selection
+3.  **Create Scope**
 
-- **Label**: Machine <span style="color: #eab308">●</span>
-- **Description**: Select the physical machine to assign to this scope.
-- **Input**: Dropdown menu.
-  - The dropdown lists available machines that are in the `Ready` status.
-  - Hovering over the info icon <span class="iconify" data-icon="ph:info"></span> next to a machine name displays detailed hardware specifications (CPU, Memory, Storage, System info, etc.).
+    Once you have filled in the details, click the **Create** button to initiate the creation process.
 
-#### Storage Devices
+</Steps>
 
-- **Label**: Storage Devices <span style="color: #eab308">●</span>
-- **Description**: Select the block devices to be used by the scope.
-- **Input**: Checkboxes.
-  - This section appears after you select a machine.
-  - It lists available non-boot block devices.
-  - Hovering over a device shows its model and capacity.
+## Automated Provisioning
 
-#### Network Configuration
-
-- **Calico CIDR** (Optional):
-  - **Description**: The CIDR block for Calico networking.
-  - **Input**: Text field (e.g., `192.168.0.0/16`).
-- **Virtual IP** (Optional):
-  - **Description**: The virtual IP address for the scope.
-  - **Input**: Text field (e.g., `192.168.1.1`).
-
-### 3. Creation Process
-
-Once you have filled in the details, click the **Create** button. The system will perform the following steps automatically:
+After you initiate the creation, the system automatically performs the following steps:
 
 <Steps>
 
 1.  **Create Scope**: Initializes the scope record.
+
+    This step maps to the Juju `CreateModel` operation. It establishes a new isolated workspace (Model) within the Juju controller. Key actions include:
+
+    - **Namespace Isolation**: Creates a logical boundary for resources, ensuring that applications and machines in this scope do not interfere with others.
+    - **Environment Configuration**: Sets up model-level configurations, such as APT mirrors for faster package downloads.
+    - **Access Control**: Automatically injects SSH keys to grant authorized users access to the machines within this scope.
+
 2.  **Add Machine Tags**: Tags the selected machine.
+
+    This step applies specific tags to the machine in MAAS. Tags are used to:
+
+    - **Mark Ownership**: Associates the machine with the specific scope being created.
+    - **Reserve Resources**: Prevents other processes from accidentally using this machine while it is being set up.
+    - **Define Capabilities**: Can be used to indicate specific hardware capabilities or roles (e.g., `compute`, `storage`) required for the node.
+
 3.  **Commission Machine**: Configures the machine (SSH, networking, storage).
+
+    Commissioning is a critical step to verify hardware and prepare it for deployment. It involves:
+
+    - **Hardware Inventory**: Boots an ephemeral OS to scan and record detailed specs (CPU, Memory, Disks, NICs).
+    - **Health Checks**: Runs scripts to test hardware functionality (Disk I/O, Memory, IPMI/BMC).
+    - **Configuration**: Sets up out-of-band management (BMC/IPMI) and registers network/storage interfaces.
+    - **Status Change**: On success, the machine becomes `Ready` for deployment. On failure, it is marked as `Failed commissioning` for troubleshooting.
+
 4.  **Wait for Ready**: Waits for the machine to report a `Ready` status.
+
+    The `Ready` status is mandatory before any further actions can be taken. It confirms that:
+
+    - Commissioning has completed successfully.
+    - The machine is free and available in the pool.
+    - It is eligible to be allocated and deployed with an operating system.
+      Attempting to deploy a machine that is not `Ready` (e.g., still commissioning or in a broken state) will fail.
+
 5.  **Create Machine**: Associates the machine with the scope.
+
+    This step executes the Juju `AddMachines` operation. It registers the specific physical machine (from MAAS) into the Juju controller. This action triggers:
+
+    - **Provisioning**: Juju instructs MAAS to deploy the operating system (e.g., Ubuntu) onto the machine.
+    - **Agent Installation**: Once the OS is running, the Juju Agent is installed, allowing Juju to manage the machine as a node.
+
 6.  **Wait for Agent**: Waits for the agent to start on the machine.
+
+    This step monitors the Juju Agent status until it reports as `started`. This signifies that:
+
+    - The OS installation is complete and the machine has booted.
+    - The Juju Agent is running and has successfully connected to the Juju Controller.
+    - The node is now online and ready to accept software deployments (Charms).
+
 7.  **Create Node**: Finalizes the node creation with network and storage settings.
+
+    This is the final orchestration step where the actual software stack is deployed. It performs the following actions:
+
+    - **Network Reservation**: Reserves necessary IP addresses for internal services (e.g., Ceph NFS, Kubernetes Load Balancer).
+    - **Software Deployment**: Deploys and configures the core components:
+      - **Ceph**: For distributed storage (using the selected OSD devices).
+      - **Kubernetes**: For container orchestration (configuring Calico networking and Load Balancers).
+      - **Addons**: Additional system utilities.
+      - **Observability (COS)**: Monitoring and logging stack.
+    - **Relation Establishment**: Connects these components together to ensure they work as a cohesive system.
 
 </Steps>
 
