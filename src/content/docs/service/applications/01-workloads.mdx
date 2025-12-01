@@ -1,4 +1,96 @@
 ---
 title: Workloads
-description: Manage your containerized workloads. You can deploy, scale, and monitor your applications here.
+description: Manage Kubernetes applications and workloads.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Workloads page provides a unified view of the applications running in your OtterScale cluster. It aggregates information about Deployments, StatefulSets, and DaemonSets, allowing you to monitor their health and perform basic management tasks.
+
+## Introduction
+
+The Workloads page displays a list of all applications. The table includes the following information:
+
+| Column        | Description                                                                                                                                                                                             |
+| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Name**      | The name of the application.<br />**Clickable**: Navigates to the **[Workload Details](#workload-details)** page, where you can view in-depth information about the application's resources and status. |
+| **Type**      | The Kubernetes workload type (e.g., `Deployment`, `StatefulSet`, `DaemonSet`).                                                                                                                          |
+| **Namespace** | The Kubernetes namespace where the application is deployed.                                                                                                                                             |
+| **Health**    | The health status of the application, shown as a ratio of healthy pods to total pods.                                                                                                                   |
+| **Service**   | The number of Kubernetes Services associated with the application.                                                                                                                                      |
+| **Pod**       | The total number of Pods managed by the application.                                                                                                                                                    |
+| **Replica**   | The desired number of replicas (instances) for the application.                                                                                                                                         |
+| **Container** | The number of containers defined in the application's pod spec.                                                                                                                                         |
+| **Volume**    | The number of Persistent Volume Claims (PVCs) attached to the application.                                                                                                                              |
+| **NodePort**  | Displays any exposed NodePorts.<br /> **Clickable**: Click the external link icon next to the port number to open the service in a new tab, using the node's IP address and the assigned NodePort.      |
+
+## Workload Details
+
+Clicking on a workload's name takes you to the details page, which provides a comprehensive view of the application:
+
+- **Header**: Displays the application name, namespace, type, and associated labels.
+- **Statistics Cards**:
+  - **Containers**: Lists the containers within the pods and their images.
+  - **Persistent Volume Claims**: Shows the storage volumes attached to the workload.
+  - **Storage Classes**: Indicates the storage classes used by the volumes.
+
+### Pods Table
+
+The **Pods Table** lists all individual pods managed by this workload.
+
+| Column             | Description                                                                                                            |
+| :----------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| **Name**           | The unique name of the pod.                                                                                            |
+| **Phase**          | The current lifecycle phase of the pod (e.g., `Running`, `Pending`).                                                   |
+| **Ready**          | The number of ready containers relative to the total number of containers in the pod.                                  |
+| **Restarts**       | The number of times the pod's containers have been restarted.                                                          |
+| **Last Condition** | The most recent condition or error status. If an issue exists, it displays the reason and message (hover for details). |
+| **Terminal**       | **Clickable**: Opens a web-based terminal session connected to the pod in a new window.                                |
+| **Actions**        | Provides options to manage the individual pod.                                                                         |
+
+### Services Table
+
+The **Services Table** lists the Kubernetes Services associated with the workload, providing network access details.
+
+| Column         | Description                                                                                                                                 |
+| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Name**       | The name of the Kubernetes Service.                                                                                                         |
+| **Type**       | The type of service (e.g., `ClusterIP`, `NodePort`, `LoadBalancer`).                                                                        |
+| **Cluster IP** | The internal IP address assigned to the service within the cluster.                                                                         |
+| **Ports**      | Lists the port configurations, including the protocol (e.g., TCP/UDP), the exposed port, the NodePort (if applicable), and the target port. |
+
+## Manage Workloads
+
+You can manage the lifecycle of your applications using the **Actions** menu.
+
+### Workload Actions
+
+The **Actions** menu (three dots icon) for each application provides the following options:
+
+#### Restart
+
+Triggers a rolling restart of the application. This is useful for reloading configurations or clearing transient issues.
+
+<Steps>
+
+1.  Select **Restart** from the actions menu.
+2.  Confirm the action to initiate the restart process.
+
+</Steps>
+
+#### Scale
+
+Allows you to adjust the number of replicas for the application.
+
+<Aside type="note">
+	Scaling is available for `Deployment` and `StatefulSet` types. `DaemonSet` scaling is managed by
+	the number of eligible nodes in the cluster.
+</Aside>
+
+<Steps>
+
+1.  Select **Scale** from the actions menu.
+2.  Enter the desired number of replicas.
+3.  Click **Confirm** to update the application scale.
+
+</Steps>

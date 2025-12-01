@@ -1,4 +1,75 @@
 ---
 title: Store
-description: Browse and deploy applications from the application store.
+description: Discover and deploy applications using Helm charts.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Store page serves as a marketplace for discovering and deploying applications to your OtterScale cluster. It leverages Helm charts to package and manage applications, providing a user-friendly interface to browse, install, and manage releases.
+
+## Introduction
+
+The Store page displays a catalog of available applications (Helm charts). You can browse the catalog using filters for name, keyword, maintainer, and deprecation status.
+
+Each application card displays:
+
+- **Icon**: The application's logo.
+- **Name**: The name of the application.
+- **Version**: The current version of the chart.
+- **Description**: A brief description of the application.
+- **Repository**: The source repository of the chart (e.g., `otterscale/`). Official OtterScale charts are marked with a "Official" badge.
+
+## Application Details
+
+Clicking on an application card opens a details panel with two main tabs:
+
+### Information
+
+Provides comprehensive details about the chart:
+
+- **Description**: Full description of the application.
+- **Keywords**: Tags associated with the chart.
+- **Dependencies**: Lists other charts required by this application.
+- **Home**: Link to the application's homepage.
+- **Sources**: Links to the source code.
+- **Maintainers**: List of the chart's maintainers.
+
+### Releases
+
+Lists the installed instances (releases) of this chart in your cluster. The table includes:
+
+- **Name**: The name of the release.
+- **Namespace**: The namespace where it is deployed.
+- **Chart**: The chart version and application version.
+- **Revision**: The revision number of the release.
+- **Actions**: Options to manage the release (Edit, Rollback, Delete).
+
+## Manage Applications
+
+You can install new applications or manage existing releases directly from the Store.
+
+### Install an Application
+
+To deploy a new application:
+
+<Steps>
+
+1.  Click on the application card to open the details panel.
+2.  Click the **Install** button.
+3.  **Configuration**:
+    - **Name**: Enter a name for the release.
+    - **Namespace**: Specify the target namespace.
+    - **Version**: Select the chart version to install.
+    - **Dry Run**: Toggle to simulate the installation without making changes.
+    - **Configuration**: Customize the `values.yaml` configuration for the chart.
+4.  Click **Confirm** to start the installation.
+
+</Steps>
+
+### Manage Releases
+
+For existing releases listed in the **Releases** tab, you can perform the following actions:
+
+- **Edit**: Update the release configuration (e.g., change values or upgrade version).
+- **Rollback**: Revert the release to a previous revision.
+- **Delete**: Uninstall the release from the cluster.
