@@ -1,0 +1,96 @@
+---
+title: Compute
+description: Manage Virtual Machines.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Compute section allows you to create and manage Virtual Machines (VMs) within the OtterScale cluster. You can provision new instances, monitor their resource usage, and perform lifecycle management operations.
+
+## Overview
+
+The Compute page displays a list of all Virtual Machines. The table includes the following information:
+
+| Column            | Description                                                                                                                                                      |
+| :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**          | The name of the Virtual Machine.                                                                                                                                 |
+| **Status**        | The current state of the VM (e.g., Running, Stopped).                                                                                                            |
+| **Namespace**     | The Kubernetes namespace where the VM resides.                                                                                                                   |
+| **Machine**       | The physical node (machine) hosting the VM instance.<br />**Expandable**: Click to view machine details.See [Machine Details](/basic/machines/#machine-details). |
+| **Instance Type** | The hardware profile (CPU/RAM) assigned to the VM.                                                                                                               |
+| **Disk**          | The storage volumes attached to the VM.<br /> **Expandable**: Click to view and manage individual disks. See [Disk Management](#disk-management).                |
+| **Ports**         | The network ports exposed by the VM.<br /> **Expandable**: Click to view and manage port configurations. See [Port Management](#port-management).                |
+| **Created**       | The timestamp when the VM was created.                                                                                                                           |
+| **Metrics**       | Real-time resource usage for CPU, Memory, and Storage.                                                                                                           |
+| **VNC**           | Provides a direct VNC console connection to the VM.                                                                                                              |
+
+## Manage Virtual Machines
+
+You can create new Virtual Machines or manage existing ones using the **Actions** menu.
+
+### Create a New Virtual Machine
+
+To provision a new VM:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Virtual Machine" will appear.
+
+3.  **Basic Configuration**:
+
+    - **Name**: Enter a unique name for the VM.
+    - **Namespace**: Specify the namespace (defaults to `default`).
+    - **Instance Type**: Select a hardware profile from the dropdown list (displays CPU cores and Memory size).
+    - **Data Volume**: Select the bootable Data Volume (PVC) to use for the OS disk.
+
+4.  **Advanced Configuration** (Optional):
+
+    - Expand the "Advanced" section to configure a **Startup Script** (Cloud-Init user data) for bootstrapping the instance.
+
+5.  Click **Confirm** to launch the Virtual Machine.
+
+</Steps>
+
+### Virtual Machine Actions
+
+The **Actions** menu (three dots icon) for each VM provides the following options:
+
+#### Lifecycle Management
+
+- **Pause/Resume**: Temporarily pause the VM execution or resume it.
+- **Start/Stop**: Power on or power off the VM.
+- **Restart**: Reboot the VM.
+
+#### Data Management
+
+- **Snapshot**: Create a point-in-time snapshot of the VM's state and data.
+- **Restore**: Revert the VM to a previous snapshot.
+
+#### Operations
+
+- **Clone**: Create a duplicate of the VM.
+- **Migrate**: Move the VM to a different physical node in the cluster.
+- **Delete**: Permanently remove the Virtual Machine and its associated resources.
+
+<Aside type="danger" title="Warning">
+	Deleting a Virtual Machine is irreversible. Ensure you have backed up any critical data before
+	proceeding.
+</Aside>
+
+## Disk Management
+
+The **Disk** column allows you to expand the row to view and manage the storage volumes attached to the Virtual Machine.
+
+- **View Disks**: See a list of all attached disks, including their name, size, and type.
+- **Attach Disk**: Add a new Data Volume (PVC) to the VM.
+- **Detach Disk**: Remove an existing disk from the VM.
+
+## Port Management
+
+The **Ports** column allows you to expand the row to view and manage the network ports exposed by the Virtual Machine.
+
+- **View Ports**: See a list of configured ports, including the port number, protocol (TCP/UDP), and target port.
+- **Add Port**: Expose a new port on the VM service.
+- **Remove Port**: Close an existing port.
