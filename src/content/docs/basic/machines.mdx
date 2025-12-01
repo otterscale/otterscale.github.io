@@ -13,7 +13,7 @@ The Machines section allows you to manage the **physical machines** (bare metal)
 	available for commissioning and deployment.
 </Aside>
 
-## Machine List
+## Introduction
 
 The Machines page displays a comprehensive list of all machines in your scope, along with real-time statistics and management tools.
 
@@ -37,33 +37,62 @@ At the top of the page, you will find a dashboard summarizing the state of your 
 	</Card>
 </CardGrid>
 
-### Columns
+### Data Table
 
 The table provides detailed information for each machine. You can toggle column visibility using the **Columns** button.
 
-| Column                  | Description                                                                               |
-| :---------------------- | :---------------------------------------------------------------------------------------- |
-| **FQDN / IP**           | The Fully Qualified Domain Name and IP addresses. Click the FQDN to view machine details. |
-| **Power**               | Current power state (On/Off) and the power control type (e.g., IPMI, Manual).             |
-| **Status**              | The current deployment status (e.g., Deployed, Ready, Commissioning).                     |
-| **Core / Architecture** | Number of CPU cores and the system architecture (e.g., amd64).                            |
-| **RAM**                 | Total available RAM.                                                                      |
-| **Disk**                | Number of physical disk drives detected.                                                  |
-| **Storage**             | Total storage capacity.                                                                   |
-| **GPU**                 | Details of installed GPUs, if any.                                                        |
-| **Scope**               | The scope to which the machine is assigned.                                               |
-| **Tags**                | Tags assigned to the machine for organization.                                            |
-| **Memory**              | A real-time bar chart indicating memory usage.                                            |
-| **Storage**             | A real-time bar chart indicating storage usage.                                           |
-| **Actions**             | Quick actions available for the machine, such as **Power Off** or **Remove**.             |
+| Column                  | Description                                                                                                   |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------ |
+| **FQDN / IP**           | The Fully Qualified Domain Name and IP addresses. Click the FQDN to view [machine details](#machine-details). |
+| **Power**               | Current power state (On/Off) and the power control type (e.g., IPMI, Manual).                                 |
+| **Status**              | The current deployment status (e.g., Deployed, Ready, Commissioning).                                         |
+| **Core / Architecture** | Number of CPU cores and the system architecture (e.g., amd64).                                                |
+| **RAM**                 | Total available RAM.                                                                                          |
+| **Disk**                | Number of physical disk drives detected.                                                                      |
+| **Storage**             | Total storage capacity.                                                                                       |
+| **GPU**                 | Details of installed GPUs, if any.                                                                            |
+| **Scope**               | The scope to which the machine is assigned.                                                                   |
+| **Tags**                | Tags assigned to the machine for organization.                                                                |
+| **Memory**              | A real-time bar chart indicating memory usage.                                                                |
+| **Storage**             | A real-time bar chart indicating storage usage.                                                               |
+| **Actions**             | Quick actions available for the machine, such as **Power Off** or **Remove**.                                 |
 
-### Filtering and Management
+## Manage Machine
 
-You can use the toolbar above the table to filter and manage the list:
+You can perform management actions on individual machines using the action menu or specific buttons.
 
-- **Search**: Filter machines by their FQDN or IP address.
-- **Power Filter**: Filter the list to show only machines with a specific power state (e.g., On, Off).
-- **Status Filter**: Filter by deployment status (e.g., Deployed, New).
+### Power Off
+
+Turns off the machine.
+This action is only available when the machine is currently powered on.
+
+<Aside type="caution" title="Requirement">
+	You must type the machine's FQDN to confirm the action.
+</Aside>
+
+### Remove
+
+Permanently removes the machine from the system.
+
+<Aside type="danger" title="Requirement">
+	You must type the machine's FQDN to confirm deletion.
+</Aside>
+
+- **Options**:
+  - **Force**: Force removal even if the machine is not in a valid state.
+  - **Purge Disk**: Securely erase the disk contents during removal.
+
+### Adding to Scope
+
+To add a machine to a specific scope:
+
+<Steps>
+
+1. Navigate to `https://<your-url>/scope/<scope-name>/setup`.
+2. Click the **Add Node** button.
+3. Select the machine that has not yet been registered to a scope to add it.
+
+</Steps>
 
 ## Machine Details
 
@@ -129,41 +158,3 @@ Lists all network interfaces with the following details:
 | **DHCP**                   | Whether DHCP is enabled.                             |
 | **Boot Interface**         | Indicates if this is the interface used for booting. |
 | **Interface Speed**        | The capability speed of the interface.               |
-
-## Actions
-
-You can perform management actions on individual machines using the action menu or specific buttons.
-
-### Remove
-
-Permanently removes the machine from the system.
-
-<Aside type="danger" title="Requirement">
-	You must type the machine's FQDN to confirm deletion.
-</Aside>
-
-- **Options**:
-  - **Force**: Force removal even if the machine is not in a valid state.
-  - **Purge Disk**: Securely erase the disk contents during removal.
-
-### Power Off
-
-Turns off the machine.
-
-<Aside type="caution" title="Requirement">
-	You must type the machine's FQDN to confirm the action.
-</Aside>
-
-<Aside type="note">This action is only available when the machine is currently powered on.</Aside>
-
-## Add Machine to Scope
-
-To add a machine to a specific scope:
-
-<Steps>
-
-1. Navigate to `https://<your-url>/scope/<scope-name>/setup`.
-2. Click the **Add Node** button.
-3. Select the machine that has not yet been registered to a scope to add it.
-
-</Steps>
