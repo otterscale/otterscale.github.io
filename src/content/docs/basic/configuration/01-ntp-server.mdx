@@ -1,0 +1,41 @@
+---
+title: NTP Server
+description: Configure NTP server for OtterScale.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+This page allows you to configure the Network Time Protocol (NTP) servers used by the OtterScale system for time synchronization. Accurate timekeeping is crucial for distributed systems and log consistency.
+
+## Overview
+
+The NTP Server settings page displays the currently configured NTP server addresses. Each server is shown with a clock icon.
+
+## Why is NTP Important?
+
+NTP (Network Time Protocol) is used to synchronize the clocks of computers over a network. In a cluster environment like OtterScale, it serves several critical functions:
+
+- **Log Analysis**: Synchronized time is essential for correlating logs across different servers to debug issues effectively.
+- **Distributed Consistency**: Distributed systems (e.g., databases, consensus algorithms) rely on accurate time to maintain data integrity and order of operations.
+- **Security**: Many security protocols (like TLS/SSL certificates and Kerberos) rely on time validation. Significant time drift can cause authentication failures.
+- **Scheduled Tasks**: Ensures that automated tasks and backups run at the correct coordinated times.
+
+## Edit NTP Servers
+
+To modify the NTP server list, follow these steps:
+
+<Steps>
+
+1.  Click the **Edit** button (pencil icon) located at the top right of the configuration section.
+
+2.  A modal window titled "Edit NTP Server" will appear.
+
+3.  In the **Address** field, you can manage the list of NTP servers:
+
+    - **Add a server:** Type the NTP server address (e.g., `pool.ntp.org`) in the input field and click the **Add** button (or press Enter).
+    - **Remove a server:** Click the remove icon next to an existing address to delete it.
+    - **Clear all:** Use the **Clear** button to remove all entries.
+
+4.  Click **Confirm** to save your changes. The system will update the configuration and the new list will be displayed.
+
+</Steps>

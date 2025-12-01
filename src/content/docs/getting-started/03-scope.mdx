@@ -83,31 +83,14 @@ After you initiate the creation, the system automatically performs the following
     - **Configuration**: Sets up out-of-band management (BMC/IPMI) and registers network/storage interfaces.
     - **Status Change**: On success, the machine becomes `Ready` for deployment. On failure, it is marked as `Failed commissioning` for troubleshooting.
 
-4.  **Wait for Ready**: Waits for the machine to report a `Ready` status.
-
-    The `Ready` status is mandatory before any further actions can be taken. It confirms that:
-
-    - Commissioning has completed successfully.
-    - The machine is free and available in the pool.
-    - It is eligible to be allocated and deployed with an operating system.
-      Attempting to deploy a machine that is not `Ready` (e.g., still commissioning or in a broken state) will fail.
-
-5.  **Create Machine**: Associates the machine with the scope.
+4.  **Create Machine**: Associates the machine with the scope.
 
     This step executes the Juju `AddMachines` operation. It registers the specific physical machine (from MAAS) into the Juju controller. This action triggers:
 
     - **Provisioning**: Juju instructs MAAS to deploy the operating system (e.g., Ubuntu) onto the machine.
     - **Agent Installation**: Once the OS is running, the Juju Agent is installed, allowing Juju to manage the machine as a node.
 
-6.  **Wait for Agent**: Waits for the agent to start on the machine.
-
-    This step monitors the Juju Agent status until it reports as `started`. This signifies that:
-
-    - The OS installation is complete and the machine has booted.
-    - The Juju Agent is running and has successfully connected to the Juju Controller.
-    - The node is now online and ready to accept software deployments (Charms).
-
-7.  **Create Node**: Finalizes the node creation with network and storage settings.
+5.  **Create Node**: Finalizes the node creation with network and storage settings.
 
     This is the final orchestration step where the actual software stack is deployed. It performs the following actions:
 
