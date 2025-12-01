@@ -1,4 +1,93 @@
 ---
-title: Block Devices
-description: Manage block devices for your VMs and applications.
+title: Block Device
+description: Manage Ceph RADOS Block Devices (RBD).
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Block Device page allows you to manage Ceph RADOS Block Devices (RBD). RBDs are block-based storage devices that are striped across the cluster, providing high-performance and reliable storage for virtual machines, containers, and other applications.
+
+## Introduction
+
+The Block Device page displays a list of all RBD images. The table includes the following information:
+
+| Column        | Description                                                                                                                                      |
+| :------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**      | The name of the block device image.                                                                                                              |
+| **Pool Name** | The storage pool where the image is stored.                                                                                                      |
+| **Usage**     | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                                     |
+| **Snapshots** | The number of snapshots taken of this block device. Clicking the external link icon opens a detailed view of the [snapshots](#manage-snapshots). |
+
+## Create Block Device
+
+You can create new block devices to provide storage for your applications.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Image Name**: Enter a unique name for the block device.
+3.  **Pool Name**: Select the storage pool to host the image.
+4.  **Quota Size**: Specify the size of the block device (e.g., 100 GB).
+5.  **Advanced Settings** (Optional):
+    - **Striping**: Configure **Object Size**, **Stripe Unit**, and **Stripe Count** to optimize performance for specific workloads.
+    - **Features**: Enable or disable RBD features like **Layering**, **Exclusive Lock**, **Object Map**, **Fast Diff**, and **Deep Flatten**.
+6.  Click **Confirm** to create the block device.
+
+</Steps>
+
+## Manage Block Devices
+
+You can modify or delete existing block devices using the **Actions** menu.
+
+### Edit Block Device
+
+Allows you to resize the block device.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Quota Size** to expand or shrink the device.
+3.  Click **Confirm** to save changes.
+
+</Steps>
+
+### Delete Block Device
+
+Permanently removes a block device and all its data.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the name of the image to confirm deletion.
+3.  Click **Confirm** to permanently delete the block device.
+
+</Steps>
+
+<Aside type="danger">
+	Deleting a block device is irreversible. Ensure that the device is not mounted or in use by any
+	application and that you have backed up any critical data.
+</Aside>
+
+## Manage Snapshots
+
+Snapshots provide a read-only copy of the block device state at a specific point in time. You can view and manage snapshots by clicking the external link icon in the **Snapshots** column.
+
+### Snapshot List
+
+The snapshot list displays the following information:
+
+| Column      | Description                                                                     |
+| :---------- | :------------------------------------------------------------------------------ |
+| **Name**    | The name of the snapshot.                                                       |
+| **Protect** | Indicates whether the snapshot is protected from deletion.                      |
+| **Usage**   | A progress bar showing the storage usage of the snapshot.                       |
+| **Actions** | Provides options to manage the snapshot (Rollback, Protect, Unprotect, Delete). |
+
+### Snapshot Actions
+
+The **Actions** menu for each snapshot provides the following options:
+
+- **Rollback**: Reverts the block device to the state captured in the snapshot. **Note**: This will discard any changes made since the snapshot was taken.
+- **Protect**: Prevents the snapshot from being deleted. Useful for critical backups.
+- **Unprotect**: Removes the protection, allowing the snapshot to be deleted.
+- **Delete**: Permanently removes the snapshot.

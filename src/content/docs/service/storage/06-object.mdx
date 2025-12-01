@@ -1,4 +1,160 @@
 ---
-title: Object Storage
-description: Manage object storage buckets and access.
+title: Object
+description: Manage Ceph Object Gateway (RGW) buckets and users.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Object page allows you to manage the Ceph Object Gateway (RGW), which provides an S3-compatible object storage interface. You can manage buckets for storing objects and users for controlling access.
+
+The page is divided into two main sections: **Bucket** and **User**.
+
+## Bucket
+
+The Bucket section allows you to manage S3 buckets.
+
+### Introduction
+
+The Bucket table displays a list of all buckets. The table includes the following information:
+
+| Column         | Description                                     |
+| :------------- | :---------------------------------------------- |
+| **Name**       | The name of the bucket.                         |
+| **Owner**      | The user ID of the bucket owner.                |
+| **Usage**      | The total size of objects stored in the bucket. |
+| **Created At** | The creation timestamp of the bucket.           |
+
+### Create Bucket
+
+You can create new buckets to store your data.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Name**: Enter a unique name for the bucket.
+3.  **Owner**: Select the owner of the bucket from the list of users.
+4.  **Policy** (Optional): Enter a JSON policy to define access permissions. You can use the provided links to generate or reference AWS policies.
+5.  **Access Control List** (Optional): Select a canned ACL (e.g., `private`, `public-read`) to define basic access permissions.
+6.  Click **Confirm** to create the bucket.
+
+</Steps>
+
+### Manage Buckets
+
+You can modify or delete existing buckets using the **Actions** menu.
+
+#### Edit Bucket
+
+Allows you to update the bucket's owner, policy, or ACL.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Owner**, **Policy**, or **Access Control List** as needed.
+3.  Click **Confirm** to save changes.
+
+</Steps>
+
+#### Delete Bucket
+
+Permanently removes a bucket and all its objects.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the name of the bucket to confirm deletion.
+3.  Click **Confirm** to permanently delete the bucket.
+
+</Steps>
+
+## User
+
+The User section allows you to manage RGW users and their access keys.
+
+### Introduction
+
+The User table displays a list of all users. The table includes the following information:
+
+| Column        | Description                                                                                                                         |
+| :------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
+| **ID**        | The unique identifier of the user.                                                                                                  |
+| **User**      | The display name of the user.                                                                                                       |
+| **Suspended** | Indicates whether the user account is suspended.                                                                                    |
+| **Key**       | The number of access keys associated with the user. Clicking the external link icon opens a detailed view of the [keys](#key-list). |
+
+### Create User
+
+You can create new users to access the object storage.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **ID**: Enter a unique identifier for the user.
+3.  **Name**: Enter a display name for the user.
+4.  **Suspend**: Toggle to create the user in a suspended state.
+5.  Click **Confirm** to create the user.
+
+</Steps>
+
+### Manage Users
+
+You can modify or delete existing users using the **Actions** menu.
+
+#### Edit User
+
+Allows you to update the user's name or suspension status.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Name** or **Suspend** status.
+3.  Click **Confirm** to save changes.
+
+</Steps>
+
+#### Delete User
+
+Permanently removes a user.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the ID of the user to confirm deletion.
+3.  Click **Confirm** to permanently delete the user.
+
+</Steps>
+
+### Manage Keys
+
+Access keys are used to authenticate requests to the object storage service. You can view and manage keys by clicking the external link icon in the **Key** column.
+
+#### Key List
+
+The key list displays the following information:
+
+| Column         | Description                                  |
+| :------------- | :------------------------------------------- |
+| **Access Key** | The access key ID.                           |
+| **Actions**    | Provides options to manage the key (Delete). |
+
+#### Create Key
+
+You can generate new access keys for a user.
+
+<Steps>
+
+1.  Click the **Create** button within the key management view.
+2.  The system will generate a new access key and secret key.
+
+</Steps>
+
+#### Delete Key
+
+Permanently removes an access key.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Confirm the deletion.
+
+</Steps>
