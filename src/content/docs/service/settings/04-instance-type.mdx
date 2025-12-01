@@ -1,4 +1,58 @@
 ---
-title: Instance Types
-description: Manage instance types for your application.
+title: Instance Type
+description: Manage hardware profiles for Virtual Machines.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Instance Type page allows you to define and manage hardware profiles (InstanceTypes) for Virtual Machines. An InstanceType specifies the CPU and Memory resources allocated to a VM.
+
+## Introduction
+
+The Instance Type page displays a list of available hardware profiles. The table includes the following information:
+
+| Column          | Description                                                       |
+| :-------------- | :---------------------------------------------------------------- |
+| **Name**        | The name of the Instance Type (e.g., `small`, `medium`, `large`). |
+| **Namespace**   | The Kubernetes namespace where the Instance Type is defined.      |
+| **CPU Cores**   | The number of virtual CPU cores allocated.                        |
+| **Memory**      | The amount of RAM allocated.                                      |
+| **Create Time** | The timestamp when the Instance Type was created.                 |
+
+## Manage Instance Types
+
+You can create new Instance Types or manage existing ones using the **Actions** menu.
+
+### Create a New Instance Type
+
+To define a new hardware profile:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Instance Type" will appear.
+
+3.  **Configuration**:
+
+    - **Name**: Enter a unique name for the Instance Type.
+    - **Namespace**: Specify the namespace (defaults to `default`).
+    - **CPU Cores**: Enter the number of CPU cores.
+    - **Memory**: Set the amount of memory (e.g., 4 GB).
+
+4.  Click **Confirm** to create the Instance Type.
+
+</Steps>
+
+### Instance Type Actions
+
+The **Actions** menu (three dots icon) for each Instance Type provides the following options:
+
+#### Delete
+
+Permanently removes the Instance Type.
+
+<Aside type="danger" title="Warning">
+	Deleting an Instance Type will prevent new VMs from using it. Existing VMs using this type may be
+	affected if they are restarted or migrated.
+</Aside>

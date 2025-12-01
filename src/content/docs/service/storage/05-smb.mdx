@@ -1,4 +1,66 @@
 ---
 title: SMB
-description: Setup and manage SMB shares.
+description: Manage Samba (SMB) shares.
 ---
+
+import { Steps } from '@astrojs/starlight/components';
+
+The SMB page allows you to manage Samba (SMB) shares, enabling file sharing across your network with Windows and other SMB-compatible clients. You can configure security modes, user access, and share properties.
+
+## Introduction
+
+The SMB table displays a list of all SMB shares. The table includes the following information:
+
+| Column           | Description                                                                                                    |
+| :--------------- | :------------------------------------------------------------------------------------------------------------- |
+| **URI**          | The connection URI for the share (e.g., `smb://<ip>/<share>`).                                                 |
+| **Health**       | The health status of the share.                                                                                |
+| **Size**         | The allocated storage size for the share.                                                                      |
+| **Browsable**    | Indicates if the share is visible in network browsing lists.                                                   |
+| **Read Only**    | Indicates if the share is read-only.                                                                           |
+| **Guest OK**     | Indicates if guest access (no password) is allowed.                                                            |
+| **Map To Guest** | Specifies how login requests with invalid credentials are handled (e.g., `Never`, `Bad User`, `Bad Password`). |
+| **Mode**         | The security mode of the share (`User` or `Active Directory`).                                                 |
+| **Valid Users**  | A list of users or groups allowed to access the share.                                                         |
+
+## Create SMB Share
+
+You can create new SMB shares to expose storage to your network.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Name**: Enter a unique name for the share.
+3.  **Port**: Optionally specify a custom port (default is 445).
+4.  **Size**: Specify the storage size for the share (e.g., 100 GB).
+5.  **Common Configuration**:
+    - **Map To Guest**: Configure how to handle guest access (e.g., `Never`, `Bad User`).
+6.  **Security Configuration**:
+    - **Mode**: Select **User** (local users) or **Active Directory**.
+    - **Local Users** (User Mode): Manage local username and password credentials.
+    - **Realm** (AD Mode): Enter the Active Directory realm.
+    - **Join Source** (AD Mode): Provide credentials to join the domain.
+    - **Valid Users**: Specify which users or groups are allowed to access the share.
+7.  **Share Settings**:
+    - **Browsable**: Toggle to make the share visible.
+    - **Read Only**: Toggle to prevent write access.
+    - **Guest Accessible**: Toggle to allow access without authentication.
+8.  Click **Confirm** to create the SMB share.
+
+</Steps>
+
+## Manage SMB Shares
+
+You can modify existing SMB shares using the **Actions** menu.
+
+### Edit SMB Share
+
+Allows you to update the share's configuration, including size, security settings, and access controls.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the desired settings (e.g., **Size**, **Valid Users**, **Browsable**).
+3.  Click **Confirm** to save changes.
+
+</Steps>

@@ -1,4 +1,141 @@
 ---
 title: File System
-description: Configure and manage file systems.
+description: Manage Ceph File Systems (CephFS) and NFS exports.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The File System page allows you to manage Ceph File Systems (CephFS) and Network File System (NFS) exports. CephFS provides a POSIX-compliant file system on top of the Ceph cluster, while NFS exports allow you to share these file systems with standard NFS clients.
+
+The page is divided into two main sections: **NFS** and **Group**.
+
+## NFS
+
+The NFS section allows you to manage subvolumes and export them via NFS.
+
+### Introduction
+
+The NFS table displays a list of subvolumes. The table includes the following information:
+
+| Column         | Description                                                                                                                                |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**       | The name of the subvolume.                                                                                                                 |
+| **Pool Name**  | The data pool where the subvolume is stored.                                                                                               |
+| **Export**     | Displays the NFS export path and allowed clients (IPs). Clicking the copy icon copies the mount command.                                   |
+| **Usage**      | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                               |
+| **Created At** | The creation timestamp of the subvolume.                                                                                                   |
+| **Snapshots**  | The number of snapshots taken of this subvolume. Clicking the external link icon opens a detailed view of the [snapshots](#snapshot-list). |
+
+### Create NFS Export
+
+You can create new subvolumes and export them via NFS.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Name**: Enter a unique name for the subvolume.
+3.  **Group**: Displays the current subvolume group (default is `default`).
+4.  **Quota Size**: Specify the size limit for the subvolume (e.g., 10 GB).
+5.  Click **Confirm** to create the subvolume.
+
+</Steps>
+
+### Manage NFS Exports
+
+You can manage access, modify quotas, or delete NFS exports using the **Actions** menu.
+
+#### Grant/Revoke Access
+
+Control which clients can access the NFS export.
+
+- **Grant Access**: Adds a client IP address to the allowed list.
+- **Revoke Access**: Removes a client IP address from the allowed list.
+
+#### Edit NFS Export
+
+Allows you to resize the subvolume quota.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Quota Size**.
+3.  Click **Confirm** to save changes.
+
+</Steps>
+
+#### Delete NFS Export
+
+Permanently removes the subvolume and its export.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the name of the subvolume to confirm deletion.
+3.  Click **Confirm** to permanently delete the subvolume.
+
+</Steps>
+
+### Manage Snapshots
+
+Snapshots provide a read-only copy of the subvolume at a specific point in time. You can view and manage snapshots by clicking the external link icon in the **Snapshots** column.
+
+#### Snapshot List
+
+The snapshot list displays the following information:
+
+| Column             | Description                                                       |
+| :----------------- | :---------------------------------------------------------------- |
+| **Name**           | The name of the snapshot.                                         |
+| **Pending Clones** | Indicates if there are any pending clones based on this snapshot. |
+| **Created At**     | The creation timestamp of the snapshot.                           |
+| **Actions**        | Provides options to manage the snapshot (Delete).                 |
+
+#### Snapshot Actions
+
+- **Delete**: Permanently removes the snapshot.
+
+## Group
+
+The Group section allows you to manage subvolume groups, which are used to organize subvolumes.
+
+### Introduction
+
+The Group table displays a list of subvolume groups. The table includes the following information:
+
+| Column         | Description                              |
+| :------------- | :--------------------------------------- |
+| **Name**       | The name of the subvolume group.         |
+| **Pool Name**  | The data pool associated with the group. |
+| **Created At** | The creation timestamp of the group.     |
+
+### Create Group
+
+You can create new subvolume groups to organize your file systems.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Name**: Enter a unique name for the group.
+3.  **Pool Name**: Select the data pool for the group.
+4.  **Quota Size**: Optionally set a quota for the group.
+5.  Click **Confirm** to create the group.
+
+</Steps>
+
+### Manage Groups
+
+You can delete empty subvolume groups.
+
+#### Delete Group
+
+Permanently removes a subvolume group.
+
+<Aside type="note">A group must be empty (contain no subvolumes) before it can be deleted.</Aside>
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the name of the group to confirm deletion.
+3.  Click **Confirm** to permanently delete the group.
+
+</Steps>

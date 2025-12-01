@@ -1,4 +1,43 @@
 ---
 title: OSD
-description: Manage the underlying storage daemons.
+description: Monitor and manage Object Storage Daemons (OSDs).
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The OSD (Object Storage Daemon) page provides a comprehensive view of the storage daemons that manage data within your Ceph cluster. It allows you to monitor the health, performance, and usage of each OSD.
+
+## Introduction
+
+The OSD page displays a list of all Object Storage Daemons. The table includes the following information:
+
+| Column           | Description                                                                                                                                       |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Name**         | The unique identifier of the OSD (e.g., `osd.0`).                                                                                                 |
+| **State**        | The current status of the OSD. `Up` indicates the daemon is running and reachable. `In` indicates the OSD is in the cluster map and storing data. |
+| **Exists**       | Indicates whether the OSD physically exists and is recognized by the cluster.                                                                     |
+| **Device Class** | The type of storage medium used by the OSD (e.g., `hdd`, `ssd`, `nvme`).                                                                          |
+| **Machine**      | The hostname of the physical machine hosting the OSD. Clicking the hostname navigates to the machine's details page.                              |
+| **PG Count**     | The number of Placement Groups (PGs) hosted on this OSD.                                                                                          |
+| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Total Space).                                                                     |
+| **IOPS**         | A real-time chart displaying the Input/Output Operations Per Second (Input vs. Output).                                                           |
+| **Throughput**   | A real-time chart displaying the data transfer rate (Read vs. Write).                                                                             |
+
+## Manage OSDs
+
+You can perform maintenance tasks on individual OSDs using the **Actions** menu.
+
+### OSD Actions
+
+The **Actions** menu (three dots icon) for each OSD provides the following options:
+
+#### View SMART
+
+Displays S.M.A.R.T. (Self-Monitoring, Analysis and Reporting Technology) information of the underlying storage drive to check for hardware health and potential failures.
+
+<Steps>
+
+1.  Select **View SMART** from the actions menu.
+2.  The system will display the S.M.A.R.T. information.
+
+</Steps>

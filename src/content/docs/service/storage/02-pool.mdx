@@ -1,4 +1,74 @@
 ---
-title: Pools
-description: Create and manage storage pools for better resource allocation.
+title: Pool
+description: Manage Ceph storage pools.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Pool page allows you to manage Ceph storage pools, which are logical partitions for storing objects. Pools provide a layer of abstraction between clients and the underlying OSDs, allowing you to configure data durability, availability, and performance policies.
+
+## Introduction
+
+The Pool page displays a list of all storage pools. The table includes the following information:
+
+| Column           | Description                                                                                                                                                                                           |
+| :--------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**         | The name of the pool. A spinner icon indicates if the pool is currently updating.                                                                                                                     |
+| **Type**         | The type of the pool, either `Replicated` (copies data) or `Erasure` (uses erasure coding for efficiency). It also displays configuration details like replica count or erasure coding profile (k+m). |
+| **Applications** | The applications enabled for this pool (e.g., `rbd`, `cephfs`, `rgw`).                                                                                                                                |
+| **PG State**     | The state of the Placement Groups (PGs) within the pool (e.g., `active`, `clean`, `degraded`).                                                                                                        |
+| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Total Space).                                                                                                                         |
+
+## Create Pool
+
+You can create new storage pools to meet specific application requirements.
+
+<Steps>
+
+1.  Click the **Create** button.
+2.  **Name**: Enter a unique name for the pool.
+3.  **Type**: Select the pool type:
+    - **Replicated**: Stores multiple copies of data. Ideal for high performance and fast recovery.
+      - **Replicated Size**: Specify the number of replicas (e.g., 3).
+    - **Erasure**: Uses erasure coding to save space. Ideal for cold storage or large datasets.
+      - **EC Overwrite**: Enable if you need to support overwrites (required for RBD/CephFS on EC pools).
+4.  **Applications**: Select the applications that will use this pool (e.g., `rbd`, `cephfs`, `rgw`).
+5.  **Quota**: Optionally set limits on the pool's usage:
+    - **Max Bytes**: The maximum amount of data (in GB or TB) the pool can store.
+    - **Max Objects**: The maximum number of objects the pool can store.
+6.  Click **Confirm** to create the pool.
+
+</Steps>
+
+## Manage Pools
+
+You can modify or delete existing pools using the **Actions** menu.
+
+### Edit Pool
+
+Allows you to modify the pool's configuration, such as quotas.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Name**, **Quota Size**, or **Quota Objects** as needed.
+3.  Click **Confirm** to save changes.
+
+</Steps>
+
+### Delete Pool
+
+Permanently removes a storage pool and all its data.
+
+<Steps>
+
+1.  Select **Delete** from the actions menu (trash icon).
+2.  Type the name of the pool to confirm deletion.
+3.  Click **Confirm** to permanently delete the pool.
+
+</Steps>
+
+<Aside type="danger">
+	Deleting a pool is irreversible. Ensure that no applications are currently using the pool and that
+	you have backed up any critical data.
+</Aside>

@@ -1,4 +1,71 @@
 ---
-title: Data Volumes
-description: Manage data volumes for your application.
+title: Data Volume
+description: Manage persistent storage volumes for Virtual Machines.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Data Volume page allows you to manage persistent storage volumes (DataVolumes) used by Virtual Machines in the OtterScale cluster. DataVolumes provide a way to automate the importing, cloning, and uploading of data into Persistent Volume Claims (PVCs).
+
+## Introduction
+
+The Data Volume page displays a list of configured DataVolumes. The table includes the following information:
+
+| Column        | Description                                                                                                             |
+| :------------ | :---------------------------------------------------------------------------------------------------------------------- |
+| **Name**      | The name of the DataVolume.                                                                                             |
+| **Namespace** | The Kubernetes namespace where the DataVolume resides.                                                                  |
+| **Phase**     | The current status of the DataVolume (e.g., Succeeded, ImportInProgress).                                               |
+| **Source**    | The source of the data (e.g., HTTP URL, Blank Image, PVC). Hovering over the badge reveals detailed source information. |
+| **Progress**  | The progress of the data import or clone operation.                                                                     |
+| **Size**      | The capacity of the volume.                                                                                             |
+
+## Manage Data Volumes
+
+You can create new DataVolumes or manage existing ones using the **Actions** menu.
+
+### Create a New Data Volume
+
+To create a new DataVolume:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Data Volume" will appear.
+
+3.  **Configuration**:
+
+    - **Name**: Enter a unique name for the DataVolume.
+    - **Namespace**: Specify the namespace (defaults to `default`).
+    - **Size**: Set the capacity of the volume (e.g., 10 GB).
+    - **Source**: Enter the URL of the source image (e.g., a cloud image URL). You can use the "Cloud Image" button to find common Ubuntu cloud images.
+
+4.  Click **Confirm** to create the DataVolume.
+
+</Steps>
+
+### Data Volume Actions
+
+The **Actions** menu (three dots icon) for each DataVolume provides the following options:
+
+#### Extend
+
+Allows you to increase the size of an existing DataVolume.
+
+<Steps>
+
+1.  Select **Extend** from the actions menu.
+2.  Enter the new, larger size for the volume.
+3.  Click **Confirm** to apply the changes.
+
+</Steps>
+
+#### Delete
+
+Permanently removes the DataVolume and its associated data.
+
+<Aside type="danger" title="Warning">
+	Deleting a DataVolume is irreversible. Ensure you have backed up any critical data before
+	proceeding.
+</Aside>

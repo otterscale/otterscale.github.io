@@ -1,4 +1,24 @@
 ---
 title: Services
-description: Configure services to expose your workloads to the network.
+description: Monitor Kubernetes Services and network access.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Services page provides a list of Kubernetes Services within your OtterScale cluster. Services define a logical set of Pods and a policy by which to access them, enabling network connectivity for your applications.
+
+## Introduction
+
+The Services page displays a list of all services. The table includes the following information:
+
+| Column         | Description                                                                                                                                                                                                                                    |
+| :------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**       | The name of the Kubernetes Service.                                                                                                                                                                                                            |
+| **Type**       | The type of service (e.g., `ClusterIP`, `NodePort`, `LoadBalancer`), which determines how the service is exposed.                                                                                                                              |
+| **Cluster IP** | The internal IP address assigned to the service, used for communication within the cluster.                                                                                                                                                    |
+| **Ports**      | The number of ports exposed by the service. Hovering over the count reveals a detailed table with the following fields: **Protocol**, **Port**, **NodePort**, **TargetPort**, and **Name**.                                                    |
+| **Endpoints**  | For services of type `NodePort`, this column displays the accessible endpoints. Hovering over the endpoint name reveals the full URL (e.g., `http://<node-ip>:<node-port>`), and a copy button allows you to quickly copy it to the clipboard. |
+
+## Manage Services
+
+Currently, the Services page is read-only and provides monitoring capabilities. You can view the configuration and access points for your services, but creation and modification are typically handled through the application deployment process (e.g., via the **Workloads** page or Helm charts).

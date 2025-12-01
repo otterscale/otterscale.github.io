@@ -1,4 +1,66 @@
 ---
 title: Extensions
-description: Install and manage extensions for your application.
+description: Manage system extensions and add-ons.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Extensions page allows you to manage the add-ons and system components that extend the functionality of your OtterScale cluster. Extensions are grouped into bundles based on their purpose, such as General, Model, Registry, Virtual Machine, and Storage.
+
+## Introduction
+
+Extensions are essential components that enable specific features within the platform. The Extensions page organizes these components into expandable bundles. Each bundle displays a progress bar indicating the installation status of the extensions within it.
+
+### Extension Bundles
+
+The available extension bundles include:
+
+| Bundle                 | Description                                                              |
+| :--------------------- | :----------------------------------------------------------------------- |
+| **General**            | Core system extensions required for basic platform functionality.        |
+| **Container Registry** | Extensions for managing container images and registries.                 |
+| **Model**              | Extensions related to Large Language Model (LLM) serving and management. |
+| **Virtual Machine**    | Extensions enabling Virtual Machine (VM) virtualization and management.  |
+| **Storage**            | Extensions for persistent storage management and volume provisioning.    |
+
+## Manage Extensions
+
+You can install or upgrade extensions directly from the bundle card.
+
+### Install Extensions
+
+If a bundle has missing extensions (indicated by a progress bar that is not full and a red or yellow color), you can install them:
+
+<Steps>
+
+1.  Locate the bundle you want to install (e.g., "Model").
+2.  Click the **Install** button on the right side of the bundle card.
+3.  The system will begin installing the missing extensions. A toast notification will appear to track the progress.
+4.  Once completed, the progress bar will turn green, indicating all extensions are installed.
+
+</Steps>
+
+### Upgrade Extensions
+
+If all extensions in a bundle are installed but updates are available, you can upgrade them:
+
+<Steps>
+
+1.  Locate the bundle with available updates.
+2.  Click the **Upgrade** button on the right side of the bundle card.
+3.  The system will update the extensions to their latest versions.
+
+</Steps>
+
+### View Extension Details
+
+You can expand any bundle to view the individual extensions contained within it.
+
+1.  Click on the bundle card to expand the accordion.
+2.  You will see a list of individual extensions.
+3.  Each extension card displays:
+    - **Icon**: Visual identifier for the extension.
+    - **Name**: The display name of the extension.
+    - **Version**: The currently installed version (or the latest available version).
+    - **Status**: A green checkmark indicates the extension is installed and active; a red minus circle indicates it is not installed.
+    - **Description**: A brief explanation of what the extension does.
