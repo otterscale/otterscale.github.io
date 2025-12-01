@@ -29,7 +29,7 @@ export default defineConfig({
 			defaultLocale: 'root',
 			locales,
 			editLink: {
-				baseUrl: 'https://github.com/otterscale/otterscale.github.io/edit/main/docs/'
+				baseUrl: 'https://github.com/otterscale/otterscale.github.io/edit/main/'
 			},
 			sidebar: [
 				{
