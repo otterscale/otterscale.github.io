@@ -1,4 +1,75 @@
 ---
-title: Built-in Tests
-description: Run built-in tests for your Storage.
+title: Built-in Test
+description: Run performance benchmarks for storage subsystems.
 ---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+The Built-in Test page allows you to run performance benchmarks on your storage infrastructure. It provides tools to validate the performance of block storage (using FIO) and object storage (using Warp).
+
+## Overview
+
+The page is divided into two main sections:
+
+- **IO Test**: Benchmarks disk I/O performance using the Flexible I/O tester (FIO). This is useful for testing Ceph block devices or NFS shares.
+- **Object Storage Test**: Benchmarks S3-compatible object storage performance using MinIO Warp. This supports testing internal (Ceph, MinIO) and external S3 endpoints.
+
+## IO Test (FIO)
+
+FIO (Flexible I/O tester) is a standard tool for benchmarking disk I/O. You can use it to simulate specific workload patterns and measure the performance of your storage backend.
+
+### Run an IO Test
+
+To start a new IO benchmark:
+
+<Steps>
+
+1.  Navigate to the **IO Test** tab.
+2.  Click the **Create** button.
+3.  Configure the test parameters:
+    - **Target**: Select the storage target (e.g., Ceph Block Pool or NFS).
+    - **Access Mode**: Choose the I/O pattern (Read, Write, Random Read, Random Write, etc.).
+    - **Block Size**: Set the size of I/O units (e.g., 4k, 64k).
+    - **IO Depth**: Define the queue depth for asynchronous I/O.
+    - **Run Time**: Set the duration of the test.
+4.  Click **Confirm** to start the test.
+
+</Steps>
+
+### Understanding Results
+
+Once the test completes, the results table displays key metrics:
+
+- **IOPS**: Input/Output Operations Per Second. Higher is better for transactional workloads.
+- **Bandwidth**: Data transfer rate (MB/s). Higher is better for streaming workloads.
+- **Latency**: The time taken to complete an I/O request (Min, Max, Mean). Lower is better.
+
+## Object Storage Test (Warp)
+
+Warp is a high-performance S3 benchmarking tool. It is designed to measure the throughput and latency of object storage services.
+
+### Run an Object Storage Test
+
+To start a new Object Storage benchmark:
+
+<Steps>
+
+1.  Navigate to the **Object Storage Test** tab.
+2.  Click the **Create** button.
+3.  Configure the test parameters:
+    - **Target**: Select an internal service (Ceph, MinIO) or configure an external S3 endpoint (Host, Access Key, Secret Key).
+    - **Operation**: Choose the operation to test (PUT, GET, DELETE, etc.).
+    - **Object Size**: Set the size of the objects used in the test.
+    - **Duration**: Set the duration of the benchmark.
+    - **Concurrency**: (Optional) Adjust the number of concurrent operations.
+4.  Click **Confirm** to start the test.
+
+</Steps>
+
+### Understanding Results
+
+The results table provides insights into the object storage performance:
+
+- **Throughput**: The speed of data transfer (Fastest, Median, Slowest).
+- **Operations**: The rate of object operations (OPS).
+- **Total Transferred**: The total amount of data and number of objects processed during the test.
