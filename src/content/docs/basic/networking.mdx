@@ -3,7 +3,7 @@ title: Networking
 description: Manage networking in OtterScale.
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Aside } from '@astrojs/starlight/components';
 
 This page allows you to manage the network infrastructure for the OtterScale cluster. You can configure fabrics, VLANs, and subnets to define how machines communicate within the cluster and with the external world.
 
@@ -11,13 +11,15 @@ This page allows you to manage the network infrastructure for the OtterScale clu
 
 The Networking page displays a list of configured networks. The table includes the following information:
 
-- **Fabric**: The physical network fabric associated with the network.
-- **VLAN**: The Virtual LAN (VLAN) ID and name.
-- **DHCP On**: Indicates whether DHCP is enabled for this network.
-- **Subnet**: The CIDR notation of the subnet (e.g., `192.168.1.0/24`) and the Gateway IP address.
-- **IP Address**: The number of IP addresses currently in use or reserved.
-- **IP Range**: The configured IP ranges for dynamic allocation.
-- **Statistics**: Visual representation of IP address usage (Available vs. Total).
+| Column         | Description                                                                          |
+| :------------- | :----------------------------------------------------------------------------------- |
+| **Fabric**     | The physical network fabric associated with the network.                             |
+| **VLAN**       | The Virtual LAN (VLAN) ID and name.                                                  |
+| **DHCP On**    | Indicates whether DHCP is enabled for this network.                                  |
+| **Subnet**     | The CIDR notation of the subnet (e.g., `192.168.1.0/24`) and the Gateway IP address. |
+| **IP Address** | The number of IP addresses currently in use or reserved.                             |
+| **IP Range**   | The configured IP ranges for dynamic allocation.                                     |
+| **Statistics** | Visual representation of IP address usage (Available vs. Total).                     |
 
 ## Manage Networks
 
@@ -33,11 +35,11 @@ To add a new network configuration:
 
 2.  A modal window titled "Create Network" will appear.
 
-3.  **VLAN Settings**:
+3.  Configure **VLAN Settings**:
 
     - **DHCP On**: Toggle this switch to enable or disable DHCP service for this network.
 
-4.  **Subnet Settings**:
+4.  Configure **Subnet Settings**:
 
     - **CIDR**: Enter the Classless Inter-Domain Routing (CIDR) notation for the subnet (e.g., `10.0.0.0/24`).
     - **Gateway**: Enter the IP address of the network gateway.
@@ -78,4 +80,6 @@ Allows you to modify subnet properties:
 
 Permanently removes the fabric and its associated network configuration.
 
-- **Note**: This action is destructive and may affect machines currently using this network.
+<Aside type="danger" title="Warning">
+	This action is destructive and may affect machines currently using this network.
+</Aside>
