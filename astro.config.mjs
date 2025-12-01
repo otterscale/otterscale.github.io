@@ -81,7 +81,43 @@ export default defineConfig({
 					translations: {
 						'zh-Hant': '服務'
 					},
-					autogenerate: { directory: 'service' }
+					items: [
+						{
+							label: 'Compute',
+							translations: {
+								'zh-Hant': '計算'
+							},
+							slug: 'service/compute'
+						},
+						{
+							label: 'Models',
+							translations: {
+								'zh-Hant': '模型'
+							},
+							slug: 'service/models'
+						},
+						{
+							label: 'Applications',
+							translations: {
+								'zh-Hant': '應用'
+							},
+							autogenerate: { directory: 'service/applications' }
+						},
+						{
+							label: 'Storage',
+							translations: {
+								'zh-Hant': '儲存'
+							},
+							autogenerate: { directory: 'service/storage' }
+						},
+						{
+							label: 'Settings',
+							translations: {
+								'zh-Hant': '設定'
+							},
+							autogenerate: { directory: 'service/settings' }
+						}
+					]
 				},
 				...openAPISidebarGroups
 			],
