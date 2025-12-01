@@ -1,0 +1,85 @@
+---
+title: Networking
+description: Manage networking in OtterScale.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This page allows you to manage the network infrastructure for the OtterScale cluster. You can configure fabrics, VLANs, and subnets to define how machines communicate within the cluster and with the external world.
+
+## Overview
+
+The Networking page displays a list of configured networks. The table includes the following information:
+
+| Column         | Description                                                                          |
+| :------------- | :----------------------------------------------------------------------------------- |
+| **Fabric**     | The physical network fabric associated with the network.                             |
+| **VLAN**       | The Virtual LAN (VLAN) ID and name.                                                  |
+| **DHCP On**    | Indicates whether DHCP is enabled for this network.                                  |
+| **Subnet**     | The CIDR notation of the subnet (e.g., `192.168.1.0/24`) and the Gateway IP address. |
+| **IP Address** | The number of IP addresses currently in use or reserved.                             |
+| **IP Range**   | The configured IP ranges for dynamic allocation.                                     |
+| **Statistics** | Visual representation of IP address usage (Available vs. Total).                     |
+
+## Manage Networks
+
+You can create new networks or manage existing ones using the **Actions** menu (three dots icon) in each row.
+
+### Create a New Network
+
+To add a new network configuration:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Network" will appear.
+
+3.  Configure **VLAN Settings**:
+
+    - **DHCP On**: Toggle this switch to enable or disable DHCP service for this network.
+
+4.  Configure **Subnet Settings**:
+
+    - **CIDR**: Enter the Classless Inter-Domain Routing (CIDR) notation for the subnet (e.g., `10.0.0.0/24`).
+    - **Gateway**: Enter the IP address of the network gateway.
+    - **DNS**: Add one or more DNS server IP addresses.
+
+5.  Click **Confirm** to create the network.
+
+</Steps>
+
+### Network Actions
+
+The **Actions** menu provides granular control over the different components of a network row:
+
+#### Edit Fabric
+
+Allows you to rename the physical fabric associated with the network.
+
+#### Edit VLAN
+
+Allows you to modify VLAN properties:
+
+- **Name**: Rename the VLAN.
+- **MTU**: Set the Maximum Transmission Unit size.
+- **Description**: Add or update the description.
+- **DHCP On**: Enable or disable DHCP for this VLAN.
+
+#### Edit Subnet
+
+Allows you to modify subnet properties:
+
+- **Name**: Rename the subnet.
+- **Description**: Add or update the description.
+- **CIDR**: Update the subnet mask/range.
+- **Gateway**: Change the gateway IP address.
+- **DNS**: Manage DNS servers and toggle DNS resolution.
+
+#### Delete Fabric
+
+Permanently removes the fabric and its associated network configuration.
+
+<Aside type="danger" title="Warning">
+	This action is destructive and may affect machines currently using this network.
+</Aside>

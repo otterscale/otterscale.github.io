@@ -1,0 +1,38 @@
+---
+title: Package Repository
+description: Configure package repositories for OtterScale.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+This page allows you to manage the package repositories used by the machines in the OtterScale cluster. These repositories are the sources from which software packages and updates are downloaded (e.g., the Ubuntu archive).
+
+## Overview
+
+The Package Repository settings page displays a list of configured repositories. The table includes the following information:
+
+- **Name**: The name of the repository (e.g., `Ubuntu archive`).
+- **URL**: The base URL of the repository.
+- **Enabled**: Indicates whether the repository is currently active and being used.
+
+## Manage Package Repositories
+
+You can modify the URL of existing package repositories. This is useful if you want to point to a local mirror or a different upstream source to improve download speeds or manage bandwidth.
+
+### Edit Repository URL
+
+To change the URL of a package repository:
+
+<Steps>
+
+1.  Locate the repository you want to modify in the list.
+
+2.  Click the **Edit** button (pencil icon) in the actions column.
+
+3.  A modal window titled "Edit Package Repository" will appear.
+
+4.  **URL**: Enter the new URL for the repository.
+
+5.  Click **Confirm** to save your changes.
+
+</Steps>

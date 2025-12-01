@@ -1,0 +1,55 @@
+---
+title: Machine Tag
+description: Configure machine tags for OtterScale.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+This page allows you to manage tags that can be assigned to machines in the OtterScale cluster. Tags are useful for grouping machines, applying specific configurations, or identifying machine roles (e.g., `kubernetes-worker`, `ceph-osd`).
+
+## Overview
+
+The Machine Tag settings page displays a list of all existing tags. The table includes the following information:
+
+- **Tag**: The name of the tag (e.g., `gpu`, `storage`).
+- **Comment**: A description or note associated with the tag. Built-in tags may have specific comments indicating their purpose.
+
+## Manage Machine Tags
+
+You can create new tags or delete existing ones.
+
+### Create a New Tag
+
+To create a custom tag:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Machine Tag" will appear.
+
+3.  **Name**: Enter a unique name for the tag.
+
+4.  **Comment**: (Optional) Enter a description for the tag.
+
+5.  Click **Confirm** to save. The new tag will appear in the list.
+
+</Steps>
+
+### Delete a Tag
+
+To remove a tag:
+
+<Steps>
+
+1.  Locate the tag you want to remove in the list.
+
+2.  Click the **Delete** button (trash icon) in the actions column.
+
+    - **Note**: Tags marked as "built-in" in their comment cannot be deleted. The delete button will be disabled for these tags.
+
+3.  A confirmation modal will appear. You must type the name of the tag to confirm deletion.
+
+4.  Click **Confirm** to permanently delete the tag.
+
+</Steps>

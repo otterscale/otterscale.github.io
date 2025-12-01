@@ -1,0 +1,52 @@
+---
+title: Boot Image
+description: Configure boot image for OtterScale.
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+This page allows you to manage the operating system images (Boot Images) available for provisioning machines in the OtterScale cluster. These images are typically Ubuntu LTS releases.
+
+## Overview
+
+The Boot Image settings page displays a list of configured boot images. The table includes the following information:
+
+- **Name**: The display name of the operating system (e.g., Ubuntu 22.04 LTS).
+- **Source**: The URL of the image repository.
+- **Distro Series**: The codename of the distribution release (e.g., `jammy`, `noble`).
+- **Default**: Indicates if this is the default image used when no specific image is requested.
+- **Architecture**: The CPU architectures supported by this image (e.g., `amd64`, `arm64`).
+- **Status**: Shows the sync status of the image architectures.
+
+## Manage Boot Images
+
+You can perform the following actions to manage boot images:
+
+### Create a New Boot Image
+
+To add a new boot image configuration:
+
+<Steps>
+
+1.  Click the **Create** button (plus icon) at the top of the page.
+
+2.  A modal window titled "Create Boot Image" will appear.
+
+3.  **Select Distro Series**: Choose the desired Ubuntu release from the dropdown menu.
+
+4.  **Select Architecture**: Choose one or more CPU architectures to support for this release.
+
+5.  Click **Confirm** to save. The system will begin tracking this image configuration.
+
+</Steps>
+
+### Import Images
+
+To synchronize the local image cache with the upstream source:
+
+1.  Click the **Import** button (refresh icon).
+2.  The system will trigger a background process to download and update the images. The button will show an "Importing..." state with a spinner while the process is running.
+
+### Set Default Image
+
+The image marked with a circle icon in the **Default** column is the current default. To change the default image, use the actions menu (three dots) on the desired image row and select **Set Default**.

@@ -52,7 +52,29 @@ export default defineConfig({
 					translations: {
 						'zh-Hant': '基本'
 					},
-					autogenerate: { directory: 'basic' }
+					items: [
+						{
+							label: 'Machines',
+							translations: {
+								'zh-Hant': '機器'
+							},
+							slug: 'basic/machines'
+						},
+						{
+							label: 'Networking',
+							translations: {
+								'zh-Hant': '網路'
+							},
+							slug: 'basic/networking'
+						},
+						{
+							label: 'Configuration',
+							translations: {
+								'zh-Hant': '設定'
+							},
+							autogenerate: { directory: 'basic/configuration' }
+						}
+					]
 				},
 				{
 					label: 'Service',
