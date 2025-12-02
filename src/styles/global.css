@@ -30,7 +30,6 @@
 }
 
 .site-title {
-	/* @apply font-sans font-bold text-xl tracking-tight text-indigo-700 dark:text-indigo-300; */
 	@apply font-title font-light gap-2 text-2xl tracking-tight text-black dark:text-white;
 }
 
