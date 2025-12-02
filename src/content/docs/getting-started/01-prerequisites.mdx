@@ -11,11 +11,15 @@ Before installing OtterScale, ensure your environment meets the following specif
 
 ### Operating System
 
+This is a specific version of Linux. If you're using a different operating system, you'll need to install Ubuntu 24.04 LTS first.
+
 | Component | Requirement                     |
 | :-------- | :------------------------------ |
 | **OS**    | **Ubuntu 24.04 LTS** (Required) |
 
 ### Hardware
+
+These are the minimum requirements. More is always better for performance.
 
 | Resource       | Minimum Requirement      |
 | :------------- | :----------------------- |
@@ -24,10 +28,12 @@ Before installing OtterScale, ensure your environment meets the following specif
 
 ### Network Configuration
 
+The installer will help set up networking - no manual configuration needed.
+
 - **Connectivity:** At least one network interface with external internet access.
-- **Bridge Configuration:** The installation script checks for a network bridge named `br-otters`.
-  - _Existing:_ If found, it will be used automatically.
-  - _Missing:_ You will be prompted to select an existing bridge or create a new one.
+- **Bridge Configuration:** The installation script will check for network bridge `br-otters`.
+  - _Existing:_ If the bridge exists, it will be used.
+  - _Missing:_ If the bridge does not exist, the script will prompt to select an existing bridge or create a new one automatically.
 
 ---
 
@@ -36,34 +42,122 @@ Before installing OtterScale, ensure your environment meets the following specif
 The installation process requires outbound access to various external services. Please whitelist the following domains and ports.
 
 <Tabs>
-  <TabItem label="Core Infrastructure">
+  <TabItem label="Canonical Services">
 
-| Service Group           | Port(s)                             | Domains                                                                                                                                                                                                                                                      |
-| :---------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Canonical Services**  | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* | `api.charmhub.io`, `api.jujucharms.com`, `changelogs.ubuntu.com`, `charmhub.io`, `cloud-images.ubuntu.com`, `maas.ubuntu.com`, `images.maas.io`\*, `juju.is`, `jaas.ai`, `streams.canonical.com`, `objects.githubusercontent.com`, `contracts.canonical.com` |
-| **Snap Store**          | TCP 443                             | `snapcraft.io`, `api.snapcraft.io`, `storage.snapcraftcontent.com`, `*.cdn.snapcraftcontent.com`                                                                                                                                                             |
-| **Ubuntu Repos**        | TCP 443, 80                         | `archive.ubuntu.com`, `security.ubuntu.com`, `esm.ubuntu.com`, `ports.ubuntu.com`, `tw.archive.ubuntu.com`                                                                                                                                                   |
-| **GitHub & OtterScale** | TCP 443, 80                         | `otterscale.github.io`, `otterscale.com`, `github.com`, `raw.githubusercontent.com`                                                                                                                                                                          |
-
-  </TabItem>
-  <TabItem label="Registries & Images">
-
-| Registry           | Port    | Domains                                                                                                                                   |
-| :----------------- | :------ | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Kubernetes**     | TCP 443 | `registry.k8s.io`, `k8s.gcr.io`, `ghcr.io`, `storage.googleapis.com`, `d39mqg4b1dx9z1.cloudfront.net`                                     |
-| **Docker Hub**     | TCP 443 | `docker.io`, `hub.docker.com`, `auth.docker.io`, `registry-1.docker.io`, `production.cloudflare.docker.com`, `*.r2.cloudflarestorage.com` |
-| **NVIDIA**         | TCP 443 | `nvcr.io`                                                                                                                                 |
-| **Red Hat / Quay** | TCP 443 | `registry.redhat.io`, `quay.io`, `registry.access.redhat.com`                                                                             |
-| **Others**         | TCP 443 | `registry.cn-hangzhou.aliyuncs.com`                                                                                                       |
+| Domains | Port(s)
+| :------------------------------ | :---------------|
+| `api.charmhub.io`               | TCP 443 (HTTPS) |
+| `api.jujucharms.com`            | TCP 443 (HTTPS) |
+| `changelogs.ubuntu.com`         | TCP 443 (HTTPS) |
+| `charmhub.io`                   | TCP 443 (HTTPS) |
+| `cloud-images.ubuntu.com`       | TCP 443 (HTTPS) |
+| `maas.ubuntu.com`               | TCP 443 (HTTPS) |
+| `images.maas.io`                | TCP 443 (HTTPS) |
+| `juju.is`                       | TCP 443 (HTTPS) |
+| `jaas.ai`                       | TCP 443 (HTTPS) |
+| `streams.canonical.com`         | TCP 443 (HTTPS) |
+| `objects.githubusercontent.com` | TCP 443 (HTTPS) |
+| `contracts.canonical.com`       | TCP 443 (HTTPS) |
+| `images.maas.io`                | TCP 80 (HTTP)   |
 
   </TabItem>
-  <TabItem label="AI & Helm Resources">
 
-| Category        | Port    | Domains                                                                                                                                                             |
-| :-------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **HuggingFace** | TCP 443 | `huggingface.co`, `cdn-lfs.huggingface.co`, `cdn.huggingface.co`                                                                                                    |
-| **Istio**       | TCP 443 | `istio.io`                                                                                                                                                          |
-| **Helm Charts** | TCP 443 | `charts.jetstack.io`, `charts.bitnami.com`, `open-feature.github.io`, `prometheus-community.github.io`, `project-hami.github.io`, `helm.ngc.nvidia.com`, `llm-d.ai` |
+  <TabItem label="Snap Package Management">
+
+| Domains | Port(s)
+| :----------------------------------------- | :---------------|
+| `snapcraft.io`                             | TCP 443 (HTTPS) |
+| `api.snapcraft.io`                         | TCP 443 (HTTPS) |
+| `storage.snapcraftcontent.com`             | TCP 443 (HTTPS) |
+| `canonical-lgw01.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
+| `canonical-lcy01.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
+| `canonical-lcy02.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
+| `canonical-bos01.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
 
   </TabItem>
+
+  <TabItem label="Ubuntu Package Repositories">
+
+| Domains | Port(s)
+| :---------------------- | :-----------------------------------|
+| `tw.archive.ubuntu.com` | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+| `archive.ubuntu.com`    | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+| `ports.ubuntu.com`      | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+| `security.ubuntu.com`   | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+| `esm.ubuntu.com`        | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+
+  </TabItem>
+
+  <TabItem label="GitHub and OtterScale">
+
+| Domains | Port(s)
+| :------------------------------------ | :---------------|
+| `otterscale.github.io`                | TCP 443 (HTTPS) |
+| `otterscale.com`                      | TCP 443 (HTTPS) |
+| `raw.githubusercontent.com`           | TCP 443 (HTTPS) |
+| `github.com`                          | TCP 443 (HTTPS) |
+| `release-assets.githubusercontent.com | TCP 443 (HTTPS) |
+
+  </TabItem>
+
+  <TabItem label="Kubernetes and image relate">
+
+| Domains | Port(s)
+| :------------------------------------------------------------------------------ | :---------------|
+| `registry.k8s.io`                                                               | TCP 443 (HTTPS) |
+| `k8s.gcr.io`                                                                    | TCP 443 (HTTPS) |
+| `ghcr.io`                                                                       | TCP 443 (HTTPS) |
+| `coredns`                                                                       | TCP 443 (HTTPS) |
+| `d39mqg4b1dx9z1.cloudfront.net`                                                 | TCP 443 (HTTPS) |
+| `storage.googleapis.com`                                                        | TCP 443 (HTTPS) |
+| `nvcr.io`                                                                       | TCP 443 (HTTPS) |
+| `auth.docker.io`                                                                | TCP 443 (HTTPS) |
+| `auth.docker.com`                                                               | TCP 443 (HTTPS) |
+| `login.docker.com`                                                              | TCP 443 (HTTPS) |
+| `cdn.auth0.com`                                                                 | TCP 443 (HTTPS) |
+| `docker.io`                                                                     | TCP 443 (HTTPS) |
+| `hub.docker.com`                                                                | TCP 443 (HTTPS) |
+| `registry-1.docker.io`                                                          | TCP 443 (HTTPS) |
+| `index.docker.io`                                                               | TCP 443 (HTTPS) |
+| `production.cloudflare.docker.com`                                              | TCP 443 (HTTPS) |
+| `docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com`  | TCP 443 (HTTPS) |
+| `registry.cn-hangzhou.aliyuncs.com`                                             | TCP 443 (HTTPS) |
+
+  </TabItem>
+
+  <TabItem label="HuggingFace">
+
+| Domains | Port(s)
+| :----------------------- | :---------------|
+| `huggingface.co`         | TCP 443 (HTTPS) |
+| `cdn-lfs.huggingface.co` | TCP 443 (HTTPS) |
+| `cdn.huggingface.co`     | TCP 443 (HTTPS) |
+
+  </TabItem>
+
+  <TabItem label="RedHat Models">
+
+| Domains | Port(s)
+| :--------------------------- | :---------------|
+| `registry.redhat.io`         | TCP 443 (HTTPS) |
+| `quay.io`                    | TCP 443 (HTTPS) |
+| `registry.access.redhat.com` | TCP 443 (HTTPS) |
+
+  </TabItem>
+
+  <TabItem label="HELM Charts">
+
+| Domains | Port(s) | Description |
+| :------------------------------------- | :---------------| :-------------|
+| `charts.jetstack.io`                   | TCP 443 (HTTPS) | #Cert-manager |
+| `charts.bitnami.com`                   | TCP 443 (HTTPS) | #Bitnami      |
+| `open-feature.github.io`               | TCP 443 (HTTPS) | #Open-feature |
+| `prometheus-community.github.io`       | TCP 443 (HTTPS) | #prometheus   |
+| `project-hami.github.io`               | TCP 443 (HTTPS) | #HAMi         |
+| `helm.ngc.nvidia.com`                  | TCP 443 (HTTPS) | #Nvidia       |
+| `llm-d.ai`                             | TCP 443 (HTTPS) | #llm-d        |
+| `istio-release.storage.googleapis.com` | TCP 443 (HTTPS) | # istio       |
+
+  </TabItem>
+
 </Tabs>
