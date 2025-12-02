@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import starlightOpenAPI, { openAPISidebarGroups } from 'starlight-openapi';
+import Icons from 'unplugin-icons/vite';
 
 export const locales = {
 	root: { label: 'English', lang: 'en' },
@@ -135,6 +136,6 @@ export default defineConfig({
 		})
 	],
 	vite: {
-		plugins: [tailwindcss()]
+		plugins: [tailwindcss(), Icons({ compiler: 'astro' })]
 	}
 });
