@@ -7,21 +7,16 @@ import { Card, CardGrid, LinkCard, Steps, Aside } from '@astrojs/starlight/compo
 import { Image } from 'astro:assets';
 import logo2 from '../../assets/logo2.png';
 
-<div class="flex gap-6 mb-4 items-center">
+<div class="flex flex-col md:flex-row gap-6 mb-4 items-center">
 	<div>
 		<strong class="text-xl">OtterScale</strong> is a{' '}
 		<strong class="text-xl">Hyper-Converged Infrastructure (HCI)</strong>
-		platform that unifies compute, storage, networking, and virtualization into a single, software-defined
-		system. By collapsing traditional infrastructure silos, OtterScale simplifies deployment and management
-		while delivering the scalability needed for modern enterprise workloads.
+		platform that unifies compute, storage, networking, and virtualization into a scalable solution.
+		Seamlessly manage VMs, containers, GPUs, and applications through a single control plane with enterprise-grade
+		performance.
 	</div>
 	<Image src={logo2} alt="OtterScale Logo" width="200" height="200" />
 </div>
-<Aside type="tip">
-	OtterScale is purpose-built for high-performance computing, offering robust **computation**
-	capabilities with GPU acceleration, scalable **storage**, and efficient **cluster** management,
-	making it an ideal foundation for AI/LLM/Data Center workloads.
-</Aside>
 
 ## System Architecture
 
@@ -48,19 +43,27 @@ The platform utilizes Ceph to provide a robust, self-healing storage fabric. Sto
 
 ## Key Features
 
-<CardGrid>
-	<Card title="Scope Management" icon="setting">
-		Logically isolate resources and manage access control for different teams or projects.
+<CardGrid stagger>
+	<Card icon="laptop" title="Virtualization">
+		KVM/QEMU VMs with live migration and GPU management
 	</Card>
-	<Card title="AI/LLM Readiness" icon="rocket">
-		Optimized for high-performance computing with support for GPU acceleration and high-speed
-		networking (InfiniBand/RoCE).
+	<Card icon="seti:docker" title="Container Orchestration">
+		Native Kubernetes and Juju charm deployment
 	</Card>
-	<Card title="Multi-Tenancy" icon="seti:lock">
-		Securely share infrastructure across multiple users while maintaining resource isolation.
+	<Card icon="seti:db" title="Distributed Storage">
+		Built-in Ceph clusters with automated backup
 	</Card>
-	<Card title="Unified Interface" icon="laptop">
-		A single pane of glass for monitoring and managing the entire stack, from metal to service.
+	<Card icon="gitter" title="Monitoring">
+		Integrated Prometheus and Grafana stack
+	</Card>
+	<Card icon="approve-check" title="Security">
+		RBAC with LDAP/AD integration and SSO
+	</Card>
+	<Card icon="puzzle" title="Application Marketplace">
+		Curated catalog of ready-to-deploy apps
+	</Card>
+	<Card icon="rocket" title="High Availability">
+		Multi-node deployment with automatic failover
 	</Card>
 </CardGrid>
 

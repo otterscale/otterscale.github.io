@@ -27,23 +27,54 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Icon } from '@astrojs/starlight/components';
 
-## Next steps
+## Key Features
 
 <CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
+	<Card icon="laptop" title="Virtualization">
+		KVM/QEMU VMs with live migration and GPU management
 	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a sidebar on this page.
+	<Card icon="seti:docker" title="Container Orchestration">
+		Native Kubernetes and Juju charm deployment
 	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	<Card icon="seti:db" title="Distributed Storage">
+		Built-in Ceph clusters with automated backup
 	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
+	<Card icon="gitter" title="Monitoring">
+		Integrated Prometheus and Grafana stack
 	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
+	<Card icon="seti:lock" title="Security">
+		RBAC with LDAP/AD integration and SSO
+	</Card>
+	<Card icon="puzzle" title="Application Marketplace">
+		Curated catalog of ready-to-deploy apps
+	</Card>
+	<Card icon="rocket" title="High Availability">
+		Multi-node deployment with automatic failover
+	</Card>
+</CardGrid>
+
+<CardGrid stagger>
+	<Card icon="laptop" title="Virtualization">
+		KVM/QEMU VMs with live migration and GPU management
+	</Card>
+	<Card icon="seti:docker" title="Container Orchestration">
+		Native Kubernetes and Juju charm deployment
+	</Card>
+	<Card icon="seti:db" title="Distributed Storage">
+		Built-in Ceph clusters with automated backup
+	</Card>
+	<Card icon="gitter" title="Monitoring">
+		Integrated Prometheus and Grafana stack
+	</Card>
+	<Card icon="seti:lock" title="Security">
+		RBAC with LDAP/AD integration and SSO
+	</Card>
+	<Card icon="puzzle" title="Application Marketplace">
+		Curated catalog of ready-to-deploy apps
+	</Card>
+	<Card icon="rocket" title="High Availability">
+		Multi-node deployment with automatic failover
 	</Card>
 </CardGrid>
