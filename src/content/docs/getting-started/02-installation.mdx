@@ -9,37 +9,45 @@ Follow the steps below to install and configure OtterScale.
 
 <Steps>
 
-1.  **Start Services**
+1.  **Prepare apt package**
+
+    ```bash
+    sudo apt install -y git curl
+    ```
+
+2.  **Git clone otterscale**
+
+    ```bash
+    git clone https://github.com/otterscale/otterscale.git
+    ```
+
+3.  **Prepare and modify .env file**
+
+    ```bash
+    cd otterscale
+    cp .env.example .env
+    ```
+
+    Update .env APP_VERSION and PUBLIC_API_URL
+
+    ```bash
+    APP_VERSION=0.6.0-beta.3
+    PUBLIC_API_URL=http://xx.xx.xx.xx:8299
+    ```
+
+4.  **Start Services**
 
     Run the following command to start the necessary services using Docker Compose:
 
     ```bash
-    docker-compose up -d
+    sudo docker-compose up -d
     ```
 
-2.  **Configure Installation**
-
-    Create an `install.cfg` file with the required configuration. You can use the following template:
-
-    ```bash title="install.cfg"
-    ## MAAS DHCP Range IP
-    MAAS_DHCP_START_IP="192.168.197.216"
-    MAAS_DHCP_END_IP="192.168.197.219"
-
-    ## OtterScale Web IP
-    OTTERSCALE_WEB_IP="192.168.197.220"
-    ```
-
-    <Aside type="caution" title="Network Configuration">
-    	Ensure that the IP addresses are correctly configured for your network environment. Incorrect
-    	settings may cause connectivity issues.
-    </Aside>
-
-3.  **Run Installation Script**
+5.  **Run Installation Script**
 
     Execute the installation script through the User Interface:
 
     1.  Access the OtterScale UI.
-    2.  Execute the `install.sh` script.
+    2.  Copy the CLI from OtterScale UI and execute the command with sudo privilege.
 
 </Steps>
