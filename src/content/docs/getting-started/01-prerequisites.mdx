@@ -42,7 +42,7 @@ The installer will help set up networking - no manual configuration needed.
 The installation process requires outbound access to various external services. Please whitelist the following domains and ports.
 
 <Tabs>
-  <TabItem label="Canonical Services">
+  <TabItem label="Canonical">
 
 | Domains | Port(s)
 | :------------------------------ | :---------------|
@@ -62,7 +62,7 @@ The installation process requires outbound access to various external services. 
 
   </TabItem>
 
-  <TabItem label="Snap Package Management">
+  <TabItem label="Snap Package">
 
 | Domains | Port(s)
 | :----------------------------------------- | :---------------|
@@ -76,7 +76,7 @@ The installation process requires outbound access to various external services. 
 
   </TabItem>
 
-  <TabItem label="Ubuntu Package Repositories">
+  <TabItem label="Ubuntu Repositories">
 
 | Domains | Port(s)
 | :---------------------- | :-----------------------------------|
@@ -88,19 +88,17 @@ The installation process requires outbound access to various external services. 
 
   </TabItem>
 
-  <TabItem label="GitHub and OtterScale">
+  <TabItem label="GitHub">
 
 | Domains | Port(s)
-| :------------------------------------ | :---------------|
-| `otterscale.github.io`                | TCP 443 (HTTPS) |
-| `otterscale.com`                      | TCP 443 (HTTPS) |
-| `raw.githubusercontent.com`           | TCP 443 (HTTPS) |
-| `github.com`                          | TCP 443 (HTTPS) |
-| `release-assets.githubusercontent.com | TCP 443 (HTTPS) |
+| :------------------------------------- | :---------------|
+| `github.com`                           | TCP 443 (HTTPS) |
+| `raw.githubusercontent.com`            | TCP 443 (HTTPS) |
+| `release-assets.githubusercontent.com` | TCP 443 (HTTPS) |
 
   </TabItem>
 
-  <TabItem label="Kubernetes and image relate">
+  <TabItem label="Kubernetes">
 
 | Domains | Port(s)
 | :------------------------------------------------------------------------------ | :---------------|
@@ -149,14 +147,17 @@ The installation process requires outbound access to various external services. 
 
 | Domains | Port(s) | Description |
 | :------------------------------------- | :---------------| :-------------|
+| `otterscale.github.io`                 | TCP 443 (HTTPS) | #OtterScale   |
 | `charts.jetstack.io`                   | TCP 443 (HTTPS) | #Cert-manager |
-| `charts.bitnami.com`                   | TCP 443 (HTTPS) | #Bitnami      |
 | `open-feature.github.io`               | TCP 443 (HTTPS) | #Open-feature |
+| `istio-release.storage.googleapis.com` | TCP 443 (HTTPS) | #Istio        |
 | `prometheus-community.github.io`       | TCP 443 (HTTPS) | #prometheus   |
 | `project-hami.github.io`               | TCP 443 (HTTPS) | #HAMi         |
 | `helm.ngc.nvidia.com`                  | TCP 443 (HTTPS) | #Nvidia       |
+| `cloudnative-pg.github.io/charts`      | TCP 443 (HTTPS) | #CloudNative  |
 | `llm-d.ai`                             | TCP 443 (HTTPS) | #llm-d        |
-| `istio-release.storage.googleapis.com` | TCP 443 (HTTPS) | # istio       |
+| `codecentric.github.io`                | TCP 443 (HTTPS) | #KeyCloak     |
+| `charts.bitnami.com`                   | TCP 443 (HTTPS) | #Bitnami      |
 
   </TabItem>
 

@@ -9,13 +9,19 @@ Follow the steps below to install and configure OtterScale.
 
 <Steps>
 
-1.  **Git clone otterscale**
+1.  **Prepare apt package**
 
     ```bash
-    https://github.com/otterscale/otterscale.git
+    sudo apt install -y git curl
     ```
 
-2.  **Prepare and modify .env file**
+2.  **Git clone otterscale**
+
+    ```bash
+    git clone https://github.com/otterscale/otterscale.git
+    ```
+
+3.  **Prepare and modify .env file**
 
     ```bash
     cd otterscale
@@ -29,15 +35,15 @@ Follow the steps below to install and configure OtterScale.
     PUBLIC_API_URL=http://xx.xx.xx.xx:8299
     ```
 
-3.  **Start Services**
+4.  **Start Services**
 
     Run the following command to start the necessary services using Docker Compose:
 
     ```bash
-    docker-compose up -d
+    sudo docker-compose up -d
     ```
 
-4.  **Run Installation Script**
+5.  **Run Installation Script**
 
     Execute the installation script through the User Interface:
 
