@@ -3,7 +3,7 @@ title: Prerequisites
 description: Hardware and network requirements for running OtterScale.
 ---
 
-import { Card, CardGrid, Aside, Tabs, TabItem, Badge } from '@astrojs/starlight/components';
+import { Card, CardGrid, Aside, Badge } from '@astrojs/starlight/components';
 
 ## System Requirements
 
@@ -41,11 +41,11 @@ The installer will help set up networking - no manual configuration needed.
 
 The installation process requires outbound access to various external services. Please whitelist the following domains and ports.
 
-<Tabs>
-  <TabItem label="Canonical">
+<details>
+<summary>Canonical</summary>
 
-| Domains | Port(s)
-| :------------------------------ | :---------------|
+| Domains                         | Port(s)         |
+| :------------------------------ | :-------------- |
 | `api.charmhub.io`               | TCP 443 (HTTPS) |
 | `api.jujucharms.com`            | TCP 443 (HTTPS) |
 | `changelogs.ubuntu.com`         | TCP 443 (HTTPS) |
@@ -60,12 +60,13 @@ The installation process requires outbound access to various external services. 
 | `contracts.canonical.com`       | TCP 443 (HTTPS) |
 | `images.maas.io`                | TCP 80 (HTTP)   |
 
-  </TabItem>
+</details>
 
-  <TabItem label="Snap Package">
+<details>
+<summary>Snap Package</summary>
 
-| Domains | Port(s)
-| :----------------------------------------- | :---------------|
+| Domains                                    | Port(s)         |
+| :----------------------------------------- | :-------------- |
 | `snapcraft.io`                             | TCP 443 (HTTPS) |
 | `api.snapcraft.io`                         | TCP 443 (HTTPS) |
 | `storage.snapcraftcontent.com`             | TCP 443 (HTTPS) |
@@ -74,79 +75,85 @@ The installation process requires outbound access to various external services. 
 | `canonical-lcy02.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
 | `canonical-bos01.cdn.snapcraftcontent.com` | TCP 443 (HTTPS) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="Ubuntu Repositories">
+<details>
+<summary>Ubuntu Repositories</summary>
 
-| Domains | Port(s)
-| :---------------------- | :-----------------------------------|
-| `tw.archive.ubuntu.com` | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
-| `archive.ubuntu.com`    | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
-| `ports.ubuntu.com`      | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
-| `security.ubuntu.com`   | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
-| `esm.ubuntu.com`        | TCP 443 (HTTPS)<br/>TCP 80 (HTTP)\* |
+| Domains                 | Port(s)                           |
+| :---------------------- | :-------------------------------- |
+| `tw.archive.ubuntu.com` | TCP 443 (HTTPS)<br/>TCP 80 (HTTP) |
+| `archive.ubuntu.com`    | TCP 443 (HTTPS)<br/>TCP 80 (HTTP) |
+| `ports.ubuntu.com`      | TCP 443 (HTTPS)<br/>TCP 80 (HTTP) |
+| `security.ubuntu.com`   | TCP 443 (HTTPS)<br/>TCP 80 (HTTP) |
+| `esm.ubuntu.com`        | TCP 443 (HTTPS)<br/>TCP 80 (HTTP) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="GitHub">
+<details>
+<summary>GitHub</summary>
 
-| Domains | Port(s)
-| :------------------------------------- | :---------------|
+| Domains                                | Port(s)         |
+| :------------------------------------- | :-------------- |
 | `github.com`                           | TCP 443 (HTTPS) |
 | `raw.githubusercontent.com`            | TCP 443 (HTTPS) |
 | `release-assets.githubusercontent.com` | TCP 443 (HTTPS) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="Kubernetes">
+<details>
+<summary>Kubernetes</summary>
 
-| Domains | Port(s)
-| :------------------------------------------------------------------------------ | :---------------|
-| `registry.k8s.io`                                                               | TCP 443 (HTTPS) |
-| `k8s.gcr.io`                                                                    | TCP 443 (HTTPS) |
-| `ghcr.io`                                                                       | TCP 443 (HTTPS) |
-| `coredns`                                                                       | TCP 443 (HTTPS) |
-| `d39mqg4b1dx9z1.cloudfront.net`                                                 | TCP 443 (HTTPS) |
-| `storage.googleapis.com`                                                        | TCP 443 (HTTPS) |
-| `nvcr.io`                                                                       | TCP 443 (HTTPS) |
-| `auth.docker.io`                                                                | TCP 443 (HTTPS) |
-| `auth.docker.com`                                                               | TCP 443 (HTTPS) |
-| `login.docker.com`                                                              | TCP 443 (HTTPS) |
-| `cdn.auth0.com`                                                                 | TCP 443 (HTTPS) |
-| `docker.io`                                                                     | TCP 443 (HTTPS) |
-| `hub.docker.com`                                                                | TCP 443 (HTTPS) |
-| `registry-1.docker.io`                                                          | TCP 443 (HTTPS) |
-| `index.docker.io`                                                               | TCP 443 (HTTPS) |
-| `production.cloudflare.docker.com`                                              | TCP 443 (HTTPS) |
-| `docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com`  | TCP 443 (HTTPS) |
-| `registry.cn-hangzhou.aliyuncs.com`                                             | TCP 443 (HTTPS) |
+| Domains                                                                        | Port(s)         |
+| :----------------------------------------------------------------------------- | :-------------- |
+| `registry.k8s.io`                                                              | TCP 443 (HTTPS) |
+| `k8s.gcr.io`                                                                   | TCP 443 (HTTPS) |
+| `ghcr.io`                                                                      | TCP 443 (HTTPS) |
+| `coredns`                                                                      | TCP 443 (HTTPS) |
+| `d39mqg4b1dx9z1.cloudfront.net`                                                | TCP 443 (HTTPS) |
+| `storage.googleapis.com`                                                       | TCP 443 (HTTPS) |
+| `nvcr.io`                                                                      | TCP 443 (HTTPS) |
+| `auth.docker.io`                                                               | TCP 443 (HTTPS) |
+| `auth.docker.com`                                                              | TCP 443 (HTTPS) |
+| `login.docker.com`                                                             | TCP 443 (HTTPS) |
+| `cdn.auth0.com`                                                                | TCP 443 (HTTPS) |
+| `docker.io`                                                                    | TCP 443 (HTTPS) |
+| `hub.docker.com`                                                               | TCP 443 (HTTPS) |
+| `registry-1.docker.io`                                                         | TCP 443 (HTTPS) |
+| `index.docker.io`                                                              | TCP 443 (HTTPS) |
+| `production.cloudflare.docker.com`                                             | TCP 443 (HTTPS) |
+| `docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com` | TCP 443 (HTTPS) |
+| `registry.cn-hangzhou.aliyuncs.com`                                            | TCP 443 (HTTPS) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="HuggingFace">
+<details>
+<summary>HuggingFace</summary>
 
-| Domains | Port(s)
-| :----------------------- | :---------------|
+| Domains                  | Port(s)         |
+| :----------------------- | :-------------- |
 | `huggingface.co`         | TCP 443 (HTTPS) |
 | `cdn-lfs.huggingface.co` | TCP 443 (HTTPS) |
 | `cdn.huggingface.co`     | TCP 443 (HTTPS) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="RedHat Models">
+<details>
+<summary>RedHat Models</summary>
 
-| Domains | Port(s)
-| :--------------------------- | :---------------|
+| Domains                      | Port(s)         |
+| :--------------------------- | :-------------- |
 | `registry.redhat.io`         | TCP 443 (HTTPS) |
 | `quay.io`                    | TCP 443 (HTTPS) |
 | `registry.access.redhat.com` | TCP 443 (HTTPS) |
 
-  </TabItem>
+</details>
 
-  <TabItem label="HELM Charts">
+<details>
+<summary>HELM Charts</summary>
 
-| Domains | Port(s) | Description |
-| :------------------------------------- | :---------------| :-------------|
+| Domains                                | Port(s)         | Description   |
+| :------------------------------------- | :-------------- | :------------ |
 | `otterscale.github.io`                 | TCP 443 (HTTPS) | #OtterScale   |
 | `charts.jetstack.io`                   | TCP 443 (HTTPS) | #Cert-manager |
 | `open-feature.github.io`               | TCP 443 (HTTPS) | #Open-feature |
@@ -159,6 +166,4 @@ The installation process requires outbound access to various external services. 
 | `codecentric.github.io`                | TCP 443 (HTTPS) | #KeyCloak     |
 | `charts.bitnami.com`                   | TCP 443 (HTTPS) | #Bitnami      |
 
-  </TabItem>
-
-</Tabs>
+</details>
