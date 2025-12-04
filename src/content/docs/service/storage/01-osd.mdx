@@ -3,22 +3,23 @@ title: OSD
 description: Monitor and manage Object Storage Daemons (OSDs).
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 The OSD (Object Storage Daemon) page provides a detailed overview of the storage daemons in your Ceph cluster.  
 Each OSD represents a logical disk that maps to an underlying physical device such as NVMe, SSD, or HDD.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing an overview of OSD status in the cluster.
+At the top of the page, you will find a dashboard summarizing the state of OSD capacity and availability across the cluster:
 
-#### Count
-
-Shows the total number of OSDs detected by the cluster.
-
-#### Usage
-
-Displays the overall raw storage usage across all OSDs, including the used and total storage capacity.
+<CardGrid>
+	<Card title="Count" icon="">
+		The total number of OSDs detected by the cluster.
+	</Card>
+	<Card title="Usage" icon="">
+		The percentage of overall raw storage usage across all OSDs.
+	</Card>
+</CardGrid>
 
 ## Introduction
 

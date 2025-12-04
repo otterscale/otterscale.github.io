@@ -3,7 +3,7 @@ title: Object
 description: Manage Ceph Object Gateway (RGW) buckets and users.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 The Object page allows you to manage the Ceph Object Gateway (RGW), which provides an S3-compatible object storage interface. You can manage buckets for storing objects and users for controlling access.
 
@@ -13,15 +13,18 @@ The page is divided into two main sections: **Bucket** and **User**.
 
 The Bucket section allows you to manage S3 buckets.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing a quick overview of the RGW configuration.
+At the top of the page, you will find a dashboard summarizing the state of S3 storage:
 
-### Buckets
-Shows the total number of S3 buckets created in the system.
-
-### Usage
-Shows the total storage consumption across all buckets, including object size and metadata.
+<CardGrid>
+	<Card title="Bucket" icon="tabler:bucket">
+		The total number of S3 buckets currently defined in the system.
+	</Card>
+	<Card title="Usage" icon="tabler:chart-pie">
+		The combined storage consumption across all buckets, including object data and metadata overhead.
+	</Card>
+</CardGrid>
 
 ### Introduction
 
@@ -85,12 +88,15 @@ Permanently removes a bucket and all its objects.
 
 The User section allows you to manage RGW users and their access keys.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing a quick overview of the RGW configuration.
+At the top of the page, you will find a dashboard summarizing the state of S3 user management:
 
-### Users
-Displays the total number of RGW users.
+<CardGrid>
+	<Card title="User Shares" icon="tabler:users">
+		The total number of S3 users registered in the system.
+	</Card>
+</CardGrid>
 
 ### Introduction
 

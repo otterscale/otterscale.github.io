@@ -3,20 +3,22 @@ title: Block Device
 description: Manage Ceph RADOS Block Devices (RBD).
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 The Block Device page allows you to manage Ceph RADOS Block Devices (RBD). RBDs are block-based storage devices that are striped across the cluster, providing high-performance and reliable storage for virtual machines, containers, and other applications.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing a quick overview of RBD usage in the cluster.
+At the top of the page, you will find a dashboard summarizing the state of RBD images stored in the cluster:
 
-### Images
-Shows the total number of RADOS Block Device images currently stored across all pools.
-
-### Usage
-Displays the combined usage of all block device images.  
-Including the total used capacity and total provisioned quota, helping administrators assess storage consumption at a glance.
+<CardGrid>
+	<Card title="Image" icon="tabler:database">
+		The total number of RADOS Block Device (RBD) images currently stored across all pools.
+	</Card>
+	<Card title="Usage" icon="tabler:chart-bar">
+		Displays the aggregated storage usage of all block device images, including total used capacity and total provisioned quota.
+	</Card>
+</CardGrid>
 
 ## Introduction
 
