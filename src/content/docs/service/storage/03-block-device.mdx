@@ -7,6 +7,17 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 
 The Block Device page allows you to manage Ceph RADOS Block Devices (RBD). RBDs are block-based storage devices that are striped across the cluster, providing high-performance and reliable storage for virtual machines, containers, and other applications.
 
+## Overview
+
+At the top of the page, providing a quick overview of RBD usage in the cluster.
+
+### Images
+Shows the total number of RADOS Block Device images currently stored across all pools.
+
+### Usage
+Displays the combined usage of all block device images.  
+Including the total used capacity and total provisioned quota, helping administrators assess storage consumption at a glance.
+
 ## Introduction
 
 The Block Device page displays a list of all RBD images. The table includes the following information:
@@ -41,12 +52,15 @@ You can modify or delete existing block devices using the **Actions** menu.
 
 ### Edit Block Device
 
-Allows you to resize the block device.
+Allows you to expand or shrink the block device.
+<Aside type="danger">
+	Shrinking is irreversible. Ensure that you have backed up any critical data.
+</Aside>
 
 <Steps>
 
 1.  Select **Edit** from the actions menu (pencil icon).
-2.  Update the **Quota Size** to expand or shrink the device.
+2.  Update the **Quota Size** to increase the device size.
 3.  Click **Confirm** to save changes.
 
 </Steps>
@@ -81,7 +95,6 @@ The snapshot list displays the following information:
 | **Name**    | The name of the snapshot.                                                       |
 | **Protect** | Indicates whether the snapshot is protected from deletion.                      |
 | **Usage**   | A progress bar showing the storage usage of the snapshot.                       |
-| **Actions** | Provides options to manage the snapshot (Rollback, Protect, Unprotect, Delete). |
 
 ### Snapshot Actions
 

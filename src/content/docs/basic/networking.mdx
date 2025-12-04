@@ -5,7 +5,18 @@ description: Manage networking in OtterScale.
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-This page allows you to manage the network infrastructure for the OtterScale cluster. You can configure fabrics, VLANs, and subnets to define how machines communicate within the cluster and with the external world.
+This page allows you to manage the network infrastructure for the OtterScale cluster. You can manage network fabrics, VLANs, and subnets for machine provisioning and service connectivity.
+
+## Overview
+
+#### Networks
+
+Displays the number of defined Fabric networks in the system.
+
+#### Available subnets
+
+Shows percentage and ratio of available (unallocated) IP addresses across all subnets.
+This allows administrators to understand IP exhaustion trends and plan for expansion.
 
 ## Introduction
 
@@ -23,6 +34,7 @@ The Networking page displays a list of configured networks. The table includes t
 
 ## Manage Networks
 
+A Fabric represents a physical or logical L2 broadcast domain. Within each Fabric, you can define VLANs. Each VLAN containes one Subnet, which represent routable IP networks used for DHCP, PXE booting, and machine allocation.
 You can create new networks or manage existing ones using the **Actions** menu (three dots icon) in each row.
 
 ### Create a New Network
