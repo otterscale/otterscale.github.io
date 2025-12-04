@@ -7,6 +7,13 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 
 The Pool page allows you to manage Ceph storage pools, which are logical partitions for storing objects. Pools provide a layer of abstraction between clients and the underlying OSDs, allowing you to configure data durability, availability, and performance policies.
 
+## Overview
+
+At the top of the page, providing an overview of the pool state in the cluster.
+
+### Pool
+Shows the total number of pools currently defined in the system.
+
 ## Introduction
 
 The Pool page displays a list of all storage pools. The table includes the following information:
@@ -17,11 +24,12 @@ The Pool page displays a list of all storage pools. The table includes the follo
 | **Type**         | The type of the pool, either `Replicated` (copies data) or `Erasure` (uses erasure coding for efficiency). It also displays configuration details like replica count or erasure coding profile (k+m). |
 | **Applications** | The applications enabled for this pool (e.g., `rbd`, `cephfs`, `rgw`).                                                                                                                                |
 | **PG State**     | The state of the Placement Groups (PGs) within the pool (e.g., `active`, `clean`, `degraded`).                                                                                                        |
-| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Total Space).                                                                                                                         |
+| **Usage**        | A progress bar indicating the amount of data stored in the pool relative to its total logical capacity.                                                                                               |
 
 ## Create Pool
 
 You can create new storage pools to meet specific application requirements.
+The create dialog includes configuration fields for pool type, replica size or erasure coding settings, application assignment, and optional quotas.
 
 <Steps>
 
@@ -32,7 +40,7 @@ You can create new storage pools to meet specific application requirements.
       - **Replicated Size**: Specify the number of replicas (e.g., 3).
     - **Erasure**: Uses erasure coding to save space. Ideal for cold storage or large datasets.
       - **EC Overwrite**: Enable if you need to support overwrites (required for RBD/CephFS on EC pools).
-4.  **Applications**: Select the applications that will use this pool (e.g., `rbd`, `cephfs`, `rgw`).
+4.  **Applications**: Select one or more applications that will use this pool (e.g., `rbd`, `cephfs`, `rgw`).
 5.  **Quota**: Optionally set limits on the pool's usage:
     - **Max Bytes**: The maximum amount of data (in GB or TB) the pool can store.
     - **Max Objects**: The maximum number of objects the pool can store.

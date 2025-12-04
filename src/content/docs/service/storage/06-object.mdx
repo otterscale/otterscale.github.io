@@ -13,16 +13,26 @@ The page is divided into two main sections: **Bucket** and **User**.
 
 The Bucket section allows you to manage S3 buckets.
 
+## Overview
+
+At the top of the page, providing a quick overview of the RGW configuration.
+
+### Buckets
+Shows the total number of S3 buckets created in the system.
+
+### Usage
+Shows the total storage consumption across all buckets, including object size and metadata.
+
 ### Introduction
 
 The Bucket table displays a list of all buckets. The table includes the following information:
 
-| Column         | Description                                     |
-| :------------- | :---------------------------------------------- |
-| **Name**       | The name of the bucket.                         |
-| **Owner**      | The user ID of the bucket owner.                |
-| **Usage**      | The total size of objects stored in the bucket. |
-| **Created At** | The creation timestamp of the bucket.           |
+| Column           | Description                                     |
+| :--------------- | :---------------------------------------------- |
+| **Name**         | The name of the bucket.                         |
+| **Owner**        | The user ID of the bucket owner.                |
+| **Usage**        | The total size of objects stored in the bucket. |
+| **Created Time** | The creation timestamp of the bucket.           |
 
 ### Create Bucket
 
@@ -67,9 +77,20 @@ Permanently removes a bucket and all its objects.
 
 </Steps>
 
+<Aside type="danger">
+	Deleting a Object bucket is irreversible. Ensure that you have backed up any critical data.
+</Aside>
+
 ## User
 
 The User section allows you to manage RGW users and their access keys.
+
+## Overview
+
+At the top of the page, providing a quick overview of the RGW configuration.
+
+### Users
+Displays the total number of RGW users.
 
 ### Introduction
 
@@ -78,7 +99,7 @@ The User table displays a list of all users. The table includes the following in
 | Column        | Description                                                                                                                         |
 | :------------ | :---------------------------------------------------------------------------------------------------------------------------------- |
 | **ID**        | The unique identifier of the user.                                                                                                  |
-| **User**      | The display name of the user.                                                                                                       |
+| **Name**      | The display name of the user.                                                                                                       |
 | **Suspended** | Indicates whether the user account is suspended.                                                                                    |
 | **Key**       | The number of access keys associated with the user. Clicking the external link icon opens a detailed view of the [keys](#key-list). |
 
@@ -124,6 +145,10 @@ Permanently removes a user.
 
 </Steps>
 
+<Aside type="danger">
+	Deleting a Object user is irreversible. Ensure that you have backed up any critical data.
+</Aside>
+
 ### Manage Keys
 
 Access keys are used to authenticate requests to the object storage service. You can view and manage keys by clicking the external link icon in the **Key** column.
@@ -135,7 +160,6 @@ The key list displays the following information:
 | Column         | Description                                  |
 | :------------- | :------------------------------------------- |
 | **Access Key** | The access key ID.                           |
-| **Actions**    | Provides options to manage the key (Delete). |
 
 #### Create Key
 
@@ -158,3 +182,7 @@ Permanently removes an access key.
 2.  Confirm the deletion.
 
 </Steps>
+
+<Aside type="danger">
+	Deleting a Object key is irreversible. Ensure that you have backed up any critical data.
+</Aside>

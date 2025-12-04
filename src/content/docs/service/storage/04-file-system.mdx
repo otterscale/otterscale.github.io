@@ -13,18 +13,24 @@ The page is divided into two main sections: **NFS** and **Group**.
 
 The NFS section allows you to manage subvolumes and export them via NFS.
 
+## Overview
+
+#### NFS
+
+Shows the total number of NFS exports created from CephFS subvolumes.
+
 ### Introduction
 
 The NFS table displays a list of subvolumes. The table includes the following information:
 
-| Column         | Description                                                                                                                                |
-| :------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Name**       | The name of the subvolume.                                                                                                                 |
-| **Pool Name**  | The data pool where the subvolume is stored.                                                                                               |
-| **Export**     | Displays the NFS export path and allowed clients (IPs). Clicking the copy icon copies the mount command.                                   |
-| **Usage**      | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                               |
-| **Created At** | The creation timestamp of the subvolume.                                                                                                   |
-| **Snapshots**  | The number of snapshots taken of this subvolume. Clicking the external link icon opens a detailed view of the [snapshots](#snapshot-list). |
+| Column           | Description                                                                                                                                |
+| :--------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name**         | The name of the subvolume.                                                                                                                 |
+| **Pool Name**    | The data pool where the subvolume is stored.                                                                                               |
+| **Export**       | Displays the NFS export path and allowed clients (IPs). Clicking the copy icon copies the mount command.                                   |
+| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                               |
+| **Created Time** | The creation timestamp of the subvolume.                                                                                                   |
+| **Snapshots**    | The number of snapshots taken of this subvolume. Clicking the external link icon opens a detailed view of the [snapshots](#snapshot-list). |
 
 ### Create NFS Export
 
@@ -75,6 +81,10 @@ Permanently removes the subvolume and its export.
 
 </Steps>
 
+<Aside type="danger">
+	Deleting a NFS export is irreversible. Ensure that you have backed up any critical data.
+</Aside>
+
 ### Manage Snapshots
 
 Snapshots provide a read-only copy of the subvolume at a specific point in time. You can view and manage snapshots by clicking the external link icon in the **Snapshots** column.
@@ -87,26 +97,36 @@ The snapshot list displays the following information:
 | :----------------- | :---------------------------------------------------------------- |
 | **Name**           | The name of the snapshot.                                         |
 | **Pending Clones** | Indicates if there are any pending clones based on this snapshot. |
-| **Created At**     | The creation timestamp of the snapshot.                           |
-| **Actions**        | Provides options to manage the snapshot (Delete).                 |
+| **Created Time**   | The creation timestamp of the snapshot.                           |
 
 #### Snapshot Actions
 
 - **Delete**: Permanently removes the snapshot.
 
+<Aside type="danger">
+	Deleting a NFS snapshot is irreversible. Ensure that you have backed up any critical data.
+</Aside>
+
 ## Group
 
 The Group section allows you to manage subvolume groups, which are used to organize subvolumes.
+
+## Overview
+
+#### Group
+
+Shows the total number of subvolume groups defined in the file system.
 
 ### Introduction
 
 The Group table displays a list of subvolume groups. The table includes the following information:
 
-| Column         | Description                              |
-| :------------- | :--------------------------------------- |
-| **Name**       | The name of the subvolume group.         |
-| **Pool Name**  | The data pool associated with the group. |
-| **Created At** | The creation timestamp of the group.     |
+| Column           | Description                                                                 |
+| :--------------- | :-------------------------------------------------------------------------- |
+| **Name**         | The name of the subvolume group.                                            |
+| **Pool Name**    | The data pool associated with the group.                                    |
+| **Usage**        | A progress bar showing the cumulative usage of all subvolumes in the group. |
+| **Created Time** | The creation timestamp of the group.                                        |
 
 ### Create Group
 
@@ -139,3 +159,7 @@ Permanently removes a subvolume group.
 3.  Click **Confirm** to permanently delete the group.
 
 </Steps>
+
+<Aside type="danger">
+	Deleting a NFS group is irreversible. Ensure that you have backed up any critical data.
+</Aside>
