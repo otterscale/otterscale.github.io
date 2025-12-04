@@ -3,20 +3,22 @@ title: Networking
 description: Manage networking in OtterScale.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 This page allows you to manage the network infrastructure for the OtterScale cluster. You can manage network fabrics, VLANs, and subnets for machine provisioning and service connectivity.
 
-## Overview
+### Statistics Overview
 
-#### Networks
+At the top of the page, a set of summary cards provides a quick overview of the configured networking resources.:
 
-Displays the number of defined Fabric networks in the system.
-
-#### Available subnets
-
-Shows percentage and ratio of available (unallocated) IP addresses across all subnets.
-This allows administrators to understand IP exhaustion trends and plan for expansion.
+<CardGrid>
+	<Card title="Networks" icon="tabler:topology-star">
+		Total number of Fabrics available for network segmentation.
+	</Card>
+	<Card title="Available Subnets" icon="">
+		Overall utilization of IP address space across all subnets.
+	</Card>
+</CardGrid>
 
 ## Introduction
 

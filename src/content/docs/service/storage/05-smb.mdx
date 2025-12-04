@@ -3,17 +3,19 @@ title: SMB
 description: Manage Samba (SMB) shares.
 ---
 
-import { Steps } from '@astrojs/starlight/components';
+import { Steps, Card, CardGrid } from '@astrojs/starlight/components';
 
 The SMB page allows you to manage Samba (SMB) shares, enabling file sharing across your network with Windows and other SMB-compatible clients. You can configure security modes, user access, and share properties.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing an overview of the SMB configuration.
+At the top of the page, you will find a dashboard summarizing the state of SMB shares configured in the system:
 
-### SMB Shares
-
-Shows the total number of SMB shares created on the system.
+<CardGrid>
+	<Card title="SMB Shares" icon="">
+		The total number of SMB shares currently defined in the system.
+	</Card>
+</CardGrid>
 
 ## Introduction
 

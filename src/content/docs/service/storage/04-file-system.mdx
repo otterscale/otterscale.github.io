@@ -3,7 +3,7 @@ title: File System
 description: Manage Ceph File Systems (CephFS) and NFS exports.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 The File System page allows you to manage Ceph File Systems (CephFS) and Network File System (NFS) exports. CephFS provides a POSIX-compliant file system on top of the Ceph cluster, while NFS exports allow you to share these file systems with standard NFS clients.
 
@@ -13,11 +13,15 @@ The page is divided into two main sections: **NFS** and **Group**.
 
 The NFS section allows you to manage subvolumes and export them via NFS.
 
-## Overview
+### Statistics Overview
 
-#### NFS
+At the top of the page, you will find a dashboard summarizing the state of NFS exports configured in the system:
 
-Shows the total number of NFS exports created from CephFS subvolumes.
+<CardGrid>
+	<Card title="NFS" icon="">
+		The total number of NFS exports created from CephFS subvolumes.
+	</Card>
+</CardGrid>
 
 ### Introduction
 
@@ -111,11 +115,15 @@ The snapshot list displays the following information:
 
 The Group section allows you to manage subvolume groups, which are used to organize subvolumes.
 
-## Overview
+### Statistics Overview
 
-#### Group
+At the top of the page, you will find a dashboard summarizing the state of subvolume groups configured in the file system:
 
-Shows the total number of subvolume groups defined in the file system.
+<CardGrid>
+	<Card title="Group" icon="">
+		The total number of subvolume groups defined in the file system.
+	</Card>
+</CardGrid>
 
 ### Introduction
 

@@ -3,16 +3,19 @@ title: Pool
 description: Manage Ceph storage pools.
 ---
 
-import { Steps, Aside } from '@astrojs/starlight/components';
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
 
 The Pool page allows you to manage Ceph storage pools, which are logical partitions for storing objects. Pools provide a layer of abstraction between clients and the underlying OSDs, allowing you to configure data durability, availability, and performance policies.
 
-## Overview
+### Statistics Overview
 
-At the top of the page, providing an overview of the pool state in the cluster.
+At the top of the page, you will find a dashboard summarizing the state of pool configuration within the cluster:
 
-### Pool
-Shows the total number of pools currently defined in the system.
+<CardGrid>
+	<Card title="Pool" icon="tabler:stack">
+		The total number of storage pools currently defined in the system.
+	</Card>
+</CardGrid>
 
 ## Introduction
 
