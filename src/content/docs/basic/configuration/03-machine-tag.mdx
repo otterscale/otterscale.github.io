@@ -5,14 +5,20 @@ description: Configure machine tags for OtterScale.
 
 import { Steps } from '@astrojs/starlight/components';
 
-This page allows you to manage tags that can be assigned to machines in the OtterScale cluster. Tags are useful for grouping machines, applying specific configurations, or identifying machine roles (e.g., `kubernetes-worker`, `ceph-osd`).
+This page allows you to manage tags that can be assigned to machines in the OtterScale cluster for filtering and group management. These tags help in organizing and managing machines based on their characteristics or purposes.
 
 ## Introduction
 
-The Machine Tag settings page displays a list of all existing tags. The table includes the following information:
+The Machine Tag settings page displays a list of all existing tags in a table format. Tags are identifiable labels that can be assigned to machines for various purposes such as:
 
-- **Tag**: The name of the tag (e.g., `gpu`, `storage`).
-- **Comment**: A description or note associated with the tag. Built-in tags may have specific comments indicating their purpose.
+- **Role Identification**: Marking machines by their function (e.g., `kubernetes-worker`, `kubernetes-control-plane`, `ceph-osd`)
+- **Hardware Features**: Identifying specific capabilities (e.g., `virtual` for VMs)
+- **Grouping**: Organizing machines for bulk operations or filtering
+
+### Table Columns
+
+- **TAG**: The unique name of the tag (e.g., `virtual`, `kubernetes`, `ceph`).
+- **COMMENT**: A description or note associated with the tag. Tags with "built-in" comment are system-managed tags that cannot be deleted.
 
 ## Manage Machine Tags
 
@@ -46,10 +52,14 @@ To remove a tag:
 
 2.  Click the **Delete** button (trash icon) in the actions column.
 
-    - **Note**: Tags marked as "built-in" in their comment cannot be deleted. The delete button will be disabled for these tags.
+    - **Note**: Built-in system tags (those with "built-in" in the comment field) cannot be deleted. The Delete link will be grayed out and disabled for these tags.
 
 3.  A confirmation modal will appear. You must type the name of the tag to confirm deletion.
 
 4.  Click **Confirm** to permanently delete the tag.
 
 </Steps>
+
+:::caution
+Deleting a tag will remove it from all machines that currently have this tag assigned. This action cannot be undone.
+:::
