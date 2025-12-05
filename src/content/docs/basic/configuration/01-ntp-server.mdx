@@ -9,7 +9,15 @@ This page allows you to configure the Network Time Protocol (NTP) servers used b
 
 ## Introduction
 
-The NTP Server settings page displays the currently configured NTP server addresses. Each server is shown with a clock icon.
+The NTP Server configuration page allows you to manage the time synchronization sources for your OtterScale infrastructure. Here you can view and modify the list of NTP servers that will be used across all scopes.
+
+**Key Points:**
+
+- **Scope:** These settings apply to all scopes. Any changes made here will affect time synchronization for MAAS itself, all deployed machines, and devices using MAAS's DHCP services.
+- **Default Configuration:** By default, OtterScale uses `ntp.ubuntu.com` as the NTP server.
+- **Address Format:** You can specify NTP servers using either IP addresses (e.g., `192.168.1.1`) or hostnames (e.g., `pool.ntp.org`, `time.google.com`).
+- **Multiple Servers:** It's recommended to configure multiple NTP servers for redundancy. If one server becomes unavailable, the system will automatically fall back to alternative servers.
+- **Display:** Each configured server is displayed with a clock icon in the configuration list.
 
 ## Why is NTP Important?
 
@@ -32,9 +40,8 @@ To modify the NTP server list, follow these steps:
 
 3.  In the **Address** field, you can manage the list of NTP servers:
 
-    - **Add a server:** Type the NTP server address (e.g., `pool.ntp.org`) in the input field and click the **Add** button (or press Enter).
-    - **Remove a server:** Click the remove icon next to an existing address to delete it.
-    - **Clear all:** Use the **Clear** button to remove all entries.
+    - **Add a server:** Type the NTP server address (e.g., `pool.ntp.org`) in the input field and click the **+** button to add it to the list (or press Enter).
+    - **Remove a server:** Click the **×** icon next to an existing address to delete it from the list.
 
 4.  Click **Confirm** to save your changes. The system will update the configuration and the new list will be displayed.
 

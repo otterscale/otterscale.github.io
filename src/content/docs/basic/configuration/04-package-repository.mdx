@@ -5,15 +5,20 @@ description: Configure package repositories for OtterScale.
 
 import { Steps } from '@astrojs/starlight/components';
 
-This page allows you to manage the package repositories used by the machines in the OtterScale cluster. These repositories are the sources from which software packages and updates are downloaded (e.g., the Ubuntu archive).
+Package repositories contain software packages that can be installed on machines. These repositories can be configured with custom URLs and enabled/disabled as needed to control software sources and updates for your infrastructure.
 
 ## Introduction
 
-The Package Repository settings page displays a list of configured repositories. The table includes the following information:
+The Package Repository settings page displays a list of configured repositories in a table format. By default, OtterScale includes standard Ubuntu repositories such as:
 
-- **Name**: The name of the repository (e.g., `Ubuntu archive`).
-- **URL**: The base URL of the repository.
-- **Enabled**: Indicates whether the repository is currently active and being used.
+- **Ubuntu extra architectures**: Provides packages for additional CPU architectures
+- **Ubuntu archive**: The main Ubuntu package repository
+
+### Table Columns
+
+- **NAME**: The display name of the repository (e.g., `Ubuntu extra architectures`, `Ubuntu archive`).
+- **URL**: The base URL of the repository (e.g., `http://ports.ubuntu.com/ubuntu-ports`, `http://tw.archive.ubuntu.com/ubuntu`).
+- **ENABLED**: A toggle indicator showing whether the repository is currently active.
 
 ## Manage Package Repositories
 
@@ -27,7 +32,7 @@ To change the URL of a package repository:
 
 1.  Locate the repository you want to modify in the list.
 
-2.  Click the **Edit** button (pencil icon) in the actions column.
+2.  Click the **Edit** link (displayed with a pencil icon) on the right side of the row.
 
 3.  A modal window titled "Edit Package Repository" will appear.
 
@@ -36,3 +41,15 @@ To change the URL of a package repository:
 5.  Click **Confirm** to save your changes.
 
 </Steps>
+
+### Enable or Disable a Repository
+
+To toggle a repository's active status:
+
+1.  Locate the repository in the list.
+2.  Click on the circle icon in the **ENABLED** column to toggle between enabled (filled circle) and disabled (empty circle).
+3.  The change takes effect immediately.
+
+:::note
+Disabling a repository will prevent machines from using it as a package source. Ensure that critical repositories remain enabled to avoid issues with package installation and updates.
+:::
