@@ -15,7 +15,7 @@
     "@fontsource/geist": "^5.2.8",
     "@fontsource/geist-mono": "^5.2.7",
     "@fontsource/outfit": "^5.2.8",
-    "@iconify/json": "^2.2.413",
+    "@iconify/json": "^2.2.414",
     "@tailwindcss/vite": "^4.0.7",
     "astro": "^5.6.1",
     "sharp": "^0.34.2",
