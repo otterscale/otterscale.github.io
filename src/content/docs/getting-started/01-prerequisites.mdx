@@ -5,7 +5,7 @@ description: Hardware and network requirements for running OtterScale.
 
 import { Card, CardGrid, Aside, Badge } from '@astrojs/starlight/components';
 
-## System Requirements
+## OtterScale Control Node
 
 Before installing OtterScale, ensure your environment meets the following specifications.
 
@@ -17,12 +17,13 @@ This is a specific version of Linux. If you're using a different operating syste
 | :-------- | :------------------------------ |
 | **OS**    | **Ubuntu 24.04 LTS** (Required) |
 
-### Hardware
+### Hardware Requirements
 
-These are the minimum requirements. More is always better for performance.
+These are the minimum requirements for the control node. More is always better for performance.
 
 | Resource       | Minimum Requirement      |
 | :------------- | :----------------------- |
+| **CPU**        | 4 Cores                  |
 | **Memory**     | 8 GB RAM                 |
 | **Disk Space** | 100 GB available storage |
 
@@ -34,6 +35,47 @@ The installer will help set up networking - no manual configuration needed.
 - **Bridge Configuration:** The installation script will check for network bridge `br-otters`.
   - _Existing:_ If the bridge exists, it will be used.
   - _Missing:_ If the bridge does not exist, the script will prompt to select an existing bridge or create a new one automatically.
+
+---
+
+## K8S Nodes (Server Nodes)
+
+Ensure the following settings are configured on your server hosts.
+
+### BIOS Configuration
+
+1.  **BMC Settings:**
+    *   **BMC Static IP:** Set a static IP for the BMC to ensure stable management access.
+    *   **Boot Order:** Enable BMC Network and prioritize **Network Boot** in the boot order.
+2.  **Boot Options:**
+    *   **Boot Mode:** Set to **UEFI**.
+        *   **Why not Legacy?** Legacy mode is not recommended as it limits boot drive size to 2TB, lacks modern security features, and does not support GPT partitioning, which is standard for modern deployments.
+    *   **Fast Boot:** **Disable** Fast Boot to ensure thorough hardware initialization.
+3.  **CPU Virtualization:**
+    *   **Intel:** Enable `VMX`, `VT-d`, or `VT-x`.
+    *   **AMD:** Enable `SVM` or `AMD-V`.
+
+### Hardware Requirements
+
+| Resource       | Minimum Requirement                                 |
+| :------------- | :-------------------------------------------------- |
+| **Storage**    | At least **2 Block disks** or **2 Physical drives** |
+
+---
+
+## Network IP Requirement
+
+Ensure you have sufficient IP addresses available in your subnet.
+
+| Usage                   | Quantity  | Description                            |
+| :---------------------  | :---      | :---                                   |
+| **OS System**           | 1         | Used for the ingress controller.       |
+| **OtterScale**          | 1         | **Required from user.**A second IP in the same subnet for OtterScale services. |
+| **Juju Controller**     | 1         | Used by the Canonical Juju controller. |
+| **MAAS (DHCP)**         | 2         | Used for MAAS dynamic IP allocation.   |
+| **Kubernetes and Ceph** | 9 + N     | Used for Kubernetes and Ceph services. |
+
+**Total Estimated IPs:** 14 + N (where N is the number of servers)
 
 ---
 

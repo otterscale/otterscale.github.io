@@ -9,10 +9,11 @@ Follow the steps below to install and configure OtterScale.
 
 <Steps>
 
-1.  **Prepare apt package**
+1.  **Prepare apt package and docker**
 
     ```bash
     sudo apt install -y git curl
+    sudo snap install docker
     ```
 
 2.  **Git clone otterscale**
@@ -31,7 +32,7 @@ Follow the steps below to install and configure OtterScale.
     Update .env APP_VERSION and PUBLIC_API_URL
 
     ```bash
-    APP_VERSION=0.6.0-beta.3
+    APP_VERSION=0.6.0
     PUBLIC_API_URL=http://xx.xx.xx.xx:8299
     ```
 
