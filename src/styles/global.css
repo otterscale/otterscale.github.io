@@ -30,7 +30,7 @@
 }
 
 .site-title {
-	@apply font-title font-light gap-2 text-2xl tracking-tight text-black dark:text-white;
+	@apply font-title font-light gap-2 text-2xl tracking-tighter text-black dark:text-white;
 }
 
 .social-icons svg {
