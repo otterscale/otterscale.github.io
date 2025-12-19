@@ -98,6 +98,13 @@ export default defineConfig({
 							slug: 'service/models'
 						},
 						{
+							label: 'Repositories',
+							translations: {
+								'zh-Hant': '儲存庫'
+							},
+							slug: 'service/repositories'
+						},
+						{
 							label: 'Applications',
 							translations: {
 								'zh-Hant': '應用'
