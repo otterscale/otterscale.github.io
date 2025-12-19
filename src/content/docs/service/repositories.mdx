@@ -1,0 +1,132 @@
+---
+title: Repositories
+description: Manage container images and Helm charts in the registry.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The Repositories page allows you to view and manage the container images and Helm charts stored in your private registry.
+
+## Introduction
+
+The Repositories table displays a list of all repositories. The table includes the following information:
+
+| Column         | Description                                                                                                                    |
+| :------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| **Name**       | The name of the repository.                                                                                                    |
+| **Latest Tag** | The most recent tag associated with the repository.                                                                            |
+| **Size**       | The total size of the repository.                                                                                              |
+| **Manifests**  | The number of manifests (versions/tags) in the repository. Clicking the external link icon opens a detailed list of manifests. |
+
+## Upload Instructions
+
+You can upload Docker images and Helm charts to the repository via your local terminal.
+
+<Aside type="tip" title="Registry URL">
+To obtain the `<registry_url>`, click the **Commands** button on this page or check the **Applications Services** page.
+</Aside>
+
+<Aside title="Prerequisites">
+Ensure you have the necessary tools installed:
+
+- **Docker**: [Installation Guide](https://www.docker.com/)
+- **Helm**: [Installation Guide](https://helm.sh/)
+
+</Aside>
+
+<Tabs>
+<TabItem label="Docker Image">
+    <Steps>
+
+    1.  Tag the image:
+
+        ```bash
+        docker tag <repository>:<tag> <registry_url>/<repository>:<tag>
+        ```
+
+    2.  Push the image:
+
+        ```bash
+        docker push <registry_url>/<repository>:<tag>
+        ```
+
+    3.  After uploading, navigate to the [Applications Store](/service/applications/04-store/) to update the Helm chart configuration to use your custom image:
+
+        ```yaml
+        # Docker image
+        image:
+          # -- Docker image registry
+          repository: <registry_url>/<repository>
+          # -- Docker pull policy
+          pullPolicy: IfNotPresent
+          # -- Docker image tag, overrides the image tag whose default is the chart appVersion.
+          tag: <tag>
+        ```
+
+    </Steps>
+
+</TabItem>
+
+<TabItem label="Helm Chart">
+    <Steps>
+
+    1.  Download a chart package from [Artifact Hub](https://artifacthub.io/).
+
+    2.  Upload the downloaded chart:
+
+        ```bash
+        helm push <chart_package> oci://<registry_url>/<namespace> --plain-http
+        ```
+
+    3.  After uploading, navigate to the [Applications Store](/service/applications/04-store/) to deploy the Helm chart.
+
+    </Steps>
+
+</TabItem>
+</Tabs>
+
+## Manage Repositories
+
+<Aside>
+	While you cannot create repositories directly from the UI (they are created when you push images
+	or charts), you can manage the existing contents.
+</Aside>
+
+### View Manifests
+
+To view the specific versions or tags within a repository:
+
+<Steps>
+
+1.  Locate the repository in the list.
+2.  Click the external link icon in the **Manifests** column.
+3.  A side panel will open displaying all manifests (tags) for that repository.
+
+</Steps>
+
+### View Manifest Details
+
+You can inspect the details of a specific image or chart version.
+
+<Steps>
+
+1.  Open the **Manifests** list for a repository.
+2.  Click on any manifest item.
+3.  A dialog will appear showing detailed information:
+    - **Charts**: Displays version, description, dependencies, maintainers, and source links.
+    - **Images**: Displays author, creation time, architecture, and container configuration (ports, entrypoint, commands, etc.).
+
+</Steps>
+
+### Delete Manifest
+
+You can delete specific versions (manifests) from a repository.
+
+<Steps>
+
+1.  Open the **Manifests** list for a repository.
+2.  Locate the specific tag/version you want to remove.
+3.  Click the **Delete** button (trash icon).
+4.  Confirm the deletion to permanently remove the manifest.
+
+</Steps>

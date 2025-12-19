@@ -57,12 +57,29 @@ To deploy a new application:
 1.  Click on the application card to open the details panel.
 2.  Click the **Install** button.
 3.  **Configuration**:
+
     - **Name**: Enter a name for the release.
     - **Namespace**: Specify the target namespace.
     - **Version**: Select the chart version to install.
     - **Dry Run**: Toggle to simulate the installation without making changes.
-    - **Configuration**: Customize the `values.yaml` configuration for the chart.
-4.  Click **Confirm** to start the installation.
+    - **Configuration**: Customize the `values.yaml` configuration for the chart. You can modify the parameters to override the chart's defaults, such as replica counts, resource limits, or service settings. The editor supports YAML syntax highlighting and validation.
+
+      ```yaml
+      # Example Configuration
+      replicaCount: 1
+      image:
+        repository: nginx
+        tag: stable
+      service:
+        type: ClusterIP
+        port: 80
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+      ```
+
+4.  Click **Confirm** to start the installation. Once installed, the application will appear in the **Releases** tab.
 
 </Steps>
 
