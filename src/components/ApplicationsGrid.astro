@@ -1,0 +1,369 @@
+---
+import { Image } from 'astro:assets';
+
+import airflowIcon from '@assets/icons/airflow.svg';
+import argoCdIcon from '@assets/icons/argo-cd.svg';
+import artifactHubIcon from '@assets/icons/artifact-hub.svg';
+import authentikIcon from '@assets/icons/authentik.svg';
+import ciliumIcon from '@assets/icons/cilium.svg';
+import confluenceIcon from '@assets/icons/confluence.svg';
+import consulIcon from '@assets/icons/consul.svg';
+import datadogIcon from '@assets/icons/datadog.svg';
+import droneIcon from '@assets/icons/drone.svg';
+import elasticStackIcon from '@assets/icons/elastic-stack.svg';
+import elasticsearchIcon from '@assets/icons/elasticsearch.svg';
+import filebeatIcon from '@assets/icons/filebeat.svg';
+import giteaIcon from '@assets/icons/gitea.svg';
+import harborIcon from '@assets/icons/harbor.svg';
+import headlampIcon from '@assets/icons/headlamp.svg';
+import istioIcon from '@assets/icons/istio.svg';
+import jaegerIcon from '@assets/icons/jaeger.svg';
+import jenkinsIcon from '@assets/icons/jenkins.svg';
+import jiraIcon from '@assets/icons/jira.svg';
+import jupyterhubIcon from '@assets/icons/jupyterhub.svg';
+import kibanaIcon from '@assets/icons/kibana.svg';
+import kongIcon from '@assets/icons/kong.svg';
+import kyvernoIcon from '@assets/icons/kyverno.svg';
+import logstashIcon from '@assets/icons/logstash.svg';
+import nginxIcon from '@assets/icons/nginx.svg';
+import openebsIcon from '@assets/icons/openebs.svg';
+import openmetadataIcon from '@assets/icons/openmetadata.png';
+import prometheusIcon from '@assets/icons/prometheus.svg';
+import qdrantIcon from '@assets/icons/qdrant.svg';
+import redpandaIcon from '@assets/icons/redpanda.svg';
+import sonarqubeIcon from '@assets/icons/sonarqube.svg';
+import terraformIcon from '@assets/icons/terraform.svg';
+import traefikIcon from '@assets/icons/traefik.svg';
+import vaultIcon from '@assets/icons/vault.svg';
+
+import { shuffle } from '@utils/helpers.js';
+
+interface IconItem {
+	meta: ImageMetadata;
+	alt: string;
+	search: string;
+	url: string;
+}
+
+const icons: IconItem[] = [
+	{ meta: airflowIcon, alt: 'Airflow', search: 'airflow', url: 'https://airflow.apache.org/' },
+	{ meta: argoCdIcon, alt: 'Argo CD', search: 'argo-cd', url: 'https://argoproj.github.io/cd/' },
+	{
+		meta: artifactHubIcon,
+		alt: 'Artifact Hub',
+		search: 'artifact-hub',
+		url: 'https://artifacthub.io/'
+	},
+	{ meta: authentikIcon, alt: 'Authentik', search: 'authentik', url: 'https://goauthentik.io/' },
+	{ meta: ciliumIcon, alt: 'Cilium', search: 'cilium', url: 'https://cilium.io/' },
+	{
+		meta: confluenceIcon,
+		alt: 'Confluence',
+		search: 'confluence',
+		url: 'https://www.atlassian.com/software/confluence'
+	},
+	{ meta: consulIcon, alt: 'Consul', search: 'consul', url: 'https://www.consul.io/' },
+	{ meta: datadogIcon, alt: 'Datadog', search: 'datadog', url: 'https://www.datadoghq.com/' },
+	{ meta: droneIcon, alt: 'Drone', search: 'drone', url: 'https://www.drone.io/' },
+	{
+		meta: elasticStackIcon,
+		alt: 'Elastic Stack',
+		search: 'elastic-stack',
+		url: 'https://www.elastic.co/elastic-stack'
+	},
+	{
+		meta: elasticsearchIcon,
+		alt: 'Elasticsearch',
+		search: 'elasticsearch',
+		url: 'https://www.elastic.co/elasticsearch'
+	},
+	{
+		meta: filebeatIcon,
+		alt: 'Filebeat',
+		search: 'filebeat',
+		url: 'https://www.elastic.co/beats/filebeat'
+	},
+	{ meta: giteaIcon, alt: 'Gitea', search: 'gitea', url: 'https://about.gitea.com/' },
+	{ meta: harborIcon, alt: 'Harbor', search: 'harbor', url: 'https://goharbor.io/' },
+	{ meta: headlampIcon, alt: 'Headlamp', search: 'headlamp', url: 'https://headlamp.dev/' },
+	{ meta: istioIcon, alt: 'Istio', search: 'istiod', url: 'https://istio.io/' },
+	{ meta: jaegerIcon, alt: 'Jaeger', search: 'jaeger', url: 'https://www.jaegertracing.io/' },
+	{ meta: jenkinsIcon, alt: 'Jenkins', search: 'jenkins', url: 'https://www.jenkins.io/' },
+	{ meta: jiraIcon, alt: 'Jira', search: 'jira', url: 'https://www.atlassian.com/software/jira' },
+	{ meta: jupyterhubIcon, alt: 'JupyterHub', search: 'jupyterhub', url: 'https://jupyter.org/hub' },
+	{ meta: kibanaIcon, alt: 'Kibana', search: 'kibana', url: 'https://www.elastic.co/kibana' },
+	{ meta: kongIcon, alt: 'Kong', search: 'kong', url: 'https://konghq.com/' },
+	{ meta: kyvernoIcon, alt: 'Kyverno', search: 'kyverno', url: 'https://kyverno.io/' },
+	{
+		meta: logstashIcon,
+		alt: 'Logstash',
+		search: 'logstash',
+		url: 'https://www.elastic.co/logstash'
+	},
+	{ meta: nginxIcon, alt: 'Nginx', search: 'nginx', url: 'https://nginx.org/' },
+	{ meta: openebsIcon, alt: 'OpenEBS', search: 'openebs', url: 'https://openebs.io/' },
+	{
+		meta: openmetadataIcon,
+		alt: 'OpenMetadata',
+		search: 'openmetadata',
+		url: 'https://open-metadata.org/'
+	},
+	{ meta: prometheusIcon, alt: 'Prometheus', search: 'prometheus', url: 'https://prometheus.io/' },
+	{ meta: qdrantIcon, alt: 'Qdrant', search: 'qdrant', url: 'https://qdrant.tech/' },
+	{ meta: redpandaIcon, alt: 'Redpanda', search: 'redpanda', url: 'https://redpanda.com/' },
+	{
+		meta: sonarqubeIcon,
+		alt: 'SonarQube',
+		search: 'sonarqube',
+		url: 'https://www.sonarsource.com/products/sonarqube/'
+	},
+	{ meta: terraformIcon, alt: 'Terraform', search: 'terraform', url: 'https://www.terraform.io/' },
+	{ meta: traefikIcon, alt: 'Traefik', search: 'traefik', url: 'https://traefik.io/' },
+	{ meta: vaultIcon, alt: 'Vault', search: 'vault', url: 'https://www.vaultproject.io/' }
+];
+
+// Shuffle icons and split into 3 rows
+const shuffledIcons: IconItem[] = shuffle(icons);
+const iconsPerRow: number = Math.ceil(shuffledIcons.length / 3);
+const row1: IconItem[] = shuffledIcons.slice(0, iconsPerRow);
+const row2: IconItem[] = shuffledIcons.slice(iconsPerRow, iconsPerRow * 2);
+const row3: IconItem[] = shuffledIcons.slice(iconsPerRow * 2);
+
+const infiniteIconsRow1: IconItem[] = [...row1, ...row1];
+const infiniteIconsRow2: IconItem[] = [...row2, ...row2];
+const infiniteIconsRow3: IconItem[] = [...row3, ...row3];
+---
+
+<div class="infinite-scroll-container">
+	<!-- Row 1: Right to Left -->
+	<div class="scroll-row scroll-rtl">
+		<div class="scroll-content">
+			{
+				infiniteIconsRow1.map((icon: IconItem) => (
+					<a class="img" href={icon.url} target="_blank" rel="noopener noreferrer" title={icon.alt}>
+						<Image class:list={['icon']} src={icon.meta} alt={icon.alt} />
+						<span class="tooltip">{icon.alt}</span>
+					</a>
+				))
+			}
+		</div>
+	</div>
+
+	<!-- Row 2: Left to Right -->
+	<div class="scroll-row scroll-ltr">
+		<div class="scroll-content">
+			{
+				infiniteIconsRow2.map((icon: IconItem) => (
+					<a class="img" href={icon.url} target="_blank" rel="noopener noreferrer" title={icon.alt}>
+						<Image class:list={['icon']} src={icon.meta} alt={icon.alt} />
+						<span class="tooltip">{icon.alt}</span>
+					</a>
+				))
+			}
+		</div>
+	</div>
+
+	<!-- Row 3: Right to Left -->
+	<div class="scroll-row scroll-rtl-slow">
+		<div class="scroll-content">
+			{
+				infiniteIconsRow3.map((icon: IconItem) => (
+					<a class="img" href={icon.url} target="_blank" rel="noopener noreferrer" title={icon.alt}>
+						<Image class:list={['icon']} src={icon.meta} alt={icon.alt} />
+						<span class="tooltip">{icon.alt}</span>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</div>
+
+<style>
+	.infinite-scroll-container {
+		width: 100%;
+		overflow: hidden;
+		padding: 1rem 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.scroll-row {
+		display: flex;
+		overflow: hidden;
+		width: 100%;
+		position: relative;
+		mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+		-webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+	}
+
+	.scroll-content {
+		display: flex;
+		gap: 1rem;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		will-change: transform;
+	}
+
+	/* Pause animation on hover for better UX */
+	.scroll-row:hover .scroll-content {
+		animation-play-state: paused;
+	}
+
+	/* Row 1: Right to Left */
+	.scroll-rtl .scroll-content {
+		animation: scroll-rtl 90s linear infinite;
+	}
+
+	/* Row 2: Left to Right - Faster speed */
+	.scroll-ltr .scroll-content {
+		animation: scroll-ltr 45s linear infinite;
+	}
+
+	/* Row 3: Right to Left */
+	.scroll-rtl-slow .scroll-content {
+		animation: scroll-rtl 80s linear infinite;
+	}
+
+	@keyframes scroll-rtl {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-50%);
+		}
+	}
+
+	@keyframes scroll-ltr {
+		0% {
+			transform: translateX(-50%);
+		}
+		100% {
+			transform: translateX(0);
+		}
+	}
+
+	.img {
+		position: relative;
+		width: 7rem;
+		height: 7rem;
+		min-width: 7rem;
+		min-height: 7rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.5rem;
+		background-color: var(--sl-color-bg);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		overflow: visible;
+		margin-top: initial;
+		text-decoration: none;
+		cursor: pointer;
+		transition: border-color 0.2s ease;
+	}
+
+	.img:hover {
+		border-color: var(--sl-color-gray-3);
+	}
+
+	.img img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.img * {
+		margin-top: initial;
+	}
+
+	/* Tooltip styles */
+	.tooltip {
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.4rem 0.8rem;
+		background-color: var(--sl-color-gray-6);
+		color: var(--sl-color-white);
+		font-size: 0.75rem;
+		font-weight: 500;
+		white-space: nowrap;
+		border-radius: 0.25rem;
+		opacity: 0;
+		visibility: hidden;
+		transition:
+			opacity 0.2s ease,
+			visibility 0.2s ease;
+		pointer-events: none;
+		margin-bottom: 0.5rem;
+		z-index: 10;
+	}
+
+	.tooltip::after {
+		content: '';
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		border-width: 5px;
+		border-style: solid;
+		border-color: var(--sl-color-gray-6) transparent transparent transparent;
+	}
+
+	.img:hover .tooltip {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* Theme-aware icon switching when a light variant exists */
+	.img img.icon.light {
+		display: none;
+	}
+	.img img.icon.dark {
+		display: block;
+	}
+	:global([data-theme='light']) .img img.icon.light {
+		display: block;
+	}
+	:global([data-theme='light']) .img img.icon.dark {
+		display: none;
+	}
+
+	/* Responsive adjustments */
+	@media screen and (max-width: 768px) {
+		.img {
+			width: 5rem;
+			height: 5rem;
+			min-width: 5rem;
+			min-height: 5rem;
+		}
+
+		.scroll-content {
+			gap: 0.75rem;
+		}
+
+		.tooltip {
+			font-size: 0.65rem;
+			padding: 0.3rem 0.6rem;
+		}
+	}
+
+	@media screen and (min-width: 320px) and (max-width: 767px) {
+		.img {
+			width: 4rem;
+			height: 4rem;
+			min-width: 4rem;
+			min-height: 4rem;
+		}
+
+		.scroll-content {
+			gap: 0.5rem;
+		}
+
+		.tooltip {
+			font-size: 0.6rem;
+			padding: 0.25rem 0.5rem;
+		}
+	}
+</style>
