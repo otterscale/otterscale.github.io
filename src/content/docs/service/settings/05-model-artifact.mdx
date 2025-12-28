@@ -1,0 +1,60 @@
+---
+title: Model Artifact
+description: Manage model files and weights for AI/ML models.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+
+
+The Model Artifact page allows you to manage model artifacts for your AI/ML models. You can upload, view, and delete model artifacts associated with different models and namespaces.
+
+
+## Introduction
+
+The Model Artifact page displays a list of all model artifacts. The table includes the following columns:
+
+| Column          | Description                                                        |
+| :-------------- | :----------------------------------------------------------------- |
+| **Name**        | The name of the model artifact.                                    |
+| **Namespace**   | The Kubernetes namespace where the artifact is stored.             |
+| **Model Name**  | The name of the associated model.                                  |
+| **Status**      | The current job status for downloading or processing the artifact. |
+| **Phase**       | The current phase/status of the artifact.                          |
+| **Size**        | The size of the artifact (GB/TB).                                  |
+| **Volume**      | The volume name where the artifact is stored.                      |
+| **Create Time** | The timestamp when the artifact was created.                       |
+| **Actions**     | Management actions (delete).                                       |
+
+
+## Manage Model Artifacts
+
+You can create new model artifacts or manage existing ones using the **Actions** menu.
+
+### Create a New Model Artifact
+
+To upload a new model artifact:
+
+<Steps>
+1. Click the **Create** button (plus icon) at the top of the page.
+2. A modal window titled "Create Model Artifact" will appear.
+3. **Configuration**:
+    - **Name**: Enter a unique name for the artifact.
+    - **Namespace**: Select the namespace (usually `llm-d`).
+    - **Model Name**: Select the model name (supports Hugging Face models).
+    - **Size**: Set the artifact size (GB/TB).
+4. Click **Confirm** to create the model artifact.
+</Steps>
+
+
+### Model Artifact Actions
+
+The **Actions** menu (trash icon) for each model artifact provides the following option:
+
+#### Delete
+
+Permanently removes the model artifact.
+
+<Aside type="danger" title="Warning">
+    Deleting a model artifact will remove the file from storage. This action cannot be undone.
+</Aside>
