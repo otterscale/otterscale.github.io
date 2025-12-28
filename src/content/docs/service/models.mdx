@@ -1,49 +1,84 @@
 ---
 title: Models
-description: Manage and monitor Large Language Models.
+description: Manage and monitor AI/ML models and artifacts.
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-The Models section allows you to manage and monitor Large Language Models (LLMs) deployed in the OtterScale cluster. It provides real-time insights into model performance and resource usage.
+
+The Models page provides a unified view of all AI/ML models deployed in your OtterScale cluster. It aggregates information about model deployments and their artifacts, allowing you to monitor status, manage resources, and perform lifecycle operations.
+
 
 ## Introduction
 
-The Models page displays a list of deployed LLMs. The table includes the following information:
+The Models page displays a list of all models. The table includes the following columns (as shown in the UI):
 
-| Column                  | Description                                                                               |
-| :---------------------- | :---------------------------------------------------------------------------------------- |
-| **Model**               | The name of the application hosting the model. Links to the application details.          |
-| **Name**                | The specific name or identifier of the LLM (e.g., `llama3-8b`).                           |
-| **Replicas**            | The number of desired replicas for the model service.                                     |
-| **Healthies**           | The number of currently healthy and ready replicas.                                       |
-| **GPU Cache**           | The percentage of GPU cache currently in use.                                             |
-| **KV Cache**            | The percentage of Key-Value (KV) cache usage, critical for transformer model performance. |
-| **Requests**            | The total request latency or load metric for the model.                                   |
-| **Time to First Token** | The average time taken to generate the first token of a response (latency metric).        |
+| Column             | Description                                                                                                          |
+| :----------------- | :------------------------------------------------------------------------------------------------------------------- |
+| **Name**           | The name of the model.                                                                                               |
+| **Model Name**     | The unique identifier of the model (modelName/id).                                                                   |
+| **Namespace**      | The Kubernetes namespace where the model is deployed.                                                                |
+| **Status**         | The current status of the model (e.g., Running, Pending).                                                            |
+| **Description**    | The description of the model.                                                                                        |
+| **Prefill**        | Prefill configuration: vGPU memory %, replica, tensor (if available).                                                |
+| **Decode**         | Decode configuration: vGPU memory %, replica, tensor (if available).                                                 |
+| **First Deployed** | Timestamp of first deployment.                                                                                       |
+| **Last Deployed**  | Timestamp of last deployment.                                                                                        |
+| **GPU Relation**   | GPU resource relation (shown only if status is 'deployed').                                                          |
+| **Test**           | Test button for model API (only available when the model is in the "ready" state; opens a dialog to test the model). |
+| **Actions**        | Management actions (update, delete, etc.).                                                                           |
 
-## Monitor Models
 
-The dashboard integrates with Prometheus to provide real-time metrics for each model:
 
-- **GPU & KV Cache**: Monitor these percentages to ensure your models are not running out of memory context, which could degrade performance or cause errors.
-- **Latency Metrics**: Track "Requests" and "Time to First Token" to ensure the models are responsive and meeting service level objectives (SLOs).
+
+### Pods Table
+
+
+The **Pods Table** (in the details view) lists all pods managed by this model, if available.  
+Click the expand icon at the beginning of a row to view detailed pod information.
+
+| Column                  | Description                                                                              |
+| :---------------------- | :--------------------------------------------------------------------------------------- |
+| **Pod**                 | The unique name of the pod.                                                              |
+| **Phase**               | The current lifecycle phase of the pod (e.g., Running, Pending).                         |
+| **Ready**               | Number of ready containers vs total containers.                                          |
+| **Restarts**            | Number of times containers in the pod have restarted.                                    |
+| **Conditions**          | The most recent condition or error status for the pod.                                   |
+| **Time to First Token** | The sum of time (in seconds) taken to generate the first token for requests to this pod. |
+| **Request Latency**     | The 95th percentile end-to-end request latency (in seconds) for this pod.                |
+| **Log**                 | **Clickable**: Opens the log view for the pod.                                           |
+| **Create Time**         | The timestamp when the pod was created.                                                  |
+
+
 
 ## Manage Models
 
-You can perform basic lifecycle actions on the models:
+You can manage the lifecycle of your models using the **Actions** menu.
 
-### Create a Model
+### Model Actions
 
-To deploy a new model:
+The **Actions** menu (three dots icon) for each model provides:
 
-1.  Click the **Create** button (plus icon) at the top of the page.
-2.  Follow the prompts to configure and deploy your LLM service.
+#### Create
+Create a new model.
+<Steps>
+1. Select **Create** from the actions menu or click the **Create** button.
+2. You can search for models using the cloud icon next to the input box, or select a model from your model artifacts by clicking the archive icon.
+3. Fill in the model configuration (name, namespace, prefill/decode, description, etc.).
+4. Confirm to deploy the model.
+</Steps>
 
-### Delete a Model
+#### Update
+Modify the configuration of an existing model (such as prefill/decode, description, etc.).
+<Steps>
+1. Select **Update** from the actions menu.
+2. Edit the desired fields.
+3. Confirm to apply the changes.
+</Steps>
 
-To remove a model:
-
-1.  Locate the model in the list.
-2.  Click the **Delete** button (trash icon) in the actions menu.
-3.  Confirm the action to remove the model deployment.
+#### Delete
+Delete a model.
+<Steps>
+1. Select **Delete** from the actions menu.
+2. Confirm deletion.
+</Steps>
