@@ -12,11 +12,11 @@ import { Card, CardGrid, Aside, Badge } from '@astrojs/starlight/components';
 
 ## OtterScale Control Node
 
-Before installing OtterScale, ensure your environment meets the following specifications.
+The Control Node serves as the central management hub for your OtterScale deployment. Before proceeding with installation, verify that your designated control node machine meets the following requirements.
 
 ### Operating System
 
-This is a specific version of Linux. If you're using a different operating system, you'll need to install Ubuntu 24.04 LTS first.
+Install Ubuntu 24.04 LTS on your control node. If your machine runs a different OS, perform a clean installation of Ubuntu 24.04 LTS first.
 
 | Component | Requirement                     |
 | :-------- | :------------------------------ |
@@ -24,7 +24,7 @@ This is a specific version of Linux. If you're using a different operating syste
 
 ### Hardware Requirements
 
-These are the minimum requirements for the control node. More is always better for performance.
+Ensure your control node hardware meets or exceeds these minimum specifications. Higher resources will improve performance and stability.
 
 | Resource       | Minimum Requirement      |
 | :------------- | :----------------------- |
@@ -34,12 +34,12 @@ These are the minimum requirements for the control node. More is always better f
 
 ### Network Configuration
 
-The installer will help set up networking - no manual configuration needed.
+The OtterScale installer will automatically configure networking, but confirm the following prerequisites:
 
-- **Connectivity:** At least one network interface with external internet access.
-- **Bridge Configuration:** The installation script will check for network bridge `br-otters`.
-  - _Existing:_ If the bridge exists, it will be used.
-  - _Missing:_ If the bridge does not exist, the script will prompt to select an existing bridge or create a new one automatically.
+- **Connectivity:** Ensure at least one network interface has external internet access.
+- **Bridge Configuration:** The installer checks for a network bridge named `br-otters`.
+  - If it exists, the installer will use it.
+  - If not, you will be prompted to select an existing bridge or allow the installer to create one automatically.
 
 ---
 
@@ -50,22 +50,26 @@ The installer will help set up networking - no manual configuration needed.
 
 ## K8S Nodes (Server Nodes)
 
-Ensure the following settings are configured on your server hosts.
+K8S nodes are the servers that will form your Kubernetes cluster. These nodes must be commissioned via the OtterScale web interface after creating a Scope, and then provisioned. Ensure each server host is configured as follows before commissioning.
 
 ### BIOS Configuration
 
+Access your server's BIOS settings (typically by pressing F2, F10, or Del during boot) and configure the following settings:
+
 1.  **BMC Settings:**
-    - **BMC Static IP:** Set a static IP for the BMC to ensure stable management access.
-    - **Boot Order:** Enable BMC Network and prioritize **Network Boot** in the boot order.
+    - **BMC Static IP:** Assign a static IP address to the BMC for reliable remote management access.
+    - **Boot Order:** Enable network boot via BMC and set it as the highest priority in the boot order.
 2.  **Boot Options:**
-    - **Boot Mode:** Set to **UEFI**.
-      - **Why not Legacy?** Legacy mode is not recommended as it limits boot drive size to 2TB, lacks modern security features, and does not support GPT partitioning, which is standard for modern deployments.
-    - **Fast Boot:** **Disable** Fast Boot to ensure thorough hardware initialization.
+    - **Boot Mode:** Set to **UEFI** (recommended for modern deployments).
+      - Avoid Legacy mode, as it limits drive size to 2TB, lacks security features, and does not support GPT partitioning.
+    - **Fast Boot:** Disable Fast Boot to allow complete hardware initialization.
 3.  **CPU Virtualization:**
-    - **Intel:** Enable `VMX`, `VT-d`, or `VT-x`.
-    - **AMD:** Enable `SVM` or `AMD-V`.
+    - **Intel CPUs:** Enable `VMX`, `VT-d`, or `VT-x`.
+    - **AMD CPUs:** Enable `SVM` or `AMD-V`.
 
 ### Hardware Requirements
+
+Verify that each K8S node meets these storage requirements for optimal performance.
 
 | Resource    | Minimum Requirement                                 |
 | :---------- | :-------------------------------------------------- |
@@ -75,29 +79,27 @@ Ensure the following settings are configured on your server hosts.
 
 ## Network IP Requirement
 
-Ensure you have sufficient IP addresses available in your subnet.
+Plan your network IP allocation carefully to prevent conflicts. Ensure your subnet has sufficient available IP addresses for the OtterScale deployment.
 
 | Usage                   | Quantity | Description                                                                    |
 | :---------------------- | :------- | :----------------------------------------------------------------------------- |
-| **OS System**           | 1        | Used for the ingress controller.                                               |
-| **OtterScale**          | 1        | **Required from user.**A second IP in the same subnet for OtterScale services. |
+| **OS System**           | 1        | Reserved for the ingress controller.                                           |
+| **OtterScale**          | 1        | Required from user. A second IP in the same subnet for OtterScale services.    |
 | **Juju Controller**     | 1        | Used by the Canonical Juju controller.                                         |
 | **MAAS (DHCP)**         | 2        | Used for MAAS dynamic IP allocation.                                           |
-| **Kubernetes and Ceph** | 9 + N    | Used for Kubernetes and Ceph services.                                         |
+| **Kubernetes and Ceph** | 9 + N    | Used for Kubernetes and Ceph services (N = number of K8S nodes).               |
 
-**Total Estimated IPs:** 14 + N (where N is the number of servers)
+**Total Estimated IPs:** 14 + N (where N is the number of K8S nodes)
 
 ---
 
 <Aside>
-	**These firewall rules are for reference only.** Actual requirements depend on the applications
-	you install later. For easier management, consider using a dedicated VLAN instead of configuring
-	firewall rules on each machine.
+	These firewall rules are mandatory for the installation process. Ensure outbound access to the listed domains and ports is allowed on each node. For easier management, consider using a dedicated VLAN instead of configuring firewall rules on each machine.
 </Aside>
 
 ## Firewall Configuration
 
-The installation process requires outbound access to various external services. Please whitelist the following domains and ports.
+The OtterScale installation process requires outbound internet access to various external services. Configure your firewall to allow outbound connections to the following domains and ports on all nodes (Control Node and K8S nodes).
 
 <details>
 <summary>Canonical</summary>

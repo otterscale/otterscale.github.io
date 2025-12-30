@@ -5,50 +5,77 @@ description: Step-by-step guide to installing OtterScale.
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
-Follow the steps below to install and configure OtterScale.
+This guide provides a detailed, step-by-step process for installing OtterScale on your Control Node. Ensure you have completed all prerequisites outlined in the Prerequisites section before proceeding. The installation involves setting up dependencies, configuring the environment, and deploying the system.
+
+<Aside>
+	All commands should be run on the designated OtterScale Control Node with sudo privileges where required.
+</Aside>
 
 <Steps>
 
-1.  **Prepare apt package and docker**
+1.  ### **Install Required Packages and Docker**
+
+    Install essential tools and Docker, which are needed for cloning the repository and running containerized services.
 
     ```bash
+    sudo apt update
     sudo apt install -y git curl
     sudo snap install docker
     ```
 
-2.  **Git clone otterscale**
+2.  ### **Clone the OtterScale Repository**
+
+    Download the OtterScale source code from GitHub.
 
     ```bash
     git clone https://github.com/otterscale/otterscale.git
     ```
 
-3.  **Prepare and modify .env file**
+3.  ### **Configure the Environment File**
+
+    Navigate to the cloned directory and set up the environment configuration.
 
     ```bash
     cd otterscale
     cp .env.example .env
     ```
 
-    Update .env APP_VERSION and PUBLIC_API_URL
+    Edit the `.env` file to update the following variables:
+    - `APP_VERSION`: Set to the desired version (e.g., `0.6.0`).
+    - `PUBLIC_API_URL`: Set to your Control Node's IP address and port (e.g., `http://192.168.1.100:8299`). Replace `xx.xx.xx.xx` with your actual IP.
+
+    You can edit the file using a text editor like `nano`:
 
     ```bash
-    APP_VERSION=0.6.0
-    PUBLIC_API_URL=http://xx.xx.xx.xx:8299
+    nano .env
     ```
 
-4.  **Start Services**
+4.  ### **Start OtterScale Services**
 
-    Run the following command to start the necessary services using Docker Compose:
+    Launch the necessary services in the background using Docker Compose.
 
     ```bash
     sudo docker-compose up -d
     ```
 
-5.  **Run Installation Script**
+    Verify that the services are running:
 
-    Execute the installation script through the User Interface:
+    ```bash
+    sudo docker-compose ps
+    ```
 
-    1.  Access the OtterScale UI.
-    2.  Copy the CLI from OtterScale UI and execute the command with sudo privilege.
+5.  ### **Execute the Installation Script**
+
+    Complete the installation via the web interface.
+
+    1. Open your web browser and access the OtterScale UI at the `PUBLIC_API_URL` you configured (e.g., `http://192.168.1.100:8299`).
+    2. In the UI, locate and copy the installation CLI command.
+    3. Paste and run the command in your terminal with sudo privileges.
+
+    If you encounter any issues during execution, first verify your Firewall Configuration as outlined in the Prerequisites section. Additionally, check the `setup.log` file in the current directory for detailed error information.
 
 </Steps>
+
+<Aside>
+	Upon successful completion, your OtterScale system will be operational. Proceed to the next guide for configuration and usage.
+</Aside>
