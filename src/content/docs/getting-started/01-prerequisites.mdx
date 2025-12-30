@@ -6,10 +6,6 @@ description: Hardware and network requirements for running OtterScale.
 import { Card, CardGrid, Aside, Badge } from '@astrojs/starlight/components';
 
 <Aside>
-	At least 1+N machines are required, where N is the number of K8S nodes (minimum 1). The first machine is dedicated to the OtterScale Control Node. The remaining N machines are BMC-managed servers for the K8S cluster.
-</Aside>
-
-<Aside>
 	The **Control Node** acts as the management hub and operates independently outside the cluster
 	system.
 </Aside>
@@ -102,8 +98,6 @@ Plan your network IP allocation carefully to prevent conflicts. Ensure your subn
 </Aside>
 
 ## Firewall Configuration
-
-It is required to open the firewall on each node.
 
 The OtterScale installation process requires outbound internet access to various external services. Configure your firewall to allow outbound connections to the following domains and ports on all nodes (Control Node and K8S nodes).
 
