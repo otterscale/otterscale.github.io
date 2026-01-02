@@ -27,14 +27,14 @@ At the top of the page, you will find a dashboard summarizing the state of NFS e
 
 The NFS table displays a list of subvolumes. The table includes the following information:
 
-| Column           | Description                                                                                                                                |
-| :--------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Name**         | The name of the subvolume.                                                                                                                 |
-| **Pool Name**    | The data pool where the subvolume is stored.                                                                                               |
-| **Export**       | Displays the NFS export path and allowed clients (IPs). Clicking the copy icon copies the mount command.                                   |
-| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                               |
-| **Created Time** | The creation timestamp of the subvolume.                                                                                                   |
-| **Snapshots**    | The number of snapshots taken of this subvolume. Clicking the external link icon opens a detailed view of the [snapshots](#snapshot-list). |
+| Column           | Description                                                                                                                                                                                              |
+| :--------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Name**         | The name of the subvolume.                                                                                                                                                                               |
+| **Pool Name**    | The data pool where the subvolume is stored.                                                                                                                                                             |
+| **Export**       | Displays the NFS export host. Click the information icon in the Export column to view the export IP, path, allowed clients, and the mount command. Use the copy icon to copy the mount command directly. |
+| **Usage**        | A progress bar showing the storage capacity usage (Used Space / Quota Size).                                                                                                                             |
+| **Created Time** | Displays how long ago the NFS export was created, relative to the current time.                                                                                                                                                                 |
+| **Snapshots**    | The number of snapshots taken of this subvolume. Clicking the external link icon opens a detailed view of the [snapshots](#snapshot-list).                                                               |
 
 ### Create NFS Export
 
@@ -50,6 +50,36 @@ You can create new subvolumes and export them via NFS.
 
 </Steps>
 
+### Mount NFS Export
+
+After an NFS export is created and access is granted, clients can mount the export using standard NFS commands.
+
+#### Prerequisites
+
+- An NFS export has been created.
+- The client IP address (or CIDR range) has been granted access to the export.
+- The client has NFS utilities installed.
+
+<Steps>
+
+1.  Open the information icon in the Export column of the NFS table.
+2.  Copy the mount command using the copy icon.
+3.  Log in to the target client machine.
+4.  Create a mount directory if it does not already exist:
+	```bash
+        sudo mkdir -p /mnt/nfs
+    ```
+5.  Run the copied mount command:
+	```bash
+        sudo mount -t  nfs4 -o nfsvers=4.1 -v <NFS_IP>:<EXPORT_PATH> /mnt/nfs
+    ```
+6. Verify that the file system is mounted successfully:
+	```bash
+        mount | grep nfs
+    ```
+
+</Steps>
+
 ### Manage NFS Exports
 
 You can manage access, modify quotas, or delete NFS exports using the **Actions** menu.
@@ -58,7 +88,7 @@ You can manage access, modify quotas, or delete NFS exports using the **Actions*
 
 Control which clients can access the NFS export.
 
-- **Grant Access**: Adds a client IP address to the allowed list.
+- **Grant Access**: Adds a client IP address to the allowed list. For example, You can specify a single IP address 192.168.10.151 or a CIDR range 192.168.10.0/24.
 - **Revoke Access**: Removes a client IP address from the allowed list.
 
 #### Edit NFS Export
@@ -97,15 +127,38 @@ Snapshots provide a read-only copy of the subvolume at a specific point in time.
 
 The snapshot list displays the following information:
 
-| Column             | Description                                                       |
-| :----------------- | :---------------------------------------------------------------- |
-| **Name**           | The name of the snapshot.                                         |
-| **Pending Clones** | Indicates if there are any pending clones based on this snapshot. |
-| **Created Time**   | The creation timestamp of the snapshot.                           |
+| Column             | Description                                                                   |
+| :----------------- | :---------------------------------------------------------------------------- |
+| **Name**           | The name of the snapshot.                                                     |
+| **Pending Clones** | Indicates if there are any pending clones based on this snapshot.             |
+| **Created Time**   | Displays how long ago the snapshot was created, relative to the current time. |
 
 #### Snapshot Actions
 
-- **Delete**: Permanently removes the snapshot.
+#### Create Snapshot
+Create Snapshot allows you to capture a read-only point-in-time copy of the subvolume.
+
+<Steps>
+
+1. Click the external link icon in the Snapshots column to open the snapshot list.
+2. Click the Create button.
+3. Name: Enter a unique name for the snapshot.
+4. Click Confirm to create the snapshot.
+
+</Steps>
+
+#### Delete Snapshot
+Delete Snapshot permanently removes an existing snapshot.
+
+<Steps>
+
+1. Click the external link icon in the Snapshots column to open the snapshot list.
+2. Open the Actions menu for the target snapshot.
+3. Select Delete.
+4. Type the name of the snapshot to confirm deletion.
+5. Click Confirm to permanently delete the snapshot.
+
+</Steps>
 
 <Aside type="danger">
 	Deleting a NFS snapshot is irreversible. Ensure that you have backed up any critical data.
@@ -129,12 +182,12 @@ At the top of the page, you will find a dashboard summarizing the state of subvo
 
 The Group table displays a list of subvolume groups. The table includes the following information:
 
-| Column           | Description                                                                 |
-| :--------------- | :-------------------------------------------------------------------------- |
-| **Name**         | The name of the subvolume group.                                            |
-| **Pool Name**    | The data pool associated with the group.                                    |
-| **Usage**        | A progress bar showing the cumulative usage of all subvolumes in the group. |
-| **Created Time** | The creation timestamp of the group.                                        |
+| Column           | Description                                                                          |
+| :--------------- | :----------------------------------------------------------------------------------- |
+| **Name**         | The name of the subvolume group.                                                     |
+| **Pool Name**    | The data pool associated with the group.                                             |
+| **Usage**        | A progress bar showing the cumulative usage of all subvolumes in the group.          |
+| **Created Time** | Displays how long ago the subvolume group was created, relative to the current time. |
 
 ### Create Group
 
@@ -144,15 +197,24 @@ You can create new subvolume groups to organize your file systems.
 
 1.  Click the **Create** button.
 2.  **Name**: Enter a unique name for the group.
-3.  **Pool Name**: Select the data pool for the group.
-4.  **Quota Size**: Optionally set a quota for the group.
-5.  Click **Confirm** to create the group.
+3.  **Quota Size**: Optionally set a quota for the group.
+4.  Click **Confirm** to create the group.
 
 </Steps>
 
 ### Manage Groups
 
-You can delete empty subvolume groups.
+#### Edit Group
+
+Allows you to resize the group quota.
+
+<Steps>
+
+1.  Select **Edit** from the actions menu (pencil icon).
+2.  Update the **Quota Size**.
+3.  Click **Confirm** to save changes.
+
+</Steps>
 
 #### Delete Group
 
