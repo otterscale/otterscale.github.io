@@ -19,7 +19,9 @@ At the top of the page, you will find a dashboard summarizing the state of S3 st
 
 <CardGrid>
 	<Card title="Bucket" icon="tabler:bucket">
-		The total number of S3 buckets currently defined in the system.
+		The total number of S3 buckets currently defined in the system. 
+
+		The RGW endpoint IP that clients use to access the bucket via S3-compatible APIs.
 	</Card>
 	<Card title="Usage" icon="tabler:chart-pie">
 		The combined storage consumption across all buckets, including object data and metadata overhead.
@@ -30,12 +32,12 @@ At the top of the page, you will find a dashboard summarizing the state of S3 st
 
 The Bucket table displays a list of all buckets. The table includes the following information:
 
-| Column           | Description                                     |
-| :--------------- | :---------------------------------------------- |
-| **Name**         | The name of the bucket.                         |
-| **Owner**        | The user ID of the bucket owner.                |
-| **Usage**        | The total size of objects stored in the bucket. |
-| **Created Time** | The creation timestamp of the bucket.           |
+| Column           | Description                                                                 |
+| :--------------- | :-------------------------------------------------------------------------- |
+| **Name**         | The name of the bucket.                                                     |
+| **Owner**        | The user ID of the bucket owner.                                            |
+| **Usage**        | The total size of objects stored in the bucket.                             |
+| **Created Time** | Displays how long ago the bucket was created, relative to the current time. |
 
 ### Create Bucket
 
@@ -51,6 +53,103 @@ You can create new buckets to store your data.
 6.  Click **Confirm** to create the bucket.
 
 </Steps>
+
+### Access Bucket
+
+Use the following example to access a bucket and verify that the user’s access keys can perform basic S3 operations.
+
+#### Prerequisites
+
+- The RGW endpoint IP is reachable from the client.
+- A client machine with:
+	- Python 3
+	- The boto3 library installed.
+```bash
+	pip install boto3
+```
+
+<Steps>
+
+1. Create a user in User section.
+2. Create an access key for the user and copy the secret key.
+3. Create a bucket and assign the user as the owner. The bucket owner always has full control of the bucket regardless of the selected ACL.
+4. Export the RGW endpoint IP and credentials as environment variables:
+	```bash
+	export RGW_ENDPOINT="http://<RGW_IP>:80"
+	export AWS_ACCESS_KEY_ID="<ACCESS_KEY>"
+	export AWS_SECRET_ACCESS_KEY="<SECRET_KEY>"
+	export BUCKET_NAME="<BUCKET_NAME>"
+	export AWS_DEFAULT_REGION="us-east-1"
+	```
+5. Create a script file (for example, rgw_test.py) and run it to test PUT / GET / DELETE:
+	```Python
+	#!/usr/bin/env python3
+	import os
+	import uuid
+	import boto3
+	from botocore.client import Config
+	from botocore.exceptions import ClientError
+
+	RGW_ENDPOINT = os.environ["RGW_ENDPOINT"]
+	ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
+	SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
+	BUCKET_NAME = os.environ["BUCKET_NAME"]
+	REGION = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
+
+	def main():
+		s3 = boto3.client(
+			"s3",
+			endpoint_url=RGW_ENDPOINT,
+			aws_access_key_id=ACCESS_KEY,
+			aws_secret_access_key=SECRET_KEY,
+			region_name=REGION,
+			config=Config(signature_version="s3v4"),
+		)
+
+		test_key = f"rgw-test-{uuid.uuid4()}.txt"
+		body = "Hello Ceph RGW via boto3!\nThis is a test object.\n"
+
+		# 1) PUT
+		print(f"[1] PUT: s3://{BUCKET_NAME}/{test_key}")
+		s3.put_object(Bucket=BUCKET_NAME, Key=test_key, Body=body.encode("utf-8"))
+		print("    ✅ PUT OK")
+
+		# 2) GET
+		print(f"[2] GET: s3://{BUCKET_NAME}/{test_key}")
+		resp = s3.get_object(Bucket=BUCKET_NAME, Key=test_key)
+		print("    ✅ GET OK")
+		_ = resp["Body"].read()
+
+		# 3) DELETE
+		print(f"[4] DELETE: {test_key} and {test_key}")
+		s3.delete_object(Bucket=BUCKET_NAME, Key=test_key)
+		print("    ✅ DELETE OK")
+
+		print("[✔] Verification completed successfully.")
+
+	if __name__ == "__main__":
+		try:
+			main()
+		except ClientError as e:
+			print("❌ S3 operation failed:")
+			print(e)
+			raise
+	```
+	```bash
+	python3 rgw_test.py
+	```
+
+6. Confirm that all steps return success messages.
+
+	The script should print:
+
+	- PUT OK
+	- GET OK
+	- DELETE OK
+
+</Steps>
+
+
 
 ### Manage Buckets
 
@@ -81,7 +180,7 @@ Permanently removes a bucket and all its objects.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object bucket is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object bucket is irreversible. Ensure that you have backed up any critical data.
 </Aside>
 
 ## User
@@ -152,7 +251,7 @@ Permanently removes a user.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object user is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object user is irreversible. Ensure that you have backed up any critical data.
 </Aside>
 
 ### Manage Keys
@@ -190,5 +289,5 @@ Permanently removes an access key.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object key is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object key is irreversible. Ensure that you have backed up any critical data.
 </Aside>
