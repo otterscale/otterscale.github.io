@@ -41,10 +41,10 @@ You can create new SMB shares to expose storage to your network.
 
 1.  Click the **Create** button.
 2.  **Name**: Enter a unique name for the share.
-3.  **Port**: Optionally specify a custom port (default is 445).
+3.  **Port**: Optionally specify a custom port (use 445 port for Windows client).
 4.  **Size**: Specify the storage size for the share (e.g., 100 GB).
 5.  **Common Configuration**:
-    - **Map To Guest**: Configure how to handle guest access (e.g., `Never`, `Bad User`).
+    - **Map To Guest**: Configure how to handle guest access.
 6.  **Security Configuration**:
     - **Mode**: Select **User** (local users) or **Active Directory**.
     - **Local Users** (User Mode): Manage local username and password credentials.
@@ -69,8 +69,9 @@ Allows you to update the share's configuration, including size, security setting
 
 <Steps>
 
-1.  Select **Edit** from the actions menu (pencil icon).
-2.  Update the desired settings (e.g., **Size**, **Valid Users**, **Browsable**).
+1.  Select **Update** from the actions menu (pencil icon).
+2.  Update the desired settings.
 3.  Click **Confirm** to save changes.
+4.  Wait a few minutes for the settings to take effect.
 
 </Steps>
