@@ -54,98 +54,27 @@ You can create new buckets to store your data.
 
 </Steps>
 
-### Access Bucket
+### Access Bucket with S3 Browser
 
-Use the following example to access a bucket and verify that the user’s access keys can perform basic S3 operations.
+This section demonstrates how to access a Ceph Object Gateway (RGW) bucket using S3 Browser, a graphical S3 client.
+This approach is useful for manual verification, browsing objects, and basic upload/download operations without writing code.
 
 #### Prerequisites
-
-- The RGW endpoint IP is reachable from the client.
-- A client machine with:
-	- Python 3
-	- The boto3 library installed.
-```bash
-	pip install boto3
-```
+- S3 Browser installed on the client machine (Windows).
 
 <Steps>
 
 1. Create a user in User section.
 2. Create an access key for the user and copy the secret key.
 3. Create a bucket and assign the user as the owner. The bucket owner always has full control of the bucket regardless of the selected ACL.
-4. Export the RGW endpoint IP and credentials as environment variables:
-	```bash
-	export RGW_ENDPOINT="http://<RGW_IP>:80"
-	export AWS_ACCESS_KEY_ID="<ACCESS_KEY>"
-	export AWS_SECRET_ACCESS_KEY="<SECRET_KEY>"
-	export BUCKET_NAME="<BUCKET_NAME>"
-	export AWS_DEFAULT_REGION="us-east-1"
-	```
-5. Create a script file (for example, rgw_test.py) and run it to test PUT / GET / DELETE:
-	```Python
-	#!/usr/bin/env python3
-	import os
-	import uuid
-	import boto3
-	from botocore.client import Config
-	from botocore.exceptions import ClientError
-
-	RGW_ENDPOINT = os.environ["RGW_ENDPOINT"]
-	ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
-	SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-	BUCKET_NAME = os.environ["BUCKET_NAME"]
-	REGION = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
-
-	def main():
-		s3 = boto3.client(
-			"s3",
-			endpoint_url=RGW_ENDPOINT,
-			aws_access_key_id=ACCESS_KEY,
-			aws_secret_access_key=SECRET_KEY,
-			region_name=REGION,
-			config=Config(signature_version="s3v4"),
-		)
-
-		test_key = f"rgw-test-{uuid.uuid4()}.txt"
-		body = "Hello Ceph RGW via boto3!\nThis is a test object.\n"
-
-		# 1) PUT
-		print(f"[1] PUT: s3://{BUCKET_NAME}/{test_key}")
-		s3.put_object(Bucket=BUCKET_NAME, Key=test_key, Body=body.encode("utf-8"))
-		print("    ✅ PUT OK")
-
-		# 2) GET
-		print(f"[2] GET: s3://{BUCKET_NAME}/{test_key}")
-		resp = s3.get_object(Bucket=BUCKET_NAME, Key=test_key)
-		print("    ✅ GET OK")
-		_ = resp["Body"].read()
-
-		# 3) DELETE
-		print(f"[4] DELETE: {test_key} and {test_key}")
-		s3.delete_object(Bucket=BUCKET_NAME, Key=test_key)
-		print("    ✅ DELETE OK")
-
-		print("[✔] Verification completed successfully.")
-
-	if __name__ == "__main__":
-		try:
-			main()
-		except ClientError as e:
-			print("❌ S3 operation failed:")
-			print(e)
-			raise
-	```
-	```bash
-	python3 rgw_test.py
-	```
-
-6. Confirm that all steps return success messages.
-
-	The script should print:
-
-	- PUT OK
-	- GET OK
-	- DELETE OK
+4. Open S3 Browser.
+5. Fill in the account settings:
+	- Account type: S3 compatible storage
+	- API endpoint: RGW endpoint
+	- Access Key ID: User’s access key.
+	- Secret Access Key:  The copied secret key.
+	- Use secure transfer: Disable SSL
+6. Add new account
 
 </Steps>
 
