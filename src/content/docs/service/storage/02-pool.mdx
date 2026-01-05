@@ -43,9 +43,9 @@ The create dialog includes configuration fields for pool type, replica size or e
       - **Replicated Size**: Specify the number of replicas (e.g., 3).
     - **Erasure**: Uses erasure coding to save space. Ideal for cold storage or large datasets.
       - **EC Overwrite**: Enable if you need to support overwrites (required for RBD/CephFS on EC pools).
-4.  **Applications**: Select one or more applications that will use this pool (e.g., `rbd`, `cephfs`, `rgw`).
-5.  **Quota**: Optionally set limits on the pool's usage:
+4.  **Quota**: Optionally set limits on the pool's usage:
     - **Max Bytes**: The maximum amount of data (in GB or TB) the pool can store.
+5.  **Advanced Settings (Optional)**:
     - **Max Objects**: The maximum number of objects the pool can store.
 6.  Click **Confirm** to create the pool.
 
@@ -62,7 +62,7 @@ Allows you to modify the pool's configuration, such as quotas.
 <Steps>
 
 1.  Select **Edit** from the actions menu (pencil icon).
-2.  Update the **Name**, **Quota Size**, or **Quota Objects** as needed.
+2.  Update the **Quota Size**, or **Quota Objects** as needed.
 3.  Click **Confirm** to save changes.
 
 </Steps>

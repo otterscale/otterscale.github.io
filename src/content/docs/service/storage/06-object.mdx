@@ -19,7 +19,9 @@ At the top of the page, you will find a dashboard summarizing the state of S3 st
 
 <CardGrid>
 	<Card title="Bucket" icon="tabler:bucket">
-		The total number of S3 buckets currently defined in the system.
+		The total number of S3 buckets currently defined in the system. 
+
+		The RGW endpoint IP that clients use to access the bucket via S3-compatible APIs.
 	</Card>
 	<Card title="Usage" icon="tabler:chart-pie">
 		The combined storage consumption across all buckets, including object data and metadata overhead.
@@ -30,12 +32,12 @@ At the top of the page, you will find a dashboard summarizing the state of S3 st
 
 The Bucket table displays a list of all buckets. The table includes the following information:
 
-| Column           | Description                                     |
-| :--------------- | :---------------------------------------------- |
-| **Name**         | The name of the bucket.                         |
-| **Owner**        | The user ID of the bucket owner.                |
-| **Usage**        | The total size of objects stored in the bucket. |
-| **Created Time** | The creation timestamp of the bucket.           |
+| Column           | Description                                                                 |
+| :--------------- | :-------------------------------------------------------------------------- |
+| **Name**         | The name of the bucket.                                                     |
+| **Owner**        | The user ID of the bucket owner.                                            |
+| **Usage**        | The total size of objects stored in the bucket.                             |
+| **Created Time** | Displays how long ago the bucket was created, relative to the current time. |
 
 ### Create Bucket
 
@@ -51,6 +53,32 @@ You can create new buckets to store your data.
 6.  Click **Confirm** to create the bucket.
 
 </Steps>
+
+### Access Bucket with S3 Browser
+
+This section demonstrates how to access a Ceph Object Gateway (RGW) bucket using S3 Browser, a graphical S3 client.
+This approach is useful for manual verification, browsing objects, and basic upload/download operations without writing code.
+
+#### Prerequisites
+- S3 Browser installed on the client machine (Windows).
+
+<Steps>
+
+1. Create a user in User section.
+2. Create an access key for the user and copy the secret key.
+3. Create a bucket and assign the user as the owner. The bucket owner always has full control of the bucket regardless of the selected ACL.
+4. Open S3 Browser.
+5. Fill in the account settings:
+	- Account type: S3 compatible storage
+	- API endpoint: RGW endpoint
+	- Access Key ID: User’s access key.
+	- Secret Access Key:  The copied secret key.
+	- Use secure transfer: Disable SSL
+6. Add new account
+
+</Steps>
+
+
 
 ### Manage Buckets
 
@@ -81,7 +109,7 @@ Permanently removes a bucket and all its objects.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object bucket is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object bucket is irreversible. Ensure that you have backed up any critical data.
 </Aside>
 
 ## User
@@ -152,7 +180,7 @@ Permanently removes a user.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object user is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object user is irreversible. Ensure that you have backed up any critical data.
 </Aside>
 
 ### Manage Keys
@@ -190,5 +218,5 @@ Permanently removes an access key.
 </Steps>
 
 <Aside type="danger">
-	Deleting a Object key is irreversible. Ensure that you have backed up any critical data.
+	Deleting an Object key is irreversible. Ensure that you have backed up any critical data.
 </Aside>
