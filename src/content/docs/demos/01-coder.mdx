@@ -1,0 +1,70 @@
+---
+title: Coder Demo
+description: Deploy Coder for cloud-based VS Code IDE environments with support for both Go and Python backends.
+---
+
+import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
+
+This guide demonstrates how to deploy Coder to provide cloud-based VS Code IDE environments for development and coding.
+
+## Deploy Coder
+
+<Aside type="tip">
+Coder provides a cloud-based VS Code IDE that can be accessed through a web browser. It supports multiple backend options including Go and Python versions, making it suitable for various development workflows.
+</Aside>
+
+<Steps>
+
+1. Navigate to the Applications Store:
+
+   Open your browser and go to:
+   ```
+   <url>/scope/<scope-name>/applications/store
+   ```
+
+2. Search and install Coder:
+
+   - Search for `code-server` (available versions: `code-server-go` or `code-server-python`)
+   - Choose your preferred version (Go for better performance, Python for flexibility)
+   - Click on the Coder card
+   - Click the **Install** button and follow the installation wizard
+   - Review and confirm the Helm Chart configuration
+
+3. Verify the deployment:
+
+   Go to the Workloads page:
+   ```
+   <url>/scope/<scope-name>/applications/workloads
+   ```
+   
+   - Use the **Namespace** filter to find the deployment
+   - Search for `coder` or `code-server` to locate the deployed Coder workload
+   - Verify that the workload status shows as running
+
+4. Access Coder VS Code IDE:
+
+   - In the Workloads list, locate the Coder workload
+   - Click on the **NodePort** link to open VS Code in your browser
+   
+   <Aside type="tip" title="Default Credentials">
+   Access the VS Code IDE directly through the NodePort link. Once opened, you can start coding immediately. Authentication and access control are managed through the application deployment settings.
+   </Aside>
+
+</Steps>
+
+## Initial Setup
+
+Once Coder is deployed and running:
+
+1. Access the VS Code IDE through the NodePort link in your browser
+2. You'll see the VS Code interface with a file explorer and terminal
+3. Start creating or editing files directly in the browser-based editor
+4. Use the integrated terminal for running commands and development tasks
+
+## Next Steps
+
+Explore other demo applications to enhance your infrastructure:
+
+<LinkCard title="PostgreSQL Demo" href="/demos/03-postgres/" description="Learn how to deploy PostgreSQL database and test read/write operations with Python." />
+
+<LinkCard title="LLM Model Demo" href="/demos/04-llm-model/" description="Learn how to deploy and configure language model applications." />

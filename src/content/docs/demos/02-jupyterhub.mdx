@@ -1,0 +1,73 @@
+---
+title: JupyterHub Demo
+description: Deploy JupyterHub for multi-user Jupyter notebook environments.
+---
+
+import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
+
+This guide demonstrates how to deploy JupyterHub to provide collaborative Jupyter notebook environments for multiple users.
+
+## Deploy JupyterHub
+
+<Aside type="tip">
+JupyterHub provides a multi-user environment where multiple users can access Jupyter notebooks simultaneously, making it ideal for collaborative data science and educational purposes.
+</Aside>
+
+<Steps>
+
+1. Navigate to the Applications Store:
+
+   Open your browser and go to:
+   ```
+   <url>/scope/<scope-name>/applications/store
+   ```
+
+2. Search and install JupyterHub:
+
+   - Search for `jupyterhub`
+   - Click on the JupyterHub card
+   - Click the **Install** button and follow the installation wizard
+   - Review and confirm the Helm Chart configuration
+
+3. Verify the deployment:
+
+   Go to the Workloads page:
+   ```
+   <url>/scope/<scope-name>/applications/workloads
+   ```
+   
+   - Use the **Namespace** filter to find the deployment
+   - Search for `jupyterhub` to locate the deployed JupyterHub workload
+   - Verify that the workload status shows as running
+
+4. Access JupyterHub:
+
+   - In the same Workloads list, locate the workload named **proxy**
+   - Click on the **NodePort** link to open JupyterHub in your browser
+   
+   <Aside type="tip" title="Default Credentials">
+   The default login credentials are:
+   - **Username**: `admin`
+   - **Password**: `admin`
+   
+   For production environments, it's highly recommended to change these credentials through JupyterHub administration settings.
+   </Aside>
+
+</Steps>
+
+## Initial Setup
+
+Once JupyterHub is deployed and running:
+
+1. Access the JupyterHub login page
+2. Create or log in with your credentials
+3. Start a new notebook server
+4. Begin using Jupyter notebooks for data analysis and development
+
+## Next Steps
+
+Explore other demo applications to enhance your infrastructure:
+
+<LinkCard title="PostgreSQL Demo" href="/demos/03-postgres/" description="Learn how to deploy PostgreSQL database and test read/write operations with Python." />
+
+<LinkCard title="LLM Model Demo" href="/demos/04-llm-model/" description="Learn how to deploy and configure language model applications." />
