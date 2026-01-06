@@ -127,6 +127,13 @@ export default defineConfig({
 						}
 					]
 				},
+				{
+					label: 'Demos',
+					translations: {
+						'zh-Hant': '演示範例'
+					},
+					autogenerate: { directory: 'demos' }
+				},
 				...openAPISidebarGroups
 			],
 			customCss: ['./src/styles/global.css'],

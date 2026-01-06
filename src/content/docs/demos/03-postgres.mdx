@@ -1,0 +1,274 @@
+---
+title: PostgreSQL Demo
+description: Deploy PostgreSQL database using Helm charts from the registry.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide demonstrates how to deploy PostgreSQL to your applications using a Helm chart from Artifact Hub.
+
+## Prerequisites
+
+Ensure you have the following tools installed:
+
+- **Helm**: [Installation Guide](https://helm.sh/docs/intro/install)
+- **Access to Registry URL**: Obtain this from the Commands button on the Repositories page or Applications Services page
+
+## Deploy PostgreSQL
+
+<Aside type="tip">
+We'll be using the PostgreSQL Helm chart from [Bitnami Charts](https://artifacthub.io/packages/helm/bitnami/postgresql). You can use other charts from Artifact Hub as well.
+</Aside>
+
+<Steps>
+
+1. Download the PostgreSQL Helm chart from Artifact Hub:
+
+   ```bash
+   helm pull oci://registry-1.docker.io/bitnamicharts/postgresql --version 18.2.0
+   ```
+
+   This command downloads `postgresql-18.2.0.tgz` to your local directory.
+
+2. Upload the chart to your private registry:
+
+   ```bash
+   helm push postgresql-18.2.0.tgz oci://<registry_url>/postgres --plain-http
+   ```
+
+   Replace `<registry_url>` with your actual registry URL (e.g., `192.168.196.42:5736`).
+
+   **Example:**
+   ```bash
+   helm push postgresql-18.2.0.tgz oci://192.168.196.42:5736/postgres --plain-http
+   ```
+
+3. After uploading, navigate to the `Applications Store` to deploy the Helm chart.
+
+   **To allow external connections**, configure the service as NodePort in the deployment settings:
+   ```yaml
+   service:
+     type: NodePort
+     port: 5432
+     nodePort: 30432  # Port range: 30000-32767
+   ```
+   After deployment, you can connect externally using `<node_ip>:<nodePort>`.
+
+4. Retrieve the PostgreSQL password from `Applications Secrets`:
+   - Navigate to the **Applications Secrets** page
+   - Adjust the **namespace filter** in the top-right corner to select your namespace
+   - Click on the postgres-related secret entry
+   - Copy the password and decode it using base64:
+     ```bash
+     echo "<copied_password>" | base64 --decode
+     ```
+     Or use this online tool: [base64decode.org](https://www.base64decode.org/)
+   - Use the decoded password for your PostgreSQL connections
+</Steps>
+
+## Test with Python
+
+You can verify your PostgreSQL deployment by using Python to perform read and write operations.
+
+<Aside title="Prerequisites">
+Ensure you have Python and the PostgreSQL client library installed:
+
+```bash
+pip install psycopg2-binary
+```
+
+</Aside>
+
+### Connection Information
+
+Before running the test scripts, you'll need:
+- **Host**: PostgreSQL service endpoint
+- **Port**: Database port (default: 5432)
+- **Database**: Database name (default: postgres)
+- **User**: Username (default: postgres)
+- **Password**: Database password
+
+<Tabs>
+<TabItem label="Test Connection">
+
+```python
+import psycopg2
+
+try:
+    connection = psycopg2.connect(
+        host="<postgres_host>",
+        port=5432,
+        database="postgres",
+        user="postgres",
+        password="<password>"
+    )
+    cursor = connection.cursor()
+    cursor.execute("SELECT version();")
+    version = cursor.fetchone()
+    print("PostgreSQL version:", version)
+    cursor.close()
+    connection.close()
+    print("✓ Connection successful!")
+except Exception as e:
+    print("✗ Connection failed:", str(e))
+```
+
+</TabItem>
+
+<TabItem label="Write Data">
+
+```python
+import psycopg2
+
+connection = psycopg2.connect(
+    host="<postgres_host>",
+    port=5432,
+    database="postgres",
+    user="postgres",
+    password="<password>"
+)
+cursor = connection.cursor()
+
+# Create a test table
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS demo_users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+""")
+
+# Insert sample data
+cursor.execute("""
+    INSERT INTO demo_users (name, email) 
+    VALUES (%s, %s)
+""", ("John Doe", "john@example.com"))
+
+cursor.execute("""
+    INSERT INTO demo_users (name, email) 
+    VALUES (%s, %s)
+""", ("Jane Smith", "jane@example.com"))
+
+connection.commit()
+print("✓ Data inserted successfully!")
+
+cursor.close()
+connection.close()
+```
+
+</TabItem>
+
+<TabItem label="Read Data">
+
+```python
+import psycopg2
+
+connection = psycopg2.connect(
+    host="<postgres_host>",
+    port=5432,
+    database="postgres",
+    user="postgres",
+    password="<password>"
+)
+cursor = connection.cursor()
+
+# Read all data from the table
+cursor.execute("SELECT id, name, email, created_at FROM demo_users")
+rows = cursor.fetchall()
+
+print("Records in demo_users table:")
+for row in rows:
+    print(f"ID: {row[0]}, Name: {row[1]}, Email: {row[2]}, Created: {row[3]}")
+
+cursor.close()
+connection.close()
+```
+
+</TabItem>
+
+<TabItem label="Complete Example">
+
+```python
+import psycopg2
+from datetime import datetime
+
+class PostgreSQLDemo:
+    def __init__(self, host, port, database, user, password):
+        self.connection = psycopg2.connect(
+            host=host,
+            port=port,
+            database=database,
+            user=user,
+            password=password
+        )
+        self.cursor = self.connection.cursor()
+    
+    def test_connection(self):
+        try:
+            self.cursor.execute("SELECT version();")
+            version = self.cursor.fetchone()
+            print("✓ PostgreSQL version:", version[0])
+            return True
+        except Exception as e:
+            print("✗ Connection test failed:", str(e))
+            return False
+    
+    def write_data(self, name, email):
+        try:
+            self.cursor.execute("""
+                CREATE TABLE IF NOT EXISTS demo_users (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(100),
+                    email VARCHAR(100),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            self.cursor.execute("""
+                INSERT INTO demo_users (name, email) VALUES (%s, %s)
+            """, (name, email))
+            self.connection.commit()
+            print(f"✓ Data written: {name} ({email})")
+        except Exception as e:
+            print("✗ Write failed:", str(e))
+            self.connection.rollback()
+    
+    def read_data(self):
+        try:
+            self.cursor.execute("SELECT id, name, email, created_at FROM demo_users ORDER BY id")
+            rows = self.cursor.fetchall()
+            print(f"✓ Retrieved {len(rows)} records:")
+            for row in rows:
+                print(f"  ID: {row[0]}, Name: {row[1]}, Email: {row[2]}")
+            return rows
+        except Exception as e:
+            print("✗ Read failed:", str(e))
+            return None
+    
+    def close(self):
+        self.cursor.close()
+        self.connection.close()
+
+# Usage
+if __name__ == "__main__":
+    db = PostgreSQLDemo(
+        host="<postgres_host>",
+        port=5432,
+        database="postgres",
+        user="postgres",
+        password="<password>"
+    )
+    
+    db.test_connection()
+    db.write_data("Alice Johnson", "alice@example.com")
+    db.write_data("Bob Wilson", "bob@example.com")
+    db.read_data()
+    db.close()
+```
+
+</TabItem>
+</Tabs>
+
+<Aside type="note">
+Replace `<postgres_host>` and `<password>` with your actual PostgreSQL connection details. You can find the service endpoint in your Applications Services page.
+</Aside>
