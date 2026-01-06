@@ -19,6 +19,35 @@ Each application card displays:
 - **Description**: A brief description of the application.
 - **Repository**: The source repository of the chart (e.g., `otterscale/`). Official OtterScale charts are marked with a "Official" badge.
 
+## Managing the Catalog
+
+The Store provides tools to keep your application catalog up-to-date and flexible. You can find the **Import** and **Sync** buttons at the top right of the page.
+
+### Synchronize with ArtifactHub
+
+To populate the store with popular community applications, use the **Sync** feature.
+
+- Clicking the **Sync** button initiates a synchronization process with [ArtifactHub](https://artifacthub.io/).
+- The system automatically fetches the **top 60 most popular Helm charts** based on ArtifactHub rankings.
+- This ensures your cluster has quick access to widely used tools (such as Argo CD, Prometheus, or Airflow) without manual configuration.
+
+### Import Custom Charts
+
+If you need to deploy a specific chart that is not included in the standard catalog or the ArtifactHub sync list, you can import it manually.
+
+<Steps>
+
+1.  Click the **Import** button.
+2.  In the **Import Chart** dialog, paste the direct link to the chart's `.tgz` file.
+    * *Example:* `https://charts.bitnami.com/bitnami/nginx-15.0.0.tgz`
+3.  Click **Confirm**.
+
+</Steps>
+
+<Aside type="note">
+Ensure the URL points directly to a valid tarball (`.tgz`) file. Once imported, the chart will appear in the application list and be ready for installation.
+</Aside>
+
 ## Application Details
 
 Clicking on an application card opens a details panel with two main tabs:
