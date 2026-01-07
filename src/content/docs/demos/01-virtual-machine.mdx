@@ -1,0 +1,154 @@
+---
+title: Virtual Machine
+description: Create and provision a Virtual Machine within the OtterScale cluster.
+---
+
+import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
+
+This guide demonstrates how to create and provision a Virtual Machine (VM) within the OtterScale cluster for running workloads.
+
+## Create a Virtual Machine
+
+<Aside type="tip">
+Virtual Machines allow you to provision compute instances within your OtterScale cluster. You can configure hardware profiles, attach storage volumes, and customize network ports to meet your specific needs.
+</Aside>
+
+<Steps>
+
+1. Navigate to the Compute section:
+
+   Open your browser and go to:
+   ```
+   <url>/scope/<scope-name>/compute
+   ```
+
+2. Create a new Virtual Machine:
+
+   - Click the **Create** button (plus icon) at the top of the Compute page
+   - A modal window titled "Create Virtual Machine" will appear
+
+3. Configure Basic Settings:
+
+   - **Name**: Enter a unique name for the VM (e.g., `my-demo-vm`)
+   - **Namespace**: Specify the Kubernetes namespace (defaults to `default`)
+   - **Instance Type**: Select a hardware profile from the dropdown list (displays CPU cores and Memory size)
+   - **Data Volume**: Select the bootable Data Volume (PVC) to use as the OS disk
+
+4. Configure Advanced Settings (Optional):
+
+   - Expand the "Advanced" section to configure a **Startup Script** (Cloud-Init user data)
+   - This allows you to bootstrap the instance with custom initialization commands
+   - Example configuration for user setup and SSH access:
+
+   ```
+   #cloud-config
+   users:
+     - name: phison
+       sudo: ['ALL=(ALL) NOPASSWD:ALL']
+       groups: sudo
+       shell: /bin/bash
+   chpasswd:
+     list: |
+       phison:phison_8299
+     expire: false
+   ssh_pwauth: true
+   ```
+
+5. Review and Confirm:
+
+   - Review all the configuration settings
+   - Click **Confirm** to launch the Virtual Machine
+
+6. Wait for VM Initialization:
+
+   - The VM will begin provisioning and cloning a Data Volume for its use
+   - Monitor the **Status** column to track the initialization progress
+   - Wait until the status changes to **Running**
+
+</Steps>
+
+## Monitor the Virtual Machine
+
+Once the VM is created, you can monitor its status in the Compute page:
+
+<Steps>
+
+1. View the VM in the Compute list:
+
+   - Locate your newly created VM by name in the table
+   - Check the **Status** column to see the current state (e.g., Running, Stopped)
+
+2. Access VM resources:
+
+   - **Machine**: Click to view which physical node is hosting your VM
+   - **Disk**: Expand to view and manage attached storage volumes
+   - **Ports**: Expand to view and manage network port configurations
+   - **Metrics**: Monitor real-time CPU, Memory, and Storage usage
+   - **VNC**: Access the VM console directly through VNC
+
+</Steps>
+
+## Configure Service for VM Access
+
+To enable external access to your Virtual Machine, configure a service to expose its ports:
+
+<Steps>
+
+1. Add a service port for SSH access:
+
+   - In the Compute page, locate your VM in the table
+   - Click on the **Ports** column to expand the port management section
+   - Click **Add Port** to create a new service port
+   - Configure the port settings:
+     - **Protocol**: `tcp`
+     - **Port**: `22` (SSH service port on the VM)
+     - **NodePort**: (leave empty for automatic assignment or specify a fixed port)
+   - The system will automatically assign a NodePort (e.g., `30022`) for external access
+
+2. Note the NodePort:
+
+   - Record the assigned NodePort from the Ports section
+   - This is the port you'll use to connect to the VM from outside the cluster
+
+</Steps>
+
+## Access Your Virtual Machine
+
+Once the VM is running, fully initialized, and the service port is configured:
+
+<Steps>
+
+1. Wait for cloud-init initialization:
+
+   - The VM will automatically execute the cloud-init configuration
+   - The system user `phison` will be created with sudo privileges
+   - The password will be set as configured in the cloud-config
+
+2. Connect to the VM:
+
+   - Use SSH to connect to your VM from external hosts
+   - Connection example:
+     ```
+     ssh -p <NodePort> phison@<cluster-host>
+     ```
+   - Or use VNC to connect directly through the web interface
+   - Login credentials:
+     - **Username**: `phison`
+     - **Password**: `phison_8299`
+
+3. Start using your VM:
+
+   - You now have full access to configure and use the Virtual Machine
+   - The user has sudo privileges for system administration tasks
+
+</Steps>
+
+
+## Next Steps
+
+Explore other demo applications and services to enhance your infrastructure:
+
+<LinkCard title="Coder Demo" href="/demos/02-coder/" description="Deploy Coder for cloud-based VS Code IDE environments." />
+
+<LinkCard title="JupyterHub Demo" href="/demos/03-jupyterhub/" description="Learn how to deploy JupyterHub for collaborative Jupyter notebook environments." />
+
