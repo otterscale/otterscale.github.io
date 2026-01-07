@@ -45,13 +45,23 @@ We'll be using the PostgreSQL Helm chart from [Bitnami Charts](https://artifacth
 
 3. After uploading, navigate to the `Applications Store` to deploy the Helm chart.
 
-   **To allow external connections**, configure the service as NodePort in the deployment settings:
+   **To allow external connections and configure storage**, adjust the deployment settings:
    ```yaml
    service:
      type: NodePort
      port: 5432
      nodePort: 30432  # Port range: 30000-32767
+   primary:
+     persistence:
+       size: 10Gi  # PVC Storage Request for PostgreSQL volume (e.g., 10Gi, 20Gi, 100Gi)
    ```
+   
+   **Configuration Details**:
+   - **service.type**: Set to `NodePort` to allow external connections
+   - **service.port**: PostgreSQL service port (default: 5432)
+   - **service.nodePort**: External port accessible from outside the cluster
+   - **primary.persistence.size**: Storage size for the PostgreSQL data volume (adjust based on your needs)
+   
    After deployment, you can connect externally using `<node_ip>:<nodePort>`.
 
 4. Retrieve the PostgreSQL password from `Applications Secrets`:
