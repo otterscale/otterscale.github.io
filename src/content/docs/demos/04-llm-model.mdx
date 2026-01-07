@@ -12,11 +12,10 @@ This guide demonstrates how to deploy a Large Language Model (LLM) in your Otter
 Ensure you have the following:
 
 - **Python 3.8+**: For running the test scripts
-- **OpenAI API Key**: Obtain from [OpenAI Platform](https://platform.openai.com/api-keys)
-- **Python Libraries**: `requests` and `openai`
+- **Python Libraries**: `requests`
 
 ```bash
-pip install requests openai
+pip install requests
 ```
 
 ## Deploy LLM Model
@@ -60,26 +59,20 @@ The model deployment may take several minutes depending on the model size and av
 Once your LLM model is deployed and ready, you can test it using Python with OpenAI API integration.
 
 <Aside title="Prerequisites">
-Ensure you have Python and required libraries installed:
+Ensure you have Python and the `requests` library installed:
 
 ```bash
-pip install requests openai
+pip install requests
 ```
-
-Obtain your OpenAI API key from [OpenAI Platform](https://platform.openai.com/api-keys).
 </Aside>
 
 ### Connection Information
 
-Before running the test scripts, you'll need:
-- **OpenAI API Key**: Your API key from OpenAI
-- **Model Name**: The model you created (e.g., `llm-demo`)
-- **API Base URL**: Optional, if using a custom endpoint
+Before running the test scripts, you'll need to find the following information from the `<url>/scope/<scope-name>/models/llm` page:
+- **Service URL**: The URL information from the Service card
+- **Name**: The `name` field in the model table
+- **Model Name**: The `Model Name` field in the model table
 
-<Tabs>
-
-
-<TabItem label="Simple Question">
 
 ```python
 import requests
@@ -87,18 +80,18 @@ import json
 
 # Configuration
 SERVICE_URL = "<your_service_url>"  # e.g., http://localhost:8000
-MODEL_NAME = "<your_model_name>"    # e.g., llm-demo
-MODEL_ID = "RedHatAI/Llama-3.2-1B-Instruct-FP8"
+NAME = "<your_name>"    # e.g., llm-demo
+MODEL_NAME = "<your_model_name>"
 
 def ask_question(question):
     """Send a simple question to the LLM and get a response."""
     headers = {
-        "OtterScale-Model-Name": MODEL_NAME,
+        "OtterScale-Model-Name": NAME,
         "Content-Type": "application/json"
     }
     
     payload = {
-        "model": MODEL_ID,
+        "model": MODEL_NAME,
         "prompt": question
     }
     
@@ -120,184 +113,3 @@ answer = ask_question(question)
 print(f"Q: {question}")
 print(f"A: {answer}")
 ```
-
-</TabItem>
-
-<TabItem label="Conversation">
-
-```python
-import requests
-import json
-
-# Configuration
-SERVICE_URL = "<your_service_url>"  # e.g., http://localhost:8000
-MODEL_NAME = "<your_model_name>"    # e.g., llm-demo
-MODEL_ID = "RedHatAI/Llama-3.2-1B-Instruct-FP8"
-
-class LLMChat:
-    def __init__(self, service_url, model_name, model_id):
-        self.service_url = service_url
-        self.model_name = model_name
-        self.model_id = model_id
-        self.conversation = []
-    
-    def add_message(self, role, content):
-        """Add a message to the conversation history."""
-        self.conversation.append({"role": role, "content": content})
-    
-    def send_message(self, user_message):
-        """Send a user message and get a response."""
-        self.add_message("user", user_message)
-        
-        headers = {
-            "OtterScale-Model-Name": self.model_name,
-            "Content-Type": "application/json"
-        }
-        
-        # Build context from conversation history
-        context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in self.conversation])
-        
-        payload = {
-            "model": self.model_id,
-            "prompt": context
-        }
-        
-        try:
-            response = requests.post(
-                f"{self.service_url}/v1/chat",
-                headers=headers,
-                json=payload
-            )
-            response.raise_for_status()
-            result = response.json()
-            assistant_response = result.get("response", str(result))
-            self.add_message("assistant", assistant_response)
-            return assistant_response
-        except Exception as e:
-            return f"✗ Error: {str(e)}"
-    
-    def clear_history(self):
-        """Clear conversation history."""
-        self.conversation = []
-
-# Test
-chat = LLMChat(service_url=SERVICE_URL, model_name=MODEL_NAME, model_id=MODEL_ID)
-
-# First message
-response1 = chat.send_message("What are the three main colors of the French flag?")
-print(f"Q: What are the three main colors of the French flag?")
-print(f"A: {response1}\n")
-
-# Follow-up message (maintains context)
-response2 = chat.send_message("Which one represents liberty?")
-print(f"Q: Which one represents liberty?")
-print(f"A: {response2}\n")
-```
-
-</TabItem>
-
-<TabItem label="Complete Example">
-
-```python
-import requests
-import json
-
-# Configuration
-SERVICE_URL = "<your_service_url>"  # e.g., http://localhost:8000
-MODEL_NAME = "<your_model_name>"    # e.g., llm-demo
-MODEL_ID = "RedHatAI/Llama-3.2-1B-Instruct-FP8"
-
-class LLMDemo:
-    def __init__(self, service_url, model_name, model_id):
-        self.service_url = service_url
-        self.model_name = model_name
-        self.model_id = model_id
-        self.conversation = []
-    
-    def test_connection(self):
-        """Test if the service is accessible."""
-        try:
-            headers = {
-                "OtterScale-Model-Name": self.model_name,
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": self.model_id,
-                "prompt": "Hello"
-            }
-            response = requests.post(
-                f"{self.service_url}/v1/chat",
-                headers=headers,
-                json=payload,
-                timeout=10
-            )
-            response.raise_for_status()
-            print("✓ Connection successful!")
-            return True
-        except Exception as e:
-            print(f"✗ Connection failed: {str(e)}")
-            return False
-    
-    def send_message(self, user_message):
-        """Send a message and get a response."""
-        self.conversation.append({"role": "user", "content": user_message})
-        
-        headers = {
-            "OtterScale-Model-Name": self.model_name,
-            "Content-Type": "application/json"
-        }
-        
-        # Build context from conversation history
-        context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in self.conversation])
-        
-        payload = {
-            "model": self.model_id,
-            "prompt": context
-        }
-        
-        try:
-            response = requests.post(
-                f"{self.service_url}/v1/chat",
-                headers=headers,
-                json=payload
-            )
-            response.raise_for_status()
-            result = response.json()
-            assistant_response = result.get("response", str(result))
-            self.conversation.append({"role": "assistant", "content": assistant_response})
-            return assistant_response
-        except Exception as e:
-            return f"✗ Error: {str(e)}"
-    
-    def clear_history(self):
-        """Clear conversation history."""
-        self.conversation = []
-
-# Usage
-if __name__ == "__main__":
-    demo = LLMDemo(service_url=SERVICE_URL, model_name=MODEL_NAME, model_id=MODEL_ID)
-    
-    # Test connection
-    demo.test_connection()
-    
-    # Start conversation
-    response1 = demo.send_message("Tell me about artificial intelligence in 2 sentences.")
-    print(f"Q: Tell me about artificial intelligence in 2 sentences.")
-    print(f"A: {response1}\n")
-    
-    # Follow-up questions
-    response2 = demo.send_message("What are the main applications?")
-    print(f"Q: What are the main applications?")
-    print(f"A: {response2}\n")
-    
-    response3 = demo.send_message("How does machine learning fit into this?")
-    print(f"Q: How does machine learning fit into this?")
-    print(f"A: {response3}")
-```
-
-</TabItem>
-</Tabs>
-
-<Aside type="note">
-Replace `<your_openai_api_key>` with your actual OpenAI API key and `<your_model_name>` with your deployed model name. The examples use the OpenAI API format, which is compatible with many LLM services.
-</Aside>
