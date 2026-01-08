@@ -7,6 +7,46 @@ import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
 
 This guide demonstrates how to create and provision a Virtual Machine (VM) within the OtterScale cluster for running workloads.
 
+## Prepare Data Volume (Boot Image)
+
+Before creating a Virtual Machine, you need to create a Data Volume (Persistent Volume Claim) that will serve as the bootable OS disk for the VM.
+
+<Steps>
+
+1. Navigate to the Data Volume section:
+
+   - Open your browser and go to:
+   ```
+   <url>/scope/<scope-name>/service/data-volume
+   ```
+
+2. Create a new Data Volume for the VM boot disk:
+
+   - Click the **Create** button (plus icon) at the top of the Data Volume page
+   - A modal window titled "Create Data Volume" will appear
+
+3. Configure the boot image Data Volume (PVC):
+
+   - **Name**: Enter a unique name for the boot disk (e.g., `ubuntu-20.04-vm-boot`)
+   - **Namespace**: Specify the Kubernetes namespace (defaults to `kubevirt`)
+   - **Size**: Set the capacity of the volume (e.g., 20 GB for a typical VM)
+   - **Boot Image**: Toggle this option to enable the boot image mode (this will display the source input field)
+   - **Source**: Enter the URL of the bootable OS image:
+     - Example: `https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img`
+     - You can use the "Cloud Image" button to browse common Ubuntu cloud images
+
+4. Click **Confirm** to create the boot image Data Volume:
+
+   - The PVC will begin importing the OS image from the specified source
+   - Monitor the progress in the Data Volume list
+   - Wait until the **Phase** changes to **Succeeded** before proceeding to create the VM
+
+</Steps>
+
+<Aside type="tip">
+The Data Volume creates a Persistent Volume Claim (PVC) containing the bootable OS image. This PVC will be used as the primary disk when creating the Virtual Machine. Ensure you select a valid cloud image URL that points directly to the disk image file (typically `.img` or `.qcow2` format).
+</Aside>
+
 ## Create a Virtual Machine
 
 <Aside type="tip">
@@ -30,7 +70,7 @@ Virtual Machines allow you to provision compute instances within your OtterScale
 3. Configure Basic Settings:
 
    - **Name**: Enter a unique name for the VM (e.g., `my-demo-vm`)
-   - **Namespace**: Specify the Kubernetes namespace (defaults to `default`)
+   - **Namespace**: Specify the Kubernetes namespace (defaults to `kubevirt`)
    - **Instance Type**: Select a hardware profile from the dropdown list (displays CPU cores and Memory size)
    - **Data Volume**: Select the bootable Data Volume (PVC) to use as the OS disk
 
