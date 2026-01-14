@@ -15,6 +15,38 @@ Ensure you have the following tools installed:
 - **Docker**: For building the OpenBB image (if not already done)
 - **Access to Registry**: To push your chart and image
 
+## Build Custom Docker Image
+
+Since the official image might be outdated, we recommend building your own Docker image from the latest source code.
+
+<Steps>
+
+1. Clone the OpenBB repository and checkout a version:
+
+   ```bash
+   git clone https://github.com/OpenBB-finance/OpenBB.git
+   cd OpenBB
+   
+   # Switch to a specific version (e.g., v4.6.0)
+   git checkout v4.6.0
+   ```
+
+2. Build and push the image using the existing Dockerfile:
+
+   The OpenBB repository already includes a Dockerfile located at `build/docker/platform.dockerfile`. You can use this directly instead of creating a new one.
+
+   ```bash
+   # Build the image with the version tag
+   docker build -f build/docker/platform.dockerfile -t <registry_url>/openbb:v4.6.0 .
+
+   # Push the image to your registry
+   docker push <registry_url>/openbb:v4.6.0
+   ```
+
+   *Replace `<registry_url>` with your actual registry address.*
+
+</Steps>
+
 ## Create and Package Helm Chart
 
 <Steps>
@@ -27,25 +59,57 @@ Ensure you have the following tools installed:
 
    This creates a directory named `openbb` with the standard Helm chart structure.
 
-2. Modify `values.yaml` to configure your deployment. 
+2. Configure the Helm chart.
+
+   **Update `Chart.yaml`**:
    
-   Locate `openbb/values.yaml` and update the image and service settings. For OpenBB, you'll typically want to expose port 8000 (or whichever port your API listens on).
+   Locate `openbb/Chart.yaml` and update the version to match your release. You can also add validation metadata like `icon`, `home`, and `maintainers`.
+
+   ```yaml
+   apiVersion: v2
+   name: openbb
+   description: A Helm chart for deploying the OpenBB Platform API
+   type: application
+   version: 0.1.0
+   appVersion: "v4.6.0"
+   icon: https://raw.githubusercontent.com/OpenBB-finance/OpenBBTerminal/main/images/openbb_logo.png
+   home: https://openbb.co
+   sources:
+     - https://github.com/OpenBB-finance/OpenBB
+   maintainers:
+     - name: Your Name
+       email: your.email@example.com
+   ```
+
+   **Update `values.yaml`**:
+
+   Locate `openbb/values.yaml` and update the `image` settings to point to your new custom image. Also, update the health checks (`livenessProbe` and `readinessProbe`) to check `/docs`, as the root path `/` might return 404.
 
    ```yaml
    image:
-     repository: ghcr.io/openbb-finance/openbb-platform  # Official OpenBB Platform image
+     repository: <registry_url>/openbb
      pullPolicy: IfNotPresent
-     tag: "latest"
+     tag: "v4.6.0"
 
    service:
      type: NodePort
      port: 8000
      targetPort: 8000
      nodePort: 30080  # Optional: Fixed NodePort for easier testing
+
+   livenessProbe:
+     httpGet:
+       path: /docs
+       port: http
+
+   readinessProbe:
+     httpGet:
+       path: /docs
+       port: http
    ```
 
    <Aside type="tip">
-   Ensure `targetPort` matches the port your OpenBB application is listening on inside the container.
+   Ensure `targetPort` matches the port your OpenBB application is listening on inside the container (8000 in the Dockerfile example above).
    </Aside>
 
 3. Package the Helm chart:
@@ -54,7 +118,7 @@ Ensure you have the following tools installed:
    helm package openbb
    ```
 
-   This will create a compressed archive, e.g., `openbb-0.1.0.tgz`.
+   This will create a compressed archive: `openbb-0.1.0.tgz`.
 
 4. Push the chart to your registry (Optional but recommended):
 
@@ -64,17 +128,7 @@ Ensure you have the following tools installed:
 
    *Replace `<registry_url>` with your actual registry address.*
 
-5. Install/Deploy the chart:
-
-   ```bash
-   helm install openbb ./openbb-0.1.0.tgz
-   ```
-
-   Or if you pushed it to a registry:
-
-   ```bash
-   helm install openbb oci://<registry_url>/charts/openbb --version 0.1.0 --plain-http
-   ```
+   After uploading, navigate to the [Applications Store](/service/applications/04-store/) to update the Helm chart configuration to use your custom image.
 
 </Steps>
 
@@ -106,23 +160,22 @@ BASE_URL = "http://<node_ip>:30080"
 def check_health():
     """Check if the API server is reachable."""
     try:
-        # Assuming a health check endpoint exists, usually / or /health
-        response = requests.get(f"{BASE_URL}/") 
+        # Check /docs as the root path might return 404
+        response = requests.get(f"{BASE_URL}/docs") 
         if response.status_code == 200:
             print("✓ API is online!")
-            print("Response:", response.json())
         else:
             print(f"✗ API returned status: {response.status_code}")
     except requests.exceptions.RequestException as e:
         print(f"✗ Failed to connect: {e}")
 
-def get_market_data(ticker="AAPL"):
+def get_market_data(ticker="AAPL", provider="yfinance"):
     """Example: Fetch market data for a ticker."""
     endpoint = f"{BASE_URL}/api/v1/equity/price/quote" # Example endpoint structure
-    params = {"symbol": ticker}
+    params = {"symbol": ticker, "provider": provider}
     
     try:
-        print(f"Fetching data for {ticker}...")
+        print(f"Fetching data for {ticker} from {provider}...")
         response = requests.get(endpoint, params=params)
         
         if response.status_code == 200:
