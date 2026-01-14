@@ -1,0 +1,149 @@
+---
+title: Create Helm Chart
+description: Packaging OpenBB into a Helm Chart and deploying it.
+---
+
+import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
+
+This guide demonstrates how to package the OpenBB API Server into a Helm chart and deploy it.
+
+## Prerequisites
+
+Ensure you have the following tools installed:
+
+- **Helm**: [Installation Guide](https://helm.sh/docs/intro/install)
+- **Docker**: For building the OpenBB image (if not already done)
+- **Access to Registry**: To push your chart and image
+
+## Create and Package Helm Chart
+
+<Steps>
+
+1. Create a new Helm chart:
+
+   ```bash
+   helm create openbb
+   ```
+
+   This creates a directory named `openbb` with the standard Helm chart structure.
+
+2. Modify `values.yaml` to configure your deployment. 
+   
+   Locate `openbb/values.yaml` and update the image and service settings. For OpenBB, you'll typically want to expose port 8000 (or whichever port your API listens on).
+
+   ```yaml
+   image:
+     repository: ghcr.io/openbb-finance/openbb-platform  # Official OpenBB Platform image
+     pullPolicy: IfNotPresent
+     tag: "latest"
+
+   service:
+     type: NodePort
+     port: 8000
+     targetPort: 8000
+     nodePort: 30080  # Optional: Fixed NodePort for easier testing
+   ```
+
+   <Aside type="tip">
+   Ensure `targetPort` matches the port your OpenBB application is listening on inside the container.
+   </Aside>
+
+3. Package the Helm chart:
+
+   ```bash
+   helm package openbb
+   ```
+
+   This will create a compressed archive, e.g., `openbb-0.1.0.tgz`.
+
+4. Push the chart to your registry (Optional but recommended):
+
+   ```bash
+   helm push openbb-0.1.0.tgz oci://<registry_url>/charts --plain-http
+   ```
+
+   *Replace `<registry_url>` with your actual registry address.*
+
+5. Install/Deploy the chart:
+
+   ```bash
+   helm install openbb ./openbb-0.1.0.tgz
+   ```
+
+   Or if you pushed it to a registry:
+
+   ```bash
+   helm install openbb oci://<registry_url>/charts/openbb --version 0.1.0 --plain-http
+   ```
+
+</Steps>
+
+## Test with Python
+
+Once your OpenBB API Server is deployed and running, you can interact with it using Python.
+
+<Aside type="note">
+**Prerequisite**: Install the `requests` library.
+```bash
+pip install requests
+```
+</Aside>
+
+### API Interaction
+
+Use the following script to fetch data from your OpenBB API.
+
+<Tabs>
+<TabItem label="Fetch Data">
+
+```python
+import requests
+
+# Configuration
+# Replace with your actual Node IP and the NodePort defined in values.yaml
+BASE_URL = "http://<node_ip>:30080" 
+
+def check_health():
+    """Check if the API server is reachable."""
+    try:
+        # Assuming a health check endpoint exists, usually / or /health
+        response = requests.get(f"{BASE_URL}/") 
+        if response.status_code == 200:
+            print("✓ API is online!")
+            print("Response:", response.json())
+        else:
+            print(f"✗ API returned status: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"✗ Failed to connect: {e}")
+
+def get_market_data(ticker="AAPL"):
+    """Example: Fetch market data for a ticker."""
+    endpoint = f"{BASE_URL}/api/v1/equity/price/quote" # Example endpoint structure
+    params = {"symbol": ticker}
+    
+    try:
+        print(f"Fetching data for {ticker}...")
+        response = requests.get(endpoint, params=params)
+        
+        if response.status_code == 200:
+            data = response.json()
+            print("✓ Data received:")
+            print(data)
+        else:
+            print(f"✗ Error {response.status_code}: {response.text}")
+            
+    except Exception as e:
+        print(f"✗ Error: {e}")
+
+if __name__ == "__main__":
+    check_health()
+    # Uncomment below to test specific endpoints if your OpenBB instance supports them
+    # get_market_data("MSFT")
+```
+
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+The specific endpoints (like `/api/v1/equity/price/quote`) will depend on the version and configuration of your OpenBB Server. Consult the OpenBB API documentation for exact paths.
+</Aside>
