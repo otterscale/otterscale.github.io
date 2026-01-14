@@ -5,15 +5,30 @@ description: Packaging OpenBB into a Helm Chart and deploying it.
 
 import { Steps, Aside, Tabs, TabItem } from '@astrojs/starlight/components';
 
-This guide demonstrates how to package the OpenBB API Server into a Helm chart and deploy it.
+## About OpenBB
+
+The [**OpenBB Platform**](https://openbb.co/products/odp) is a unified financial data interface that simplifies API management for developers and analysts.
+
+**Key Benefits:**
+
+- **Single API Access** — Connect to multiple data providers without managing separate integrations
+- **High-Quality Data** — Access reliable market data across stocks, crypto, forex, and more
+- **Easy Integration** — Deploy as a containerized service for consistent environments
+
+## Overview
+
+This guide demonstrates how to containerize the OpenBB API Server using Helm charts, enabling you to deploy it consistently across Kubernetes clusters with standard deployment tools.
+
+<Aside type="note">
+Containerizing OpenBB with Helm provides reproducible deployments, easy scaling, and simplified management across different environments.
+</Aside>
 
 ## Prerequisites
 
-Ensure you have the following tools installed:
+Before proceeding, ensure you have the following tools installed:
 
-- **Helm**: [Installation Guide](https://helm.sh/docs/intro/install)
-- **Docker**: For building the OpenBB image (if not already done)
-- **Access to Registry**: To push your chart and image
+- **Helm** 3.x or later — [Installation Guide](https://helm.sh/docs/intro/install)
+- **Docker** — For building custom OpenBB images
 
 ## Build Custom Docker Image
 
@@ -21,7 +36,9 @@ Since the official image might be outdated, we recommend building your own Docke
 
 <Steps>
 
-1. Clone the OpenBB repository and checkout a version:
+1. **Clone the OpenBB repository**
+
+   Start by cloning the repository and checking out a stable version:
 
    ```bash
    git clone https://github.com/OpenBB-finance/OpenBB.git
@@ -31,19 +48,24 @@ Since the official image might be outdated, we recommend building your own Docke
    git checkout v4.6.0
    ```
 
-2. Build and push the image using the existing Dockerfile:
+2. **Build and push the Docker image**
 
-   The OpenBB repository already includes a Dockerfile located at `build/docker/platform.dockerfile`. You can use this directly instead of creating a new one.
+   The OpenBB repository includes a pre-configured Dockerfile at `build/docker/platform.dockerfile`. Use this directly:
 
    ```bash
    # Build the image with the version tag
    docker build -f build/docker/platform.dockerfile -t <registry_url>/openbb:v4.6.0 .
+   ```
 
-   # Push the image to your registry
+   After building, push the image to your registry:
+
+   ```bash
    docker push <registry_url>/openbb:v4.6.0
    ```
 
-   *Replace `<registry_url>` with your actual registry address.*
+   <Aside type="note">
+   Replace `<registry_url>` with your actual registry address (e.g., `myregistry.azurecr.io`, `my-docker-hub-username`).
+   </Aside>
 
 </Steps>
 
@@ -51,21 +73,19 @@ Since the official image might be outdated, we recommend building your own Docke
 
 <Steps>
 
-1. Create a new Helm chart:
+1. **Create a new Helm chart**
 
    ```bash
    helm create openbb
    ```
 
-   This creates a directory named `openbb` with the standard Helm chart structure.
+   This generates a directory named `openbb` with the standard Helm chart structure, including templates for Deployment, Service, and ConfigMaps.
 
-2. Configure the Helm chart.
+2. **Configure the Helm**
 
-   **Update `Chart.yaml`**:
-   
-   Locate `openbb/Chart.yaml` and update the version to match your release. You can also add validation metadata like `icon`, `home`, and `maintainers`.
+   Edit `openbb/Chart.yaml` to match your release metadata. You can add additional details like `icon`, `home`, and `maintainers` for better discoverability:
 
-   ```yaml
+   ```yaml title="openbb/Chart.yaml"
    apiVersion: v2
    name: openbb
    description: A Helm chart for deploying the OpenBB Platform API
@@ -81,11 +101,9 @@ Since the official image might be outdated, we recommend building your own Docke
        email: your.email@example.com
    ```
 
-   **Update `values.yaml`**:
+   Edit `openbb/values.yaml` to configure the image and health check settings. Point the image to your custom registry image and configure probes to use `/docs` (since the root path `/` might return 404):
 
-   Locate `openbb/values.yaml` and update the `image` settings to point to your new custom image. Also, update the health checks (`livenessProbe` and `readinessProbe`) to check `/docs`, as the root path `/` might return 404.
-
-   ```yaml
+   ```yaml title="openbb/values.yaml"
    image:
      repository: <registry_url>/openbb
      pullPolicy: IfNotPresent
@@ -99,42 +117,44 @@ Since the official image might be outdated, we recommend building your own Docke
 
    livenessProbe:
      httpGet:
-       path: /docs
+       path: /docs  # Use /docs instead of root path
        port: http
 
    readinessProbe:
      httpGet:
-       path: /docs
+       path: /docs  # Use /docs instead of root path
        port: http
    ```
 
    <Aside type="tip">
-   Ensure `targetPort` matches the port your OpenBB application is listening on inside the container (8000 in the Dockerfile example above).
+   Make sure `targetPort` (8000) matches the port your OpenBB application listens on inside the container.
    </Aside>
 
-3. Package the Helm chart:
+3. **Package the Helm chart**
 
    ```bash
    helm package openbb
    ```
 
-   This will create a compressed archive: `openbb-0.1.0.tgz`.
+   This creates a compressed archive: `openbb-0.1.0.tgz`.
 
-4. Push the chart to your registry (Optional but recommended):
+4. **Push the chart to your registry**
 
    ```bash
    helm push openbb-0.1.0.tgz oci://<registry_url>/charts --plain-http
    ```
 
-   *Replace `<registry_url>` with your actual registry address.*
+   Replace `<registry_url>` with your actual registry address.
 
-   After uploading, navigate to the [Applications Store](/service/applications/04-store/) to update the Helm chart configuration to use your custom image.
+   Once uploaded, navigate to the [Applications Store](/service/applications/04-store/) to deploy the chart with your custom image.
 
 </Steps>
 
 ## Test with Python
 
-Once your OpenBB API Server is deployed and running, you can interact with it using Python.
+Once your OpenBB API Server is deployed and running, you can interact with it programmatically using Python.
+
+### Setup
 
 <Aside type="note">
 **Prerequisite**: Install the `requests` library.
@@ -145,37 +165,39 @@ pip install requests
 
 ### API Interaction
 
-Use the following script to fetch data from your OpenBB API.
+Use the following Python script to fetch data from your OpenBB API:
 
 <Tabs>
-<TabItem label="Fetch Data">
+<TabItem label="Basic Example" icon="code">
 
-```python
+```python title="test_openbb_api.py"
 import requests
 
 # Configuration
-# Replace with your actual Node IP and the NodePort defined in values.yaml
-BASE_URL = "http://<node_ip>:30080" 
+# Replace with your actual Node IP and the NodePort from values.yaml
+BASE_URL = "http://<node_ip>:30080"
 
 def check_health():
-    """Check if the API server is reachable."""
+    """Check if the OpenBB API server is reachable."""
     try:
-        # Check /docs as the root path might return 404
-        response = requests.get(f"{BASE_URL}/docs") 
+        response = requests.get(f"{BASE_URL}/docs")
         if response.status_code == 200:
             print("✓ API is online!")
+            return True
         else:
             print(f"✗ API returned status: {response.status_code}")
+            return False
     except requests.exceptions.RequestException as e:
         print(f"✗ Failed to connect: {e}")
+        return False
 
 def get_market_data(ticker="AAPL", provider="yfinance"):
-    """Example: Fetch market data for a ticker."""
-    endpoint = f"{BASE_URL}/api/v1/equity/price/quote" # Example endpoint structure
+    """Fetch market data for a given ticker."""
+    endpoint = f"{BASE_URL}/api/v1/equity/price/quote"
     params = {"symbol": ticker, "provider": provider}
     
     try:
-        print(f"Fetching data for {ticker} from {provider}...")
+        print(f"\nFetching {ticker} data from {provider}...")
         response = requests.get(endpoint, params=params)
         
         if response.status_code == 200:
@@ -184,19 +206,18 @@ def get_market_data(ticker="AAPL", provider="yfinance"):
             print(data)
         else:
             print(f"✗ Error {response.status_code}: {response.text}")
-            
     except Exception as e:
         print(f"✗ Error: {e}")
 
 if __name__ == "__main__":
-    check_health()
-    # Uncomment below to test specific endpoints if your OpenBB instance supports them
-    # get_market_data("MSFT")
+    if check_health():
+        get_market_data("AAPL")
+        # get_market_data("MSFT")
 ```
 
 </TabItem>
 </Tabs>
 
-<Aside type="tip">
-The specific endpoints (like `/api/v1/equity/price/quote`) will depend on the version and configuration of your OpenBB Server. Consult the OpenBB API documentation for exact paths.
+<Aside type="note">
+The specific API endpoints depend on your OpenBB Server version and configuration. Check the [OpenBB API documentation](https://docs.openbb.co) for the complete list of available endpoints and parameters.
 </Aside>
