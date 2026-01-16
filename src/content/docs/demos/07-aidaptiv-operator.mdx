@@ -1,0 +1,96 @@
+---
+title: aiDAPTIV Operator
+description: Learn how to install the aiDAPTIV Cache Operator for Phison aiDAPTIVCache device support in Kubernetes
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide demonstrates how to install the **aiDAPTIV Cache Operator**, which is required for Kubernetes to recognize and utilize Phison aiDAPTIVCache devices (`phison.com/ai100`).
+
+## Prerequisites
+
+Before installing the operator, ensure you have:
+
+- Access to OtterScale platform with Application management permissions
+- A Kubernetes cluster with Phison aiDAPTIVCache hardware installed
+- Sufficient cluster resources for the operator deployment
+
+<Aside type="note">
+The aiDAPTIV Cache Operator must be installed **before** deploying any workloads that require Phison aiDAPTIVCache devices. Without this operator, Kubernetes will not be able to recognize or allocate aiDAPTIVCache resources.
+</Aside>
+
+## Installation Steps
+
+<Steps>
+
+1. **Navigate to Application Store**
+
+   In the OtterScale web interface:
+   - Go to **Application** → **Store**
+   - This opens the Helm chart repository
+
+2. **Add the aiDAPTIV Operator Chart**
+
+   Click **Import** button and provide the following information:
+   
+   - **Chart URL**: 
+     ```
+     https://github.com/otterscale/charts/releases/download/aidaptivcache-operator-0.4.3/aidaptivcache-operator-0.4.3.tgz
+     ```
+
+   Click **Confirm** to import the chart into your store.
+
+3. **Install the Operator**
+
+   - Find `aidaptivcache-inference` in the Store list
+   - Click the **Install** button
+   - In the Install Release dialog:
+     - Enter a **Name** for your deployment (e.g., `aidaptivcache-operator`)
+     - Enter a **Namespace** (e.g., `aidaptivcache-operator`)
+     - Click **View/Edit** button to open the configuration editor    
+   
+   <Aside type="tip">
+   The operator uses default values that work for most deployments. You can view the configuration by clicking **View/Edit** if you need to customize settings such as resource limits or node selectors.
+   </Aside>
+
+</Steps>
+
+## What the Operator Does
+
+The aiDAPTIV Cache Operator performs the following functions:
+
+- **Resource Manager**: Manage aiDAPTIVCache devices
+- **Device Discovery**: Automatically detects Phison aiDAPTIVCache devices on cluster nodes
+- **Device Plugin**: Registers aiDAPTIVCache devices as Kubernetes resources, enabling targeted workload scheduling
+- **Exporter**: Exposes metrics and cache information via an NVMe exporter
+
+<Aside type="caution">
+**Important**: Do not uninstall the operator while workloads are using aiDAPTIVCache devices. This may cause pod scheduling issues and device allocation failures.
+</Aside>
+
+## Troubleshooting
+
+### Operator Pod Not Starting
+
+If the operator pod fails to start:
+
+1. **Check pod logs via OtterScale UI**:
+   - Navigate to **Application** → **Workloads**
+   - Find the `aidaptivcache-operator` workload
+   - Click on the pod name to view details
+   - Click the **Logs** tab to view container logs
+
+2. Verify node labels and taints allow the operator to schedule
+
+3. Check that the cluster has sufficient resources
+
+## Next Steps
+
+After successfully installing the aiDAPTIV Cache Operator, you can:
+
+- Deploy fine-tuning jobs that utilize aiDAPTIVCache devices (see [Deploy aiDAPTIV Finetune](./08-aidaptiv-finetune))
+- Deploy inference services with aiDAPTIVCache acceleration (see [Deploy aiDAPTIV Inference](./09-aidaptiv-inference))
+
+<Aside type="tip">
+When requesting aiDAPTIVCache devices in your workloads, use the resource key `phison.com/ai100` in both `requests` and `limits` sections of your pod specifications.
+</Aside>

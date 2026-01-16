@@ -1,0 +1,543 @@
+---
+title: aiDAPTIV Finetune
+description: Fine-tune LLM models using aiDAPTIV Cache in OtterScale cluster.
+---
+
+import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
+
+This guide demonstrates how to fine-tune Large Language Models (LLMs) using aiDAPTIV Cache within the OtterScale cluster.
+
+## Overview
+
+aiDAPTIV Finetune provides efficient model fine-tuning capabilities with support for LoRA, full parameter training, and other training modes. Key features:
+
+- Distributed training support (Multi-GPU)
+- NFS storage integration for model input/output
+- LoRA fine-tuning support
+- Customizable training datasets
+- Flexible resource allocation (vGPU, memory)
+
+## Prerequisites
+
+<Aside type="caution">
+**Required**: Before using aiDAPTIV Finetune, you must install the **aiDAPTIV Cache Operator**.
+
+The operator enables Kubernetes to recognize and allocate Phison aiDAPTIVCache devices (`phison.com/ai100`) used by aiDAPTIV workloads.
+
+See [Deploy aiDAPTIV Operator](./07-aidaptiv-operator) for installation instructions.
+</Aside>
+
+## Prepare Model and Data
+
+You need to make your model files accessible to the fine-tuning job. There are two methods to achieve this, both configured via the `prescript` field in the Helm chart values.
+
+### Method 1: Using NFS Storage (Recommended)
+
+This method uses OtterScale's NFS File System to store and access model files.
+
+<Steps>
+
+1. **Create NFS File System in OtterScale**:
+
+   Navigate to the Storage section:
+   - Go to `https://<your-domain>/scope/<scope-name>/service/file-system`
+   - Create a new NFS File System or use an existing one
+   - Record the NFS server address (format: `10.102.197.0:/volumes/_nogroup/xxx`)
+
+2. **Upload your model files to NFS**:
+
+   Mount the NFS on a machine that has access and copy your model files:
+   
+   ```bash
+   # Mount NFS on a node with access
+   mkdir -p /mnt/nfs
+   mount -t nfs4 10.102.197.0:/volumes/_nogroup/xxx /mnt/nfs
+   
+   # Copy your model files to NFS
+   cp -r /path/to/your-model /mnt/nfs/models/
+   
+   # Verify files
+   ls /mnt/nfs/models/
+   ```
+
+3. **Configure prescript to mount NFS**:
+
+   In the Helm chart values, you'll configure the `prescript` to mount this NFS (see NFS Mount Configuration section below).
+
+</Steps>
+
+<Aside type="tip">
+For detailed instructions on creating and managing NFS File Systems in OtterScale, refer to the [Storage - File System](/service/storage/04-file-system) documentation.
+</Aside>
+
+### Method 2: Using SCP to Copy Models
+
+This method copies model files directly into the pod using SCP during initialization.
+
+<Steps>
+
+1. **Prepare a remote server with model files**:
+
+   Ensure you have a remote server (accessible from the cluster) that contains your model files.
+
+2. **Configure prescript with SCP**:
+
+   Use the following prescript template in your Helm chart values:
+
+   ```yaml
+   prescript: |
+     # Install required tools
+     apt-get update && apt-get install -y sshpass
+     
+     # Create model directory
+     mkdir -p /mnt/data/models
+     
+     # Copy model from remote server using SCP
+     echo "Copying model from remote server..."
+     sshpass -p 'your-password' scp -o StrictHostKeyChecking=no -r \
+       user@remote-host:/path/to/your-model /mnt/data/models/
+     
+     if [ $? -eq 0 ]; then
+       echo "Model copied successfully!"
+       ls -lh /mnt/data/models/
+     else
+       echo "Failed to copy model. Exiting..."
+       exit 1
+     fi
+   ```
+
+
+   You still need an NFS mount for storing training outputs. Add NFS mount commands after the SCP section:
+
+   ```yaml
+   postscript: |
+     # Install tools
+     apt-get update && apt-get install -y sshpass nfs-common
+     
+     # Copy model via SCP
+     mkdir -p /mnt/data/models
+     echo "Copying model from remote server..."
+     sshpass -p 'your-password' scp -o StrictHostKeyChecking=no -r \
+       user@remote-host:/path/to/model /mnt/data/models/
+     
+     # Mount NFS for output storage
+     mkdir -p /mnt/data/output
+     echo "Mounting NFS for output storage..."
+     mount -t nfs4 -o nfsvers=4.1 10.102.197.0:/volumes/_nogroup/output-path /mnt/data/output
+     
+     echo "Setup complete!"
+   ```
+
+</Steps>
+
+## Install Helm Chart
+
+<Steps>
+
+1. **Navigate to Application Store**:
+
+   In the OtterScale web interface:
+   - Go to **Application** → **Store**
+   - This opens the Helm chart repository
+
+2. **Import Helm Chart**:
+
+   - Click the **Import** button at the top of the page
+   - Enter the Helm Chart URL in the dialog:
+     ```
+     https://github.com/otterscale/charts/releases/download/aidaptivcache-finetune-0.1.3/aidaptivcache-finetune-0.1.3.tgz
+     ```
+   - Click **Confirm** to import
+
+3. **Install Chart**:
+
+   - Find `aidaptivcache-finetune` in the Store list
+   - Click the **Install** button
+   - In the Install Release dialog:
+     - Enter a **Name** for your deployment (e.g., `ft1`)
+     - Enter a **Namespace** (e.g., `ft1`)
+     - Click **View/Edit** button to open the configuration editor
+   - Edit the `values.yaml` to configure your fine-tuning job (see Configuration Guide below)
+   - Click **Confirm** to start the installation
+
+</Steps>
+
+<Aside type="tip">
+The **View/Edit** button opens a YAML editor where you can configure all the Helm chart values. This is where you'll set up the `prescript` for NFS mounting or SCP, configure paths, training parameters, and resource allocation.
+</Aside>
+
+## Configuration Guide
+
+Now that you've opened the configuration editor via **View/Edit**, you need to configure the following fields in the `values.yaml`.
+
+### Basic Configuration
+
+#### Image Settings
+
+```yaml
+image:
+  repository: docker.io/library/aidaptiv
+  tag: vNXUN_2_05BA0
+  pullPolicy: IfNotPresent
+```
+
+- `repository`: Container image address
+- `tag`: Image version tag
+- `pullPolicy`: Image pull policy (IfNotPresent/Always/Never)
+
+#### Job Configuration
+
+```yaml
+job:
+  name: finetune-job
+  backoffLimit: 1
+  restartPolicy: Never
+  ttlSecondsAfterFinished: 3600
+```
+
+- `name`: Kubernetes Job name
+- `backoffLimit`: Number of retry attempts on failure
+- `restartPolicy`: Restart policy (Never/OnFailure)
+- `ttlSecondsAfterFinished`: Time to retain Job after completion (seconds)
+
+### Training Configuration
+
+The training configuration is divided into three main sections: **expConfig**, **envConfig**, and **trainDataConfig**.
+
+#### 1. Experiment Configuration (expConfig)
+
+The `expConfig` section controls GPU resources, distributed training settings, and training hyperparameters.
+
+**Process Settings**:
+
+```yaml
+expConfig:
+  processSettings:
+    numGpus: 1                    # Number of GPUs to use
+    specifyGpus: null             # Specific GPU IDs (e.g., "0,1,2,3")
+    masterPort: 8299              # Master port for distributed training
+    multiNodeSettings:
+      enable: false               # Enable multi-node training
+      masterAddr: "127.0.0.1"     # Master node address
+```
+
+**Run Settings**:
+
+```yaml
+expConfig:
+  runSettings:
+    taskType: "text-generation"        # Task type
+    taskMode: "train"                  # Mode: train/eval/inference
+    perDeviceTrainBatchSize: 4         # Batch size per device
+    perUpdateTotalBatchSize: 16        # Total batch size (gradient accumulation)
+    numTrainEpochs: 1                  # Number of training epochs
+    maxIter: 12                        # Maximum iterations
+    maxSeqLen: 2048                    # Maximum sequence length
+    triton: true                       # Enable Triton optimization
+    precisionMode: 1                   # Precision mode (0: FP32, 1: Mixed)
+```
+
+**LoRA Settings**:
+
+```yaml
+expConfig:
+  runSettings:
+    lora:
+      enableLora: false              # Enable LoRA fine-tuning
+      loraRank: 8                    # LoRA rank
+      loraAlpha: 16                  # LoRA alpha parameter
+      loraTaskType: "CAUSAL_LM"      # Task type for LoRA
+      loraTargetModules: null        # Target modules (null for auto)
+```
+
+**Learning Rate and Optimizer**:
+
+```yaml
+expConfig:
+  runSettings:
+    lrScheduler:
+      mode: 1                        # LR scheduler mode
+      learningRate: 0.000007         # Learning rate
+    
+    optimizer:
+      beta1: 0.9                     # Adam beta1
+      beta2: 0.95                    # Adam beta2
+      eps: 0.00000001                # Epsilon
+      weightDecay: 0.01              # Weight decay
+```
+
+#### 2. Environment Configuration (envConfig)
+
+The `envConfig` section defines all file paths used during training.
+
+```yaml
+envConfig:
+  pathSettings:
+    modelNameOrPath: "/mnt/data/models/TinyLlama-1.1B-Chat-v1.0"  # Model input path
+    nvmePath: "/mnt/nvme0"                                        # NVMe cache path
+    outputDir: "/mnt/data/output"                                 # Training output path
+    trainDataPath:                                                # Training data config
+      - /config/train_data/QA_dataset_config.yaml
+    logName: "output.log"                                         # Log file name
+```
+
+**Key Path Explanations**:
+
+- **`modelNameOrPath`** (Required): 
+  - Path to the pre-trained model
+  - Must point to where NFS mounts the model via prescript
+  - Example: `/mnt/data/models/TinyLlama-1.1B-Chat-v1.0`
+  
+- **`outputDir`** (Required): 
+  - Where fine-tuned model weights will be saved
+  - Must be on NFS mount for persistence: `/mnt/data/output`
+  
+- **`nvmePath`** (Required): 
+  - NVMe device path for temporary storage and cache
+  - Typically uses node's NVMe: `/mnt/nvme0`
+
+- **`trainDataPath`**: 
+  - Path to training data configuration file(s)
+  - Supports multiple datasets (array format)
+
+<Aside type="tip">
+**Path Mapping**:
+
+The paths in `envConfig` are container paths. The `prescript` (configured in next section) mounts NFS to `/mnt/data`, making files from your NFS server available at these paths inside the container.
+</Aside>
+
+#### 3. Training Data Configuration (trainDataConfig)
+
+The `trainDataConfig` section defines the dataset format and prompts.
+
+```yaml
+trainDataConfig: |
+  instruction-dataset:
+    data_path: "HuggingFaceH4/instruction-dataset"  # HuggingFace dataset or local path
+    strategy: "QA"                                  # Data strategy (QA/Chat)
+    system_prompt: "A chat between a curious user and an artificial intelligence assistant."
+    user_prompt: "{question}"                       # User prompt template
+    question_key: "prompt"                          # Column name for questions
+    answer_key: "completion"                        # Column name for answers
+    exp_type: train                                 # Experiment type: train/eval/inference
+    label_key: "completion"                         # Label column (same as answer_key)
+```
+
+**Configuration Fields**:
+
+- **`data_path`**: HuggingFace dataset name or local file path
+- **`strategy`**: Data processing strategy (QA/Chat/Custom)
+- **`system_prompt`**: System instruction for the model
+- **`user_prompt`**: Template for user questions (use `{question}` placeholder)
+- **`question_key`**: Dataset column containing questions
+- **`answer_key`**: Dataset column containing answers
+- **`exp_type`**: Must be `train` for training
+- **`label_key`**: Column used as training labels (typically same as `answer_key`)
+
+<Aside type="note">
+You can configure multiple datasets by adding more entries in the `trainDataConfig`. Each dataset can have its own processing strategy and prompt templates.
+</Aside>
+
+### Resource Configuration
+
+```yaml
+resources:
+  limits:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+  requests:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+```
+
+- `otterscale.com/vgpu`: vGPU count
+- `otterscale.com/vgpumem-percentage`: vGPU memory percentage (0-100)
+- `phison.com/ai100`: Phison aiDAPTIVCache accelerator count
+
+### NFS Mount Configuration (Required)
+
+To access your model files and save training outputs, you need to configure the `prescript` to mount your NFS storage.
+
+```yaml
+prescript: |
+  apt install -y nfs-common
+  echo "Starting NFS mount process..."
+  mkdir -p /mnt/data
+  TIMEOUT=300
+  ELAPSED=0
+  while [ $ELAPSED -lt $TIMEOUT ]; do
+    echo "Attempting to mount NFS to /mnt/data"
+    mount -t nfs4 -o nfsvers=4.1 -v 10.102.197.0:/volumes/_nogroup/your-nfs-path /mnt/data
+    if mountpoint -q /mnt/data; then
+      echo "NFS mount successful!"
+      break
+    else
+      echo "Mount failed, retrying in 5 seconds... (${ELAPSED}s/${TIMEOUT}s)"
+      sleep 5
+      ELAPSED=$((ELAPSED + 5))
+    fi
+  done
+  if [ $ELAPSED -ge $TIMEOUT ]; then
+    echo "NFS mount timeout after ${TIMEOUT} seconds. Exiting..."
+    exit 1
+  fi
+```
+
+**Configuration Details**:
+- Replace `10.102.197.0:/volumes/_nogroup/your-nfs-path` with your actual NFS server address from the File System page
+- The script installs `nfs-common` package (required for NFS mounting)
+- Implements retry logic with a 5-minute timeout
+- Mounts NFS to `/mnt/data` which is used in the path configuration
+
+**Optional Post-execution Script**:
+
+```yaml
+postscript: |
+  echo "Training job completed"
+  echo "Model saved to: $outputDir"
+```
+
+<Aside type="caution">
+**Important**: Make sure to get the correct NFS server address from **Storage → File System** in the OtterScale interface. The address format should be `IP:/path`.
+</Aside>
+
+## Complete Configuration Example
+
+```yaml
+image:
+  repository: docker.io/library/aidaptiv
+  tag: vNXUN_2_05BA0
+  pullPolicy: IfNotPresent
+
+job:
+  name: finetune-llama-job
+  backoffLimit: 1
+  restartPolicy: Never
+  ttlSecondsAfterFinished: 3600
+
+securityContext:
+  privileged: true
+
+# NFS Mount Script (Required)
+prescript: |
+  apt install -y nfs-common
+  echo "Starting NFS mount process..."
+  mkdir -p /mnt/data
+  TIMEOUT=300
+  ELAPSED=0
+  while [ $ELAPSED -lt $TIMEOUT ]; do
+    echo "Attempting to mount NFS to /mnt/data"
+    mount -t nfs4 -o nfsvers=4.1 -v 10.102.197.0:/volumes/_nogroup/my-nfs-path /mnt/data
+    if mountpoint -q /mnt/data; then
+      echo "NFS mount successful!"
+      break
+    else
+      echo "Mount failed, retrying in 5 seconds... (${ELAPSED}s/${TIMEOUT}s)"
+      sleep 5
+      ELAPSED=$((ELAPSED + 5))
+    fi
+  done
+  if [ $ELAPSED -ge $TIMEOUT ]; then
+    echo "NFS mount timeout after ${TIMEOUT} seconds. Exiting..."
+    exit 1
+  fi
+
+envConfig:
+  pathSettings:
+    modelNameOrPath: "/mnt/data/models/TinyLlama-1.1B-Chat-v1.0"
+    nvmePath: "/mnt/nvme0"
+    outputDir: "/mnt/data/output"
+    trainDataPath:
+      - /config/train_data/QA_dataset_config.yaml
+    logName: "finetune_output.log"
+
+expConfig:
+  processSettings:
+    numGpus: 1
+    masterPort: 8299
+    multiNodeSettings:
+      enable: false
+  
+  runSettings:
+    taskType: "text-generation"
+    taskMode: "train"
+    perDeviceTrainBatchSize: 4
+    perUpdateTotalBatchSize: 16
+    numTrainEpochs: 1
+    maxIter: 100
+    maxSeqLen: 2048
+    triton: true
+    
+    lrScheduler:
+      mode: 1
+      learningRate: 0.000007
+    
+    lora:
+      enableLora: true
+      loraRank: 8
+      loraAlpha: 16
+      loraTaskType: "CAUSAL_LM"
+
+trainDataConfig: |
+  instruction-dataset:
+    data_path: "HuggingFaceH4/instruction-dataset"
+    strategy: "QA"
+    system_prompt: "A chat between a curious user and an artificial intelligence assistant."
+    user_prompt: "{question}"
+    question_key: "prompt"
+    answer_key: "completion"
+    exp_type: train
+    label_key: "completion"
+
+resources:
+  limits:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+  requests:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+```
+
+## Monitor Training Progress
+
+<Steps>
+
+1. **Check Job Status**:
+
+   Navigate to the Jobs page:
+   ```
+   https://<your-domain>/scope/<scope-name>/service/job
+   ```
+   
+   Find your fine-tune job under **Application → Job** and check its status.
+
+2. **Retrieve Output Model**:
+
+   After training completes, the fine-tuned model will be saved in the path specified by `outputDir`:
+   
+   ```bash
+   # Access via the same NFS mount used during training
+   # Mount the NFS on your local machine or a node
+   mount -t nfs4 10.102.197.0:/volumes/_nogroup/your-nfs-path /mnt/nfs
+   ls /mnt/nfs/output/
+   ```
+
+</Steps>
+
+## Related Resources
+
+<LinkCard
+  title="AiDaptiv Inference"
+  description="Deploy fine-tuned models for inference"
+  href="/demos/09-aidaptiv-inference"
+/>
+
+<LinkCard
+  title="Storage - File System"
+  description="Learn how to create and manage NFS File System"
+  href="/service/storage/04-file-system"
+/>

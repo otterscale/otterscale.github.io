@@ -1,0 +1,619 @@
+---
+title: aiDAPTIV Inference
+description: Deploy high-performance LLM inference service using aiDAPTIV Cache.
+---
+
+import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
+
+This guide demonstrates how to deploy a high-performance LLM inference service using aiDAPTIV Cache within the OtterScale cluster.
+
+## Overview
+
+aiDAPTIV Inference provides high-performance LLM inference service based on vLLM, supporting:
+
+- High-throughput serving
+- Tensor parallelism (Multi-GPU)
+- PagedAttention memory optimization
+- KV Cache offloading (DRAM/SSD)
+- Dynamic LoRA loading
+- Prefix Caching
+- OpenAI-compatible API
+
+## Prerequisites
+
+<Aside type="caution">
+**Required**: Before using aiDAPTIV Inference, you must install the **aiDAPTIV Cache Operator**.
+
+The operator enables Kubernetes to recognize and allocate Phison aiDAPTIVCache devices (`phison.com/ai100`) used by aiDAPTIV workloads.
+
+See [Deploy aiDAPTIV Operator](./07-aidaptiv-operator) for installation instructions.
+</Aside>
+
+## Prepare Model
+
+You need to make your model files accessible to the inference service. There are two methods to achieve this, both configured via the `prescript` field in the Helm chart values.
+
+### Method 1: Using NFS Storage (Recommended)
+
+This method uses OtterScale's NFS File System to store and access model files.
+
+<Steps>
+
+1. **Create NFS File System in OtterScale**:
+
+   Navigate to the Storage section:
+   - Go to `https://<your-domain>/scope/<scope-name>/service/file-system`
+   - Create a new NFS File System or use an existing one
+   - Record the NFS server address (format: `10.102.197.0:/volumes/_nogroup/xxx`)
+
+2. **Upload your model files to NFS**:
+
+   Mount the NFS on a machine that has access and copy your model files:
+   
+   ```bash
+   # Mount NFS on a node with access
+   mkdir -p /mnt/nfs
+   mount -t nfs4 10.102.197.0:/volumes/_nogroup/xxx /mnt/nfs
+   
+   # Copy your model files to NFS
+   cp -r /path/to/your-model /mnt/nfs/models/
+   
+   # Verify files
+   ls /mnt/nfs/models/
+   ```
+
+3. **Configure prescript to mount NFS**:
+
+   In the Helm chart values, you'll configure the `prescript` to mount this NFS (see NFS Mount Configuration section below).
+
+</Steps>
+
+<Aside type="tip">
+For detailed instructions on creating and managing NFS File Systems in OtterScale, refer to the [Storage - File System](/service/storage/04-file-system) documentation.
+</Aside>
+
+### Method 2: Using SCP to Copy Models
+
+This method copies model files directly into the pod using SCP during initialization.
+
+<Steps>
+
+1. **Prepare a remote server with model files**:
+
+   Ensure you have a remote server (accessible from the cluster) that contains your model files.
+
+2. **Configure prescript with SCP**:
+
+   Use the following prescript template in your Helm chart values:
+
+   ```yaml
+   prescript: |
+     # Install required tools
+     apt-get update && apt-get install -y sshpass
+     
+     # Create model directory
+     mkdir -p /mnt/data/models
+     
+     # Copy model from remote server using SCP
+     echo "Copying model from remote server..."
+     sshpass -p 'your-password' scp -o StrictHostKeyChecking=no -r \
+       user@remote-host:/path/to/your-model /mnt/data/models/
+     
+     if [ $? -eq 0 ]; then
+       echo "Model copied successfully!"
+       ls -lh /mnt/data/models/
+     else
+       echo "Failed to copy model. Exiting..."
+       exit 1
+     fi
+   ```
+
+</Steps>
+
+## Install Helm Chart
+
+<Steps>
+
+1. **Navigate to Application Store**:
+
+   In the OtterScale web interface:
+   - Go to **Application** → **Store**
+   - This opens the Helm chart repository
+
+2. **Import Helm Chart**:
+
+   - Click the **Import** button at the top of the page
+   - Enter the Helm Chart URL in the dialog:
+     ```
+     https://github.com/otterscale/charts/releases/download/aidaptivcache-inference-0.1.3/aidaptivcache-inference-0.1.3.tgz
+     ```
+   - Click **Confirm** to import
+
+3. **Install Chart**:
+
+   - Find `aidaptivcache-inference` in the Store list
+   - Click the **Install** button
+   - In the Install Release dialog:
+     - Enter a **Name** for your deployment (e.g., `llama-inference`)
+     - Enter a **Namespace** (e.g., `inference`)
+     - Click **View/Edit** button to open the configuration editor
+   - Edit the `values.yaml` to configure your inference service (see Configuration Guide below)
+   - Click **Confirm** to start the installation
+
+</Steps>
+
+<Aside type="tip">
+The **View/Edit** button opens a YAML editor where you can configure all the Helm chart values. This is where you'll set up the `prescript` for NFS mounting or SCP, configure vLLM parameters, and resource allocation.
+</Aside>
+
+## Configuration Guide
+
+Now that you've opened the configuration editor via **View/Edit**, you need to configure the following fields in the `values.yaml`.
+
+### Basic Configuration
+
+#### Image Settings
+
+```yaml
+image:
+  repository: docker.io/library/aidaptiv
+  tag: vNXUN_3_03AA
+  pullPolicy: IfNotPresent
+```
+
+- `repository`: Container image address
+- `tag`: Image version tag
+- `pullPolicy`: Image pull policy (IfNotPresent/Always/Never)
+
+#### Deployment Configuration
+
+```yaml
+deployment:
+  name: vllm-api
+  replicas: 1
+```
+
+- `name`: Kubernetes Deployment name
+- `replicas`: Number of Pod replicas (typically 1 due to limited GPU resources)
+
+### vLLM Configuration
+
+#### Environment Variables
+
+```yaml
+vllm:
+  env:
+    vllmUseV1: "1"
+    vllmWorkerMultiprocMethod: "spawn"
+    tiktokenEncodingsBase: ""
+```
+
+- `vllmUseV1`: Use vLLM v1 API
+- `vllmWorkerMultiprocMethod`: Multi-process startup method (spawn/fork)
+
+#### Command Line Arguments (Important)
+
+```yaml
+vllm:
+  args:
+    model: /mnt/data/model/Meta-Llama-3.1-8B-Instruct/
+    nvmePath: /mnt/nvme0
+    port: 8000
+    gpuMemoryUtilization: 0.9
+    maxModelLen: 32768
+    tensorParallelSize: 4
+    dramKvOffloadGb: 0
+    ssdKvOffloadGb: 500
+    noResumeKvCache: true
+    disableGpuReuse: false
+    enableChunkedPrefill: true
+```
+
+**Key Parameter Explanations**:
+
+- **`model`** (required): 
+  - Model input path
+  - Must correspond to the container mount path
+  - Example: `/mnt/data/model/Meta-Llama-3.1-8B-Instruct/`
+  - **Note**: This is the container path, not the NFS server path!
+
+- **`nvmePath`** (required): 
+  - NVMe cache path
+  - Used for KV Cache offloading
+  - Typically uses node NVMe: `/mnt/nvme0`
+
+- **`port`**: 
+  - vLLM API service port
+  - Default 8000
+
+- **`gpuMemoryUtilization`**: 
+  - GPU memory utilization ratio (0.0-1.0)
+  - Recommended 0.8-0.9 to reserve some memory buffer
+
+- **`maxModelLen`**: 
+  - Maximum sequence length
+  - Adjust based on model and GPU memory
+
+- **`tensorParallelSize`**: 
+  - Number of GPUs for tensor parallelism
+  - Must match the `otterscale.com/vgpu` value in resource configuration
+  - Example: If `tensorParallelSize: 4`, you must set `otterscale.com/vgpu: 4`
+
+- **`dramKvOffloadGb`**: 
+  - KV Cache offload to DRAM capacity (GB)
+  - Set to 0 to disable DRAM offload
+
+- **`ssdKvOffloadGb`**: 
+  - KV Cache offload to SSD capacity (GB)
+  - Used with `nvmePath`
+
+- **`enableChunkedPrefill`**: 
+  - Enable chunked prefill for better long-text performance
+
+**Optional Parameters** (commented by default):
+
+```yaml
+# disableLongToken: true        # Disable long token support
+# resumeKvCache: true            # Resume KV Cache
+# cleanObsoleteKvCache: true     # Clean obsolete KV Cache
+# enablePrefixCaching: true      # Enable prefix caching
+# enforceEager: true             # Force eager mode
+```
+
+#### LoRA Configuration
+
+```yaml
+vllm:
+  lora:
+    enable: false
+    modules: ""
+    maxRank: 32
+```
+
+**Enable LoRA Example**:
+
+```yaml
+vllm:
+  lora:
+    enable: true
+    modules: "lora=/mnt/data/lora-adapters/llama3.1-8B-lora/"
+    maxRank: 32
+```
+
+- `enable`: Set to `true` to enable LoRA
+- `modules`: LoRA adapter path, format: `lora=/path/to/adapter/`
+- `maxRank`: Maximum LoRA rank
+
+**Note**: All three parameters must be configured together to enable LoRA.
+
+### NFS Mount Configuration (For Method 1)
+
+If you're using NFS storage to access your model files, configure the `prescript` to mount your NFS storage.
+
+```yaml
+prescript: |
+  apt install -y nfs-common
+  echo "Starting NFS mount process..."
+  mkdir -p /mnt/data
+  TIMEOUT=300
+  ELAPSED=0
+  while [ $ELAPSED -lt $TIMEOUT ]; do
+    echo "Attempting to mount NFS to /mnt/data"
+    mount -t nfs4 -o nfsvers=4.1 -v 10.102.197.0:/volumes/_nogroup/your-nfs-path /mnt/data
+    if mountpoint -q /mnt/data; then
+      echo "NFS mount successful!"
+      break
+    else
+      echo "Mount failed, retrying in 5 seconds... (${ELAPSED}s/${TIMEOUT}s)"
+      sleep 5
+      ELAPSED=$((ELAPSED + 5))
+    fi
+  done
+  if [ $ELAPSED -ge $TIMEOUT ]; then
+    echo "NFS mount timeout after ${TIMEOUT} seconds. Exiting..."
+    exit 1
+  fi
+```
+
+**Configuration Details**:
+- Replace `10.102.197.0:/volumes/_nogroup/your-nfs-path` with your actual NFS server address from the File System page
+- The script installs `nfs-common` package (required for NFS mounting)
+- Implements retry logic with a 5-minute timeout
+- Mounts NFS to `/mnt/data` which is used in the model path configuration
+
+<Aside type="caution">
+**Important**: Make sure to get the correct NFS server address from **Storage → File System** in the OtterScale interface. The address format should be `IP:/path`.
+</Aside>
+
+### Service Configuration
+
+```yaml
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
+  # nodePort: 30299
+```
+
+- `type`: Service type (NodePort/ClusterIP/LoadBalancer)
+- `port`: Service external port
+- `targetPort`: Container internal port
+- `nodePort`: (Optional) Specify a fixed NodePort
+
+### Volume Configuration
+
+```yaml
+volumes:
+  dshm:
+    enabled: true
+    sizeLimit: 30Gi
+```
+
+- **`dshm`**: 
+  - `enabled`: Enable /dev/shm (shared memory)
+  - `sizeLimit`: Shared memory size (required for vLLM)
+
+<Aside type="note">
+**NFS Mounting**: Unlike previous versions, NFS is now mounted via the `prescript` field (see NFS Mount Configuration section above) rather than the `volumes.nfs` configuration. This provides more flexibility and better error handling.
+</Aside>
+
+### Resource Configuration
+
+```yaml
+resources:
+  requests:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+  limits:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 60
+    phison.com/ai100: 1
+```
+
+- **`otterscale.com/vgpu`**: vGPU count
+  - Must match `vllm.args.tensorParallelSize` for multi-GPU deployment
+  - Example: For 4-GPU tensor parallelism, set both `tensorParallelSize: 4` and `otterscale.com/vgpu: 4`
+- **`otterscale.com/vgpumem-percentage`**: vGPU memory percentage (0-100)
+- **`otterscale.com/vgpumem`**: Alternative to percentage, directly specify memory amount (MB)
+- **`phison.com/ai100`**: Phison aiDAPTIVCache accelerator count
+
+<Aside type="caution">
+**Important for Multi-GPU**: The `otterscale.com/vgpu` value must equal `tensorParallelSize`. If you configure `tensorParallelSize: 4`, you must also set `otterscale.com/vgpu: 4` in both requests and limits.
+</Aside>
+
+## Complete Configuration Examples
+
+### Example: Basic Inference Service
+
+```yaml
+image:
+  repository: docker.io/library/aidaptiv
+  tag: vNXUN_3_03AA
+  pullPolicy: IfNotPresent
+
+deployment:
+  name: llama3-inference
+  replicas: 1
+
+vllm:
+  env:
+    vllmUseV1: "1"
+    vllmWorkerMultiprocMethod: "spawn"
+  
+  args:
+    model: /mnt/data/model/Meta-Llama-3.1-8B-Instruct/
+    nvmePath: /mnt/nvme0
+    port: 8000
+    gpuMemoryUtilization: 0.9
+    maxModelLen: 32768
+    tensorParallelSize: 1
+    ssdKvOffloadGb: 500
+    enableChunkedPrefill: true
+  
+  lora:
+    enable: false
+
+service:
+  type: NodePort
+  port: 8000
+  targetPort: 8000
+
+securityContext:
+  privileged: true
+
+# NFS Mount Script
+prescript: |
+  apt install -y nfs-common
+  echo "Starting NFS mount process..."
+  mkdir -p /mnt/data
+  TIMEOUT=300
+  ELAPSED=0
+  while [ $ELAPSED -lt $TIMEOUT ]; do
+    echo "Attempting to mount NFS to /mnt/data"
+    mount -t nfs4 -o nfsvers=4.1 -v 10.102.197.0:/volumes/_nogroup/models /mnt/data
+    if mountpoint -q /mnt/data; then
+      echo "NFS mount successful!"
+      break
+    else
+      echo "Mount failed, retrying in 5 seconds... (${ELAPSED}s/${TIMEOUT}s)"
+      sleep 5
+      ELAPSED=$((ELAPSED + 5))
+    fi
+  done
+  if [ $ELAPSED -ge $TIMEOUT ]; then
+    echo "NFS mount timeout after ${TIMEOUT} seconds. Exiting..."
+    exit 1
+  fi
+
+volumes:
+  dshm:
+    enabled: true
+    sizeLimit: 30Gi
+
+resources:
+  requests:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 80
+    phison.com/ai100: 1
+  limits:
+    otterscale.com/vgpu: 1
+    otterscale.com/vgpumem-percentage: 80
+    phison.com/ai100: 1
+```
+## Using the Inference Service
+
+<Steps>
+
+1. **Get Service Address**:
+
+   Navigate to the Services page:
+   ```
+   https://<your-domain>/scope/<scope-name>/service/services
+   ```
+   
+   Find your inference service and note the NodePort.
+
+2. **Test API Connection**:
+
+   ```bash
+   # Get Node IP
+   NODE_IP="your-node-ip"
+   NODE_PORT="your-node-port"
+   
+   # Test health check
+   curl http://${NODE_IP}:${NODE_PORT}/health
+   ```
+
+3. **Use OpenAI-Compatible API**:
+
+   ```bash
+   curl http://${NODE_IP}:${NODE_PORT}/v1/completions \
+     -H "Content-Type: application/json" \
+     -d '{
+       "model": "Meta-Llama-3.1-8B-Instruct",
+       "prompt": "What is the capital of France?",
+       "max_tokens": 100,
+       "temperature": 0.7
+     }'
+   ```
+
+4. **Use Chat Completions API**:
+
+   ```bash
+   curl http://${NODE_IP}:${NODE_PORT}/v1/chat/completions \
+     -H "Content-Type: application/json" \
+     -d '{
+       "model": "Meta-Llama-3.1-8B-Instruct",
+       "messages": [
+         {"role": "system", "content": "You are a helpful assistant."},
+         {"role": "user", "content": "What is machine learning?"}
+       ],
+       "max_tokens": 200
+     }'
+   ```
+
+5. **Python Client Example**:
+
+   ```python
+   from openai import OpenAI
+   
+   # Connect to vLLM service
+   client = OpenAI(
+       base_url=f"http://{NODE_IP}:{NODE_PORT}/v1",
+       api_key="dummy"  # vLLM doesn't require a real API key
+   )
+   
+   # Perform inference
+   response = client.chat.completions.create(
+       model="Meta-Llama-3.1-8B-Instruct",
+       messages=[
+           {"role": "user", "content": "Explain quantum computing in simple terms"}
+       ],
+       max_tokens=150,
+       temperature=0.8
+   )
+   
+   print(response.choices[0].message.content)
+   ```
+
+</Steps>
+
+## Monitoring and Debugging
+
+<Steps>
+
+1. **Check Deployment Status**:
+
+   Navigate to the Workloads page:
+   ```
+   https://<your-domain>/scope/<scope-name>/service/workload
+   ```
+
+2. **View Pod Logs**:
+
+   - Click on the Pod corresponding to the Deployment
+   - View the **Logs** tab
+   - Monitor model loading, inference requests, etc.
+
+3. **Check Resource Usage**:
+
+   - View GPU and memory usage in the Pod details page
+   - Check for OOM (Out of Memory) errors
+
+</Steps>
+
+## Performance Tuning Recommendations
+
+### Memory Optimization
+
+- **Small models** (< 7B): 
+  - `gpuMemoryUtilization: 0.9`
+  - `ssdKvOffloadGb: 0` (no offload needed)
+  
+- **Medium models** (7B-13B):
+  - `gpuMemoryUtilization: 0.85`
+  - `ssdKvOffloadGb: 200-500`
+  
+- **Large models** (> 13B):
+  - `gpuMemoryUtilization: 0.8`
+  - `ssdKvOffloadGb: 500-1000`
+  - Consider multi-GPU: `tensorParallelSize: 2-4` with `otterscale.com/vgpu: 2-4`
+
+### Latency vs Throughput Trade-off
+
+- **Low latency priority**:
+  ```yaml
+  maxModelLen: 8192  # Shorter sequences
+  enableChunkedPrefill: false
+  dramKvOffloadGb: 0
+  ssdKvOffloadGb: 0
+  ```
+
+- **High throughput priority**:
+  ```yaml
+  maxModelLen: 32768  # Longer sequences
+  enableChunkedPrefill: true
+  enablePrefixCaching: true
+  ssdKvOffloadGb: 500
+  ```
+
+## Related Resources
+
+<LinkCard
+  title="aiDAPTIV Finetune"
+  description="Train and fine-tune LLM models"
+  href="/demos/08-aidaptiv-finetune"
+/>
+
+<LinkCard
+  title="Storage - File System"
+  description="Create and manage NFS File System"
+  href="/service/storage/04-file-system"
+/>
+
+<LinkCard
+  title="Services"
+  description="Manage Kubernetes Services"
+  href="/service/applications/02-services"
+/>
