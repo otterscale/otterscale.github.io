@@ -1,18 +1,17 @@
 ---
-title: aiDAPTIV Finetune
-description: Fine-tune LLM models using aiDAPTIV Cache in OtterScale cluster.
+title: aiDAPTIVCache Finetune
+description: Fine-tune LLM models using aiDAPTIVCache in OtterScale cluster.
 ---
 
 import { Steps, Aside, LinkCard } from '@astrojs/starlight/components';
 
-This guide demonstrates how to fine-tune Large Language Models (LLMs) using aiDAPTIV Cache within the OtterScale cluster.
+This guide demonstrates how to fine-tune Large Language Models (LLMs) using aiDAPTIVCache within the OtterScale cluster.
 
 ## Overview
 
-aiDAPTIV Finetune provides efficient model fine-tuning capabilities with support for LoRA, full parameter training, and other training modes. Key features:
+aiDAPTIVCache finetune provides efficient model fine-tuning capabilities with support for LoRA, full parameter training, and other training modes. Key features:
 
 - Distributed training support (Multi-GPU)
-- NFS storage integration for model input/output
 - LoRA fine-tuning support
 - Customizable training datasets
 - Flexible resource allocation (vGPU, memory)
@@ -20,11 +19,11 @@ aiDAPTIV Finetune provides efficient model fine-tuning capabilities with support
 ## Prerequisites
 
 <Aside type="caution">
-**Required**: Before using aiDAPTIV Finetune, you must install the **aiDAPTIV Cache Operator**.
+**Required**: Before using aiDAPTIVCache finetune, you must install the **aiDAPTIVCache Operator**.
 
 The operator enables Kubernetes to recognize and allocate Phison aiDAPTIVCache devices (`phison.com/ai100`) used by aiDAPTIV workloads.
 
-See [aiDAPTIV Operator](/demo/07-aidaptiv-operator) for installation instructions.
+See [aiDAPTIVCache Operator](/demos/07-aidaptivcache-operator) for installation instructions.
 </Aside>
 
 ## Prepare Model and Data
@@ -40,7 +39,7 @@ This method uses OtterScale's NFS File System to store and access model files.
 1. **Create NFS File System in OtterScale**:
 
    Navigate to the Storage section:
-   - Go to `https://<your-domain>/scope/<scope-name>/service/file-system`
+   - Go to **Storage** → **File System**
    - Create a new NFS File System or use an existing one
    - Record the NFS server address (format: `10.102.197.0:/volumes/_nogroup/xxx`)
 
@@ -192,7 +191,7 @@ job:
   name: finetune-job
   backoffLimit: 1
   restartPolicy: Never
-  ttlSecondsAfterFinished: 3600
+  ttlSecondsAfterFinished: 60
 ```
 
 - `name`: Kubernetes Job name
@@ -415,7 +414,7 @@ job:
   name: finetune-llama-job
   backoffLimit: 1
   restartPolicy: Never
-  ttlSecondsAfterFinished: 3600
+  ttlSecondsAfterFinished: 60
 
 securityContext:
   privileged: true
@@ -509,11 +508,8 @@ resources:
 1. **Check Job Status**:
 
    Navigate to the Jobs page:
-   ```
-   https://<your-domain>/scope/<scope-name>/service/job
-   ```
-   
-   Find your fine-tune job under **Application → Job** and check its status.
+   - Go to **Applications** → **Jobs**
+   - Find your fine-tune job under your namespace and check its status.
 
 2. **Retrieve Output Model**:
 
@@ -533,7 +529,7 @@ resources:
 <LinkCard
   title="AiDaptiv Inference"
   description="Deploy fine-tuned models for inference"
-  href="/demos/09-aidaptiv-inference"
+  href="/demos/09-aidaptivcache-inference"
 />
 
 <LinkCard

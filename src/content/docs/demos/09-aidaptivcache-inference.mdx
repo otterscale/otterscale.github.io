@@ -1,5 +1,5 @@
 ---
-title: aiDAPTIV Inference
+title: aiDAPTIVCache Inference
 description: Deploy high-performance LLM inference service using aiDAPTIV Cache.
 ---
 
@@ -9,24 +9,22 @@ This guide demonstrates how to deploy a high-performance LLM inference service u
 
 ## Overview
 
-aiDAPTIV Inference provides high-performance LLM inference service based on vLLM, supporting:
+aiDAPTIVCache Inference provides high-performance LLM inference service based on vLLM, supporting:
 
 - High-throughput serving
 - Tensor parallelism (Multi-GPU)
-- PagedAttention memory optimization
-- KV Cache offloading (DRAM/SSD)
+- KV Cache offloading
 - Dynamic LoRA loading
-- Prefix Caching
 - OpenAI-compatible API
 
 ## Prerequisites
 
 <Aside type="caution">
-**Required**: Before using aiDAPTIV Inference, you must install the **aiDAPTIV Cache Operator**.
+**Required**: Before using aiDAPTIVCache Inference, you must install the **aiDAPTIV Cache Operator**.
 
 The operator enables Kubernetes to recognize and allocate Phison aiDAPTIVCache devices (`phison.com/ai100`) used by aiDAPTIV workloads.
 
-See [aiDAPTIV Operator](/demo/07-aidaptiv-operator) for installation instructions.
+See [aiDAPTIV Operator](/demos/07-aidaptivcache-operator) for installation instructions.
 </Aside>
 
 ## Prepare Model
@@ -42,7 +40,7 @@ This method uses OtterScale's NFS File System to store and access model files.
 1. **Create NFS File System in OtterScale**:
 
    Navigate to the Storage section:
-   - Go to `https://<your-domain>/scope/<scope-name>/service/file-system`
+   - Go to **Storage** → **File System**
    - Create a new NFS File System or use an existing one
    - Record the NFS server address (format: `10.102.197.0:/volumes/_nogroup/xxx`)
 
@@ -467,12 +465,8 @@ resources:
 
 1. **Get Service Address**:
 
-   Navigate to the Services page:
-   ```
-   https://<your-domain>/scope/<scope-name>/service/services
-   ```
-   
-   Find your inference service and note the NodePort.
+   - Go to **Application** → **Services**
+   - Find your inference service and note the NodePort.
 
 2. **Test API Connection**:
 
@@ -546,9 +540,8 @@ resources:
 1. **Check Deployment Status**:
 
    Navigate to the Workloads page:
-   ```
-   https://<your-domain>/scope/<scope-name>/service/workload
-   ```
+   - Go to **Application** → **Workloads**
+   - Find your deployment
 
 2. **View Pod Logs**:
 
@@ -603,7 +596,7 @@ resources:
 <LinkCard
   title="aiDAPTIV Finetune"
   description="Train and fine-tune LLM models"
-  href="/demos/08-aidaptiv-finetune"
+  href="/demos/08-aidaptivcache-finetune"
 />
 
 <LinkCard
