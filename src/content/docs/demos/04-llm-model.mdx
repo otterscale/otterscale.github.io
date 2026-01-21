@@ -86,7 +86,7 @@ def ask_question(question):
     
     try:
         response = requests.post(
-            f"{SERVICE_URL}/v1/chat",
+            f"{SERVICE_URL}/v1/completions",
             headers=headers,
             json=payload
         )
