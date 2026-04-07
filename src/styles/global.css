@@ -54,7 +54,7 @@ starlight-lang-select select {
 }
 
 .site-title img {
-	height: calc(var(--sl-nav-height) - 3 * var(--sl-nav-pad-y));
+	height: calc(var(--sl-nav-height) - 3.2 * var(--sl-nav-pad-y));
 	width: auto;
 	max-width: 100%;
 	object-fit: contain;
