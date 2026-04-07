@@ -104,15 +104,6 @@
       ]
     },
     {
-      "label": "Demos",
-      "translations": {
-        "zh-Hant": "演示範例"
-      },
-      "autogenerate": {
-        "directory": "demos"
-      }
-    },
-    {
       "collapsed": false,
       "items": [],
       "label": "Symbol(StarlightOpenAPISidebarGroupsLabel)"
