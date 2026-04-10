@@ -1,0 +1,177 @@
+---
+title: Push ModelPack to Harbor
+description: Package a model as a ModelPack using modctl and push it to Harbor for use in OtterScale.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks through how to package a model as a ModelPack using `modctl` and push it to a Harbor registry for use in OtterScale.
+
+---
+
+## Prerequisites
+
+Before you begin, make sure:
+
+- You have access to **OtterScale** and **Harbor**
+- `modctl` is installed on your local machine
+- Docker is installed and running
+- You have permission to create **Robot Accounts** in the target Harbor project
+
+---
+
+## Step 1. Navigate to Harbor from OtterScale
+
+1. In the **OtterScale** UI, locate the left-side navigation bar.
+2. Click **Registry**.
+3. You will be redirected to the Harbor UI associated with your OtterScale environment.
+
+> OtterScale uses Harbor as its OCI registry for storing model artifacts such as ModelPack.
+
+---
+
+## Step 2. Create a Robot Account in Harbor
+
+Robot Accounts are recommended for CLI and automation access (for example, `docker` and `modctl`).
+
+1. In Harbor, select the target **Project** from the left sidebar.
+2. Navigate to **Robot Accounts**.
+3. Click **New Robot Account**.
+
+---
+
+## Step 3. Configure Robot Account Permissions
+
+Configure the Robot Account with the following settings:
+
+- **Name**: for example, `modctl-pusher`
+- **Scope**: select the target project
+- **Permissions**:
+  - Repository → ✅ Pull
+  - Repository → ✅ Push
+
+Click **Create**.
+
+After creation, Harbor will display:
+
+- **Username** (for example: `robot$my_project+modctl-pusher`)
+- **Token (Password)**
+
+> ⚠️ The token is shown only once. Make sure to copy and store it securely.
+
+---
+
+## Step 4. Log in to Harbor using Docker
+
+`modctl` reuses Docker’s OCI credentials, so you must log in using Docker first.
+
+```bash
+docker login <harbor-host:port>
+```
+
+### Example
+
+```bash
+docker login 127.0.0.1:32180
+```
+
+When prompted, enter:
+
+- **Username**: the Robot Account username
+- **Password**: the Robot Account token
+
+### Note for HTTP Harbor Registries
+
+If your Harbor registry is **HTTP-only**, ensure it is configured as an insecure registry in Docker:
+
+```json
+{
+  "insecure-registries": [
+    "127.0.0.1:32180"
+  ]
+}
+```
+
+After updating the configuration, restart Docker.
+
+---
+
+## Step 5. Build the ModelPack
+
+Navigate to your ModelPack project directory and run:
+
+```bash
+modctl build -t <REGISTRY/PROJECT/NAME:TAG> .
+```
+
+### Example
+
+```bash
+modctl build -t 127.0.0.1:32180/my_projects/my_project001:0.1.0 .
+```
+
+This command:
+
+- Reads the ModelPack specification in the current directory
+- Packages the model into an OCI artifact
+- Tags it with the specified registry reference
+
+---
+
+## Step 6. Push the ModelPack to Harbor
+
+Push the built ModelPack to Harbor:
+
+```bash
+modctl push <REGISTRY/PROJECT/NAME:TAG>
+```
+
+### Example
+
+```bash
+modctl push 127.0.0.1:32180/my_projects/my_project001:0.1.0
+```
+
+If your Harbor registry uses HTTP, include:
+
+```bash
+modctl push --plain-http 127.0.0.1:32180/my_projects/my_project001:0.1.0
+```
+
+---
+
+## Verify in Harbor
+
+After the push succeeds:
+
+1. Open the Harbor UI.
+2. Navigate to the target project.
+3. Confirm the repository and tag appear under **Repositories**.
+
+The ModelPack is now available for use in OtterScale.
+
+---
+
+## Common Issues
+
+### Unauthorized / 401 errors
+
+Ensure you are using a Harbor **Robot Account**, not a Keycloak user.
+
+### HTTPS / HTTP mismatch
+
+Configure Docker `insecure-registries` and use `--plain-http` with `modctl` when pushing.
+
+### Project does not exist
+
+Harbor projects must be created before pushing artifacts.
+
+---
+
+## Summary
+
+- Harbor stores ModelPack as OCI artifacts
+- Robot Accounts are required for CLI access
+- `modctl build` creates the ModelPack
+- `modctl push` uploads it to Harbor
+- OtterScale can then reference the artifact by tag or digest
