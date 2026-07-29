@@ -2,6 +2,13 @@
   "name": "otterscale-docs",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
