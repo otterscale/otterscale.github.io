@@ -10,82 +10,88 @@ import logo2 from '../../assets/otter-2.png';
 <div class="flex flex-col md:flex-row gap-6 mb-4 items-center">
 	<div>
 		<strong class="text-xl">OtterScale</strong> is a{' '}
-		<strong class="text-xl">Hyper-Converged Infrastructure (HCI)</strong>
-		platform that unifies compute, storage, networking, and virtualization into a scalable solution.
-		Seamlessly manage VMs, containers, GPUs, and applications through a single control plane with
-		enterprise-grade performance.
+		<strong class="text-xl">multi-cluster Kubernetes platform</strong> that provides a single,
+		authenticated entry point to all of your clusters — including clusters behind NAT, firewalls,
+		or in air-gapped environments. Manage Kubernetes resources, storage, virtual machines, and AI
+		workloads from one unified console.
 	</div>
 	<Image src={logo2} alt="OtterScale Logo" width="200" height="200" />
 </div>
 
-## System Architecture
+<Aside type="note" title="Work in Progress">
+	This documentation is under active development. New pages and guides are being added
+	continuously — check back often for updates.
+</Aside>
 
-OtterScale is built on a layered architecture that provides complete control from the hardware up to the application layer.
+## How It Works
 
-### Core Layers
+A central **server (hub)** accepts ConnectRPC requests, while lightweight **agents (spokes)** running inside each cluster dial home over an mTLS reverse tunnel and forward requests to their local `kube-apiserver` with the caller's identity preserved through impersonation. The result is consistent RBAC, discovery, and runtime operations across every connected cluster.
 
 <Steps>
 
-1.  **Hardware Layer**: Manages physical resources including Compute nodes, Storage nodes, and GPU accelerators.
-2.  **Provisioning Layer (MAAS)**: Handles bare metal provisioning, OS deployment, and network configuration.
-3.  **Orchestration Layer (Juju & Kubernetes)**: Manages application lifecycles and container orchestration.
-4.  **Storage Layer (Ceph)**: Provides scalable, distributed storage for the cluster.
+1.  An **agent** registers with the server via a CSR flow and receives an mTLS certificate.
+2.  The agent establishes a **reverse tunnel** back to the server, so the cluster never needs to expose an inbound endpoint.
+3.  Users send **ConnectRPC requests** to the server, authenticated with an OIDC token (Keycloak).
+4.  The server routes each request through the tunnel to the target cluster, where the agent calls the local `kube-apiserver` using **user impersonation** — so native Kubernetes RBAC applies.
 
 </Steps>
 
-### Node Provisioning & Management
+## Components
 
-OtterScale automates the lifecycle of physical nodes. Through the integration with MAAS, it handles power management (IPMI/Redfish), PXE booting, and OS installation.
+The OtterScale platform is composed of several open-source components:
 
-### Storage Topology
-
-The platform utilizes Ceph to provide a robust, self-healing storage fabric. Storage nodes are dedicated to managing data replication and distribution, ensuring high availability and performance for data-intensive workloads like AI model training.
+<CardGrid stagger>
+	<Card icon="seti:go" title="OtterScale Core">
+		The multi-cluster Kubernetes API gateway — a unified ConnectRPC endpoint over reverse
+		tunnels, secured with OIDC and mTLS. Provides generic resource CRUD, watch, exec/TTY, log
+		streaming, port-forward, and API discovery across clusters.
+	</Card>
+	<Card icon="laptop" title="Dashboard">
+		The web UI for OtterScale, built with SvelteKit. A unified operations console for
+		multi-cluster Kubernetes management, Ceph storage orchestration, VM lifecycle with console
+		access, LLM serving, and Prometheus-backed monitoring.
+	</Card>
+	<Card icon="seti:favicon" title="Tenant Operator">
+		A Kubernetes operator that turns a single <code>Workspace</code> resource into a fully
+		isolated multi-tenant environment — namespace, RBAC bindings, resource quotas, network
+		isolation, and optional Harbor registry integration.
+	</Card>
+	<Card icon="setting" title="Helm Charts">
+		A curated collection of Helm charts for deploying OtterScale and the infrastructure it
+		builds on — Rook Ceph, KubeVirt, KServe, GPU Operator, Envoy AI Gateway, Prometheus, and
+		more.
+	</Card>
+</CardGrid>
 
 ## Key Features
 
 <CardGrid stagger>
-	<Card icon="laptop" title="Virtualization">
-		KVM/QEMU VMs with live migration and GPU management
+	<Card icon="seti:docker" title="Multi-Cluster Management">
+		Scopes, resources, and RBAC across every connected cluster
 	</Card>
-	<Card icon="seti:docker" title="Container Orchestration">
-		Native Kubernetes and Juju charm deployment
+	<Card icon="seti:db" title="Storage Orchestration">
+		Ceph pools, OSD, NFS, SMB, and object gateways
 	</Card>
-	<Card icon="seti:db" title="Distributed Storage">
-		Built-in Ceph clusters with automated backup
+	<Card icon="laptop" title="Virtual Machines">
+		VM lifecycle management with xterm.js and VNC console access
 	</Card>
-	<Card icon="gitter" title="Monitoring">
-		Integrated Prometheus and Grafana stack
+	<Card icon="rocket" title="AI/ML Model Serving">
+		LLM deployment and an inference proxy
 	</Card>
 	<Card icon="seti:lock" title="Security">
-		RBAC with LDAP/AD integration and SSO
+		OIDC (Keycloak), per-tunnel mTLS, user impersonation, and FIPS 140-3
 	</Card>
-	<Card icon="puzzle" title="Application Marketplace">
-		Curated catalog of ready-to-deploy apps
+	<Card icon="gitter" title="Monitoring">
+		Built-in metrics and dashboards backed by Prometheus
 	</Card>
-	<Card icon="rocket" title="High Availability">
-		Multi-node deployment with automatic failover
+	<Card icon="puzzle" title="Multi-Tenancy">
+		Isolated workspaces with quotas, network policies, and registry access
 	</Card>
 </CardGrid>
 
-## Next Steps
+## Getting Started
 
-<CardGrid>
-	<LinkCard
-		title="Check Prerequisites"
-		href="/getting-started/01-prerequisites"
-		icon="open-book"
-		description="Get your environment ready"
-	/>
-	<LinkCard
-		title="Installation"
-		href="/getting-started/02-installation"
-		icon="rocket"
-		description="Install OtterScale"
-	/>
-	<LinkCard
-		title="Create a Scope"
-		href="/getting-started/03-scope"
-		icon="setting"
-		description="Set up your first scope"
-	/>
-</CardGrid>
+Installation, configuration, and operational guides are coming soon as part of this documentation. In the meantime:
+
+- Run `otterscale server --help` and `otterscale agent --help` to explore the available options.
+- Add the Helm repository: `helm repo add otterscale https://otterscale.github.io/charts`
