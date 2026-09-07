@@ -91,7 +91,38 @@ The OtterScale platform is composed of several open-source components:
 
 ## Getting Started
 
-Installation, configuration, and operational guides are coming soon as part of this documentation. In the meantime:
+<CardGrid>
+	<LinkCard
+		title="Requirements"
+		description="Clusters, cluster APIs, reserved IPs, storage, and client tooling."
+		href="/getting-started/requirements/"
+	/>
+	<LinkCard
+		title="Prepare the cluster"
+		description="cert-manager, a LoadBalancer address, Envoy Gateway, and the Gateway OtterScale attaches to."
+		href="/getting-started/prepare-cluster/"
+	/>
+	<LinkCard
+		title="Install the server"
+		description="The API, dashboard, Keycloak and Harbor, in one Helm release."
+		href="/getting-started/install-server/"
+	/>
+	<LinkCard
+		title="Self-managed cluster"
+		description="Join the cluster that runs the server to itself, so one cluster is the whole deployment."
+		href="/getting-started/self-managed/"
+	/>
+	<LinkCard
+		title="Multi-cluster"
+		description="Join separate clusters to the hub, each with its own token, CA copy and Harbor robot."
+		href="/getting-started/multi-cluster/"
+	/>
+</CardGrid>
 
-- Run `otterscale server --help` and `otterscale agent --help` to explore the available options.
-- Add the Helm repository: `helm repo add otterscale https://otterscale.github.io/charts`
+The two deployment modes are alternatives, not stages. Requirements explains which to pick.
+
+Along the way:
+
+- `helm repo add otterscale https://otterscale.github.io/helm-charts` adds the chart repository.
+- `otterscale server --help` and `otterscale agent --help` are the authoritative reference for every
+  flag and environment variable.
