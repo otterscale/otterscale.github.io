@@ -1,0 +1,197 @@
+---
+title: Install the server
+description: Install the OtterScale hub with Helm, including the API server, dashboard, Keycloak, Valkey and Harbor.
+slug: getting-started/install-server
+sidebar:
+  order: 3
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+The `otterscale` chart installs the whole hub in one release:
+
+| Component                | What it does                                                                                          |
+| :----------------------- | :---------------------------------------------------------------------------------------------------- |
+| **Server**               | The ConnectRPC API, and the tunnel listener agents dial into.                                          |
+| **Dashboard**            | The SvelteKit web console.                                                                            |
+| **Keycloak + PostgreSQL**| The identity provider, seeded with a ready-made `otterscale` realm and its OIDC clients.               |
+| **Valkey**               | Dashboard session storage.                                                                            |
+| **Harbor**               | The container and chart registry, federated to Keycloak over OIDC.                                     |
+| **Gateway routing**      | A `ListenerSet` on your Gateway, plus the `HTTPRoute`s that split `/`, `/api/` and `/auth/`.            |
+| **cert-manager objects** | A self-signed `Issuer`, a private CA, and the listener certificate, under the default `certSource: auto`. |
+
+## 1. Add the Helm repository
+
+```bash
+helm repo add otterscale https://otterscale.github.io/helm-charts
+helm repo update
+```
+
+## 2. Write the values file
+
+Three values are mandatory and the chart refuses to render without them. Everything else has a
+working default.
+
+| Value                 | Meaning                                                                                                                                                            |
+| :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `externalURL`         | The browser-facing base URL. OIDC redirect URIs, CORS origins and the Keycloak realm URL are all built from it. Must be `https://`.                                |
+| `harbor.externalURL`  | Harbor's browser-facing base URL. Must be `https://`, and must differ from `externalURL` by hostname or by port.                                                    |
+| `tunnel.externalURL`  | The address agents dial for the tunnel. The tunnel certificate is issued for this hostname and agents verify it, so it must be exactly what they will connect to.  |
+
+Pick the shape that matches your environment:
+
+<Tabs syncKey="url-shape">
+<TabItem label="Bare IP, chart-signed certificate">
+
+Nothing to arrange in advance: cert-manager mints a private CA and a certificate covering both
+addresses. Harbor takes port `8443` because it shares the hostname with the dashboard.
+
+Replace `192.0.2.1` with the Gateway IP you reserved. Browsers will warn about the certificate
+until you trust the CA; [First login](/getting-started/first-login/#trust-the-certificate) covers
+that.
+
+```yaml
+# otterscale-values.yaml
+externalURL: 'https://192.0.2.1'
+
+harbor:
+  externalURL: 'https://192.0.2.1:8443'
+
+tunnel:
+  externalURL: 'https://192.0.2.1:30300'
+```
+
+</TabItem>
+<TabItem label="DNS names, your own certificate">
+
+With two hostnames, Harbor can share port 443 and needs no listener of its own. Supply the
+certificate in a Secret with `tls.crt` and `tls.key` keys, and point `trustedCA` at the issuing CA
+if it is not publicly trusted.
+
+```yaml
+# otterscale-values.yaml
+externalURL: 'https://otterscale.example.com'
+
+expose:
+  listener:
+    tls:
+      certSource: secret
+      secret:
+        secretName: 'otterscale-tls'
+
+trustedCA:
+  secretName: '' # set to the CA Secret when otterscale-tls comes from an internal PKI
+
+harbor:
+  externalURL: 'https://harbor.example.com'
+  caBundleSecretName: '' # same value as trustedCA.secretName
+
+tunnel:
+  externalURL: 'https://192.0.2.1:30300'
+```
+
+`tunnel.externalURL` stays an address rather than a name unless you have a DNS record for the nodes:
+it is a `NodePort`, reached directly rather than through the Gateway.
+
+</TabItem>
+</Tabs>
+
+<Aside type="caution" title="Why the tunnel bypasses the Gateway">
+	The tunnel is mutually authenticated TLS from the agent all the way to the server. An HTTPS
+	listener on the Gateway terminates TLS, which would break client-certificate authentication, so
+	the chart exposes it as a `NodePort` on 30300 instead. It is the one OtterScale endpoint that
+	does not go through the Gateway.
+</Aside>
+
+### Values you usually do not need to set
+
+- **`expose.gateway`** already defaults to `otterscale-gateway` in `envoy-gateway-system`, the
+  Gateway created in [Prepare the cluster](/getting-started/prepare-cluster/). Change it only if
+  you named yours differently.
+- **`joinSecret`** is generated on first install and reused on upgrade. It is the root secret every
+  agent join token is derived from, so setting it by hand is only useful when you need the same
+  tokens across two installs. Changing it invalidates every token already handed out.
+- **`trustedCA`** is resolved automatically under `certSource: auto`, becoming the CA the chart
+  just created. Set it explicitly only when you supply a certificate from a private PKI yourself.
+- **`releaseVersion`** is cosmetic: it is what the dashboard displays as its version. Left empty, the
+  dashboard shows the server and dashboard image tags.
+
+## 3. Install
+
+```bash
+helm upgrade --install otterscale otterscale/otterscale \
+  -f otterscale-values.yaml \
+  -n otterscale-system --create-namespace
+```
+
+The chart validates its inputs before rendering anything, so a missing or malformed value fails
+immediately with a message naming the value, rather than half-installing and failing at runtime.
+
+## 4. Verify
+
+<Steps>
+
+1. **Every pod is running.**
+
+   Harbor and Keycloak take the longest; Keycloak imports its realm and
+   runs a schema migration on first start.
+
+   ```bash
+   kubectl -n otterscale-system get pods
+   ```
+
+2. **The listeners were accepted by your Gateway.**
+
+   This is where a missing
+   `allowedListeners.namespaces.from: All` shows up.
+
+   ```bash
+   kubectl -n otterscale-system get listenerset otterscale -o wide
+   ```
+
+3. **The routes attached.**
+
+   Two `HTTPRoute`s: one for the dashboard, API and Keycloak, one for
+   Harbor.
+
+   ```bash
+   kubectl -n otterscale-system get httproute
+   ```
+
+4. **The dashboard answers.** 
+
+   Expect a redirect to Keycloak, and a certificate warning under
+   `certSource: auto`.
+
+   ```bash
+   curl -kIL https://192.0.2.1/
+   ```
+
+</Steps>
+
+You now have a running hub, but no clusters in it. Do not log in yet: the first login is worth
+doing after at least one cluster is joined, so the dashboard has something to show.
+
+## Operational notes
+
+Two properties of the server shape how you run it, and both are by design rather than limitations to
+work around:
+
+- **Run a single replica.** Cluster registrations, allocated loopback addresses and live tunnel
+  sessions are held in the process that accepted them. A second replica would keep its own registry
+  and its own CA, so agents registered through one replica are unreachable through the other, and
+  requests routed to the wrong one fail with `cluster not registered`.
+- **A restart re-keys every agent.** The tunnel CA is generated at startup and never persisted, so
+  certificates issued before a restart stop being trusted. Agents notice the dropped session and
+  re-register automatically with backoff, but their clusters are briefly unreachable. Expect a
+  short interruption after every restart or upgrade.
+
+<Aside type="tip">
+	Agent certificates are short-lived (24 hours) on purpose. Renewal runs through the same
+	re-registration path, so there is nothing to rotate by hand.
+</Aside>
+
+## Next
+
+[Join a cluster](/getting-started/join-cluster/) covers issuing a join token, handing over the CA,
+and installing the agent.

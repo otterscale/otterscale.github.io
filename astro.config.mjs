@@ -43,6 +43,15 @@ export default defineConfig({
 						'zh-Hant': '簡介'
 					}
 				},
+				{
+					label: 'Getting Started',
+					translations: {
+						'zh-Hant': '開始使用'
+					},
+					autogenerate: {
+						directory: 'getting-started'
+					}
+				},
 				...openAPISidebarGroups
 			],
 			customCss: ['./src/styles/global.css'],

@@ -1,0 +1,279 @@
+---
+title: Prepare the cluster
+description: Install cert-manager, hand the cluster a LoadBalancer address, install Envoy Gateway, and create the Gateway that OtterScale attaches its listeners to.
+slug: getting-started/prepare-cluster
+sidebar:
+  order: 2
+---
+
+import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+Four things have to exist on the hub cluster before the OtterScale chart will install: a certificate
+issuer, a reachable `LoadBalancer` address, a Gateway API controller, and a `Gateway` for OtterScale
+to attach to. This page sets all four up and verifies each one.
+
+<Aside type="note" title="Environment variables used below">
+	Commands on this page refer to `$GATEWAY_IP`, the address you reserved in
+	[Requirements](/getting-started/requirements/#reserved-ip-addresses). Export it once:
+
+    ```bash
+    export GATEWAY_IP=192.0.2.1
+    ```
+
+</Aside>
+
+## 1. Install cert-manager
+
+OtterScale's default TLS mode (`expose.listener.tls.certSource: auto`) does not ship
+certificates; it asks cert-manager for them. The chart creates a self-signed `Issuer`, uses it to mint a private
+CA, and then issues the listener certificate from that CA. That CA is also what agents and the
+Tenant Operator are told to trust, so the whole trust chain starts here.
+
+```bash
+helm install cert-manager \
+  oci://quay.io/jetstack/charts/cert-manager \
+  --version v1.21.1 \
+  --namespace cert-manager --create-namespace \
+  --set crds.enabled=true
+```
+
+`crds.enabled=true` matters: without the CRDs, the `Issuer` and `Certificate` resources the
+OtterScale chart renders have nowhere to land, and `helm install` fails on an unknown kind.
+
+Any cert-manager release that serves `cert-manager.io/v1` will do; v1.21.1 is a known-good version.
+
+```bash
+kubectl -n cert-manager rollout status deploy/cert-manager-webhook
+```
+
+<Aside type="caution">
+	Repeat this step on every cluster you plan to join. The Tenant Operator that ships with the
+	agent has admission webhooks of its own, and they get their serving certificate from
+	cert-manager. See [Requirements](/getting-started/requirements/#on-every-managed-cluster).
+</Aside>
+
+## 2. Give the cluster a LoadBalancer address
+
+Envoy Gateway asks Kubernetes for a `Service` of type `LoadBalancer` (configured in step 4). In a
+managed cloud, the cloud controller assigns an address and you can skip this step. On bare metal
+nothing does, the Service sits at `<pending>` forever, and no OtterScale URL ever resolves.
+
+The reference OtterScale deployment runs Cilium, so the example below uses Cilium's own
+load-balancer IPAM plus L2 announcements. Any implementation that can hand out an address works
+equally well: MetalLB, kube-vip in service mode, or a cloud provider.
+
+<Steps>
+
+1. **Declare the pool the address comes from.**
+
+   A single-address block is deliberate: exactly one Service should ever claim this address, and a
+   wider range invites a second Service to take it.
+
+   ```bash
+   kubectl apply -f - <<EOF
+   apiVersion: cilium.io/v2
+   kind: CiliumLoadBalancerIPPool
+   metadata:
+     name: otterscale-lb-pool
+   spec:
+     blocks:
+       - start: "${GATEWAY_IP}"
+         stop: "${GATEWAY_IP}"
+   EOF
+   ```
+
+2. **Announce it on the L2 network.**
+
+   Allocating an address only records it in Kubernetes. Until a node answers ARP for it, nothing on
+   the subnet can reach it. This policy makes Cilium announce load-balancer addresses on physical
+   interfaces, and leaves `externalIPs` alone so it only ever claims what it was given.
+
+   ```bash
+   kubectl apply -f - <<EOF
+   apiVersion: cilium.io/v2alpha1
+   kind: CiliumL2AnnouncementPolicy
+   metadata:
+     name: l2-policy
+   spec:
+     interfaces:
+       - ^eth[0-9]+
+       - ^ens[0-9]+
+       - ^enp.*
+       - ^bond[0-9]+
+     externalIPs: false
+     loadBalancerIPs: true
+   EOF
+   ```
+
+   Adjust the interface patterns to match your nodes. The list above covers the common `eth*`,
+   `ens*`, `enp*` and `bond*` naming schemes.
+
+</Steps>
+
+## 3. Install Envoy Gateway
+
+OtterScale needs a Gateway API controller that reconciles `ListenerSet`, which means Envoy Gateway
+v1.8 or newer.
+
+How you install it depends on whether you intend to serve models. Envoy AI Gateway needs Envoy
+Gateway started with a specific extension-manager configuration, and that cannot be turned on
+later without reinstalling, so choose now, even if the inference modules come much later.
+
+<Tabs syncKey="gateway-path">
+<TabItem label="With inference support (recommended)">
+
+The `otterscale/envoy-gateway` chart bundles Envoy Gateway, the Envoy AI Gateway controller and its
+CRDs, already wired together: the extension-manager hooks AI Gateway needs, and `InferencePool`
+registered as a backend resource.
+
+```bash
+helm repo add otterscale https://otterscale.github.io/helm-charts
+helm repo update
+
+helm upgrade --install otterscale-envoy-gateway otterscale/envoy-gateway \
+  -n envoy-gateway-system --create-namespace
+```
+
+`InferencePool` itself is defined by the Gateway API Inference Extension, which is a separate
+project and is not part of that chart. Install its manifests too:
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/download/v1.0.2/manifests.yaml
+```
+
+<Aside type="tip" title="Why v1.0.2">
+	Envoy AI Gateway v1.1.0, the version this chart pins, is built and tested against Gateway API
+	v1.5.1 and Gateway API Inference Extension v1.0.2. Matching those versions avoids CRD schema
+	mismatches between the two projects.
+</Aside>
+
+</TabItem>
+<TabItem label="Platform only">
+
+If you only want the dashboard, multi-cluster management and Harbor, upstream Envoy Gateway on its
+own is enough:
+
+```bash
+helm upgrade --install otterscale-envoy-gateway \
+  oci://docker.io/envoyproxy/gateway-helm --version v1.8.3 \
+  -n envoy-gateway-system --create-namespace
+```
+
+Nothing on this path installs the Envoy AI Gateway or the Inference Extension. Adding inference
+later means reinstalling Envoy Gateway with the extension-manager configuration, because it is read
+at controller startup.
+
+</TabItem>
+</Tabs>
+
+Wait for the controller, then confirm the API that OtterScale depends on is actually present:
+
+```bash
+kubectl -n envoy-gateway-system rollout status deploy/envoy-gateway
+```
+
+```bash
+kubectl get crd listenersets.gateway.networking.k8s.io
+```
+
+<Aside type="caution" title="If the ListenerSet CRD is missing">
+	OtterScale renders `ListenerSet` from `gateway.networking.k8s.io/v1`, which arrived in Gateway
+	API v1.5. If the command above reports `NotFound`, the Gateway API CRDs on this cluster predate
+	v1.5. Install the v1.5.x CRD bundle before continuing, or the OtterScale install will fail on
+	an unknown kind.
+</Aside>
+
+## 4. Create the GatewayClass, EnvoyProxy and Gateway
+
+The OtterScale chart does not create a `Gateway`. It hangs a `ListenerSet` off one that already
+exists, which is what lets the dashboard, Harbor and anything else you route share a single address.
+So the `Gateway` is yours to create, and OtterScale adopts it.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: otterscale-proxy-config
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-otterscale
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: otterscale-gateway
+  namespace: envoy-gateway-system
+spec:
+  gatewayClassName: envoy-otterscale
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: otterscale-proxy-config
+  allowedListeners:
+    namespaces:
+      from: All
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+EOF
+```
+
+What each piece is for:
+
+- **`EnvoyProxy`** turns the proxy's Service into a `LoadBalancer`, which is how it claims the
+  address from step 2. `externalTrafficPolicy: Cluster` lets any node accept the traffic and forward
+  it internally, so the announcing node does not have to be the one running a proxy pod.
+- **`GatewayClass`** points at Envoy Gateway's controller. Naming it `envoy-otterscale` rather than
+  reusing a shared class keeps OtterScale's proxy configuration separate from any other Gateway
+  workload on the cluster.
+- **`allowedListeners.namespaces.from: All`** is the part OtterScale actually depends on. Its
+  `ListenerSet` lives in `otterscale-system`, not alongside the Gateway, and a Gateway rejects
+  listeners from other namespaces unless it opts in. Without this, the chart installs cleanly and
+  nothing is ever reachable.
+- **The `:80` listener** is a placeholder. A `Gateway` must declare at least one listener of its
+  own, and OtterScale's HTTPS listeners only arrive later with the `ListenerSet`. `from: Same`
+  restricts it to routes in `envoy-gateway-system`, so nothing in `otterscale-system` uses it. It
+  exists only to keep the Gateway valid until then.
+
+## Verify
+
+The Gateway should be accepted and holding your reserved address:
+
+```bash
+kubectl -n envoy-gateway-system get gateway otterscale-gateway
+```
+
+`PROGRAMMED` becomes `True` and `ADDRESS` shows `$GATEWAY_IP`. If the address stays empty, the
+load-balancer step did not take effect. Check the Service directly:
+
+```bash
+kubectl -n envoy-gateway-system get svc -l gateway.envoyproxy.io/owning-gateway-name=otterscale-gateway
+```
+
+<Aside type="note">
+	`PROGRAMMED=True` with no HTTPS listener yet is expected at this stage. The dashboard and Harbor
+	listeners appear in the next step, when the OtterScale chart adds its `ListenerSet`.
+</Aside>
+
+## Next
+
+[Install the server](/getting-started/install-server/) covers the hub itself: API, dashboard,
+Keycloak and Harbor.

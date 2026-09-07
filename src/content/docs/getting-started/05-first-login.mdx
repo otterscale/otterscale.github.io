@@ -1,0 +1,165 @@
+---
+title: First login
+description: Sign in to the dashboard, grant yourself cluster access, and create your first workspace.
+slug: getting-started/first-login
+sidebar:
+  order: 5
+---
+
+import { Aside, Steps, Card, CardGrid } from '@astrojs/starlight/components';
+
+The hub is running and at least one cluster has joined. What remains is identity: signing in, and
+giving that identity enough authority on the managed cluster to create a workspace.
+
+## Trust the certificate
+
+Under the default `certSource: auto` the hub serves a certificate from a private CA, so browsers
+will warn. Install that CA, the same `ca.crt` you exported in
+[Join a cluster](/getting-started/join-cluster/#2-hand-over-the-ca), into your OS or browser trust
+store, or read it out of the hub directly:
+
+```bash
+kubectl -n otterscale-system get secret otterscale-ca \
+  -o jsonpath='{.data.ca\.crt}' | base64 -d > otterscale-ca.crt
+```
+
+Clicking through the warning works for a first look, but do trust the CA before real use: Harbor and
+the dashboard exchange OIDC redirects, and a browser that distrusts one of the two hosts can fail
+the login mid-flow.
+
+## Sign in
+
+Open `externalURL` in a browser. You are redirected to Keycloak, in the seeded `otterscale` realm.
+
+The realm ships with one user:
+
+| Field        | Value      |
+| :----------- | :--------- |
+| **Username** | `admin`    |
+| **Password** | `password` |
+
+Keycloak forces a password change on first sign-in, so this credential is only good once.
+
+<Aside type="danger" title="Change it before exposing the hub">
+	These are seeded defaults, published in the chart. Sign in and set a real password before the
+	hub is reachable by anyone else. The realm also has self-registration enabled. If that is not
+	what you want, turn it off in the Keycloak admin console.
+</Aside>
+
+That `admin` user starts with two things granted:
+
+- The `admin` client role on the dashboard client, which the API turns into the Kubernetes group
+  `oidc:admin`.
+- Membership of the `harbor_admin` group, which makes it a Harbor administrator.
+
+### The Keycloak admin console
+
+For everything identity-related, such as creating users, groups, and turning off
+self-registration, Keycloak's own console is at `<externalURL>/auth/`. It uses the **master**
+realm's `admin` account, which is a different account from the realm user above:
+
+```bash
+kubectl -n otterscale-system get secret otterscale-keycloak-admin \
+  -o jsonpath='{.data.KC_BOOTSTRAP_ADMIN_PASSWORD}' | base64 -d
+```
+
+## Grant yourself cluster access
+
+At this point the dashboard lists your joined cluster but you cannot create anything in it. Every
+request reaches the managed cluster's `kube-apiserver` impersonating *you*, so that cluster's own
+RBAC decides what happens, and nothing has granted your identity anything yet.
+
+The agent chart's `clusterAdmin.users` exists for exactly this. It takes **OIDC subjects**, not
+usernames: the subject is what the API sends as `Impersonate-User`, and for Keycloak that is the
+user's internal ID.
+
+<Steps>
+
+1. **Find your subject.** In the Keycloak admin console, switch to the `otterscale` realm, open
+   **Users**, select your user, and copy the **ID** field, which is a UUID.
+
+2. **Add it to the agent's values.**
+
+   ```yaml
+   # agent-values.yaml
+   clusterAdmin:
+     enabled: true
+     users:
+       - '3f9c1e02-7a45-4b8e-9d21-6c0f5ab7e134'
+   ```
+
+3. **Upgrade the agent release.**
+
+   ```bash
+   helm --kube-context $MANAGED_CONTEXT upgrade --install otterscale-agent \
+     otterscale/otterscale-agent \
+     -f agent-values.yaml \
+     -n otterscale-system
+   ```
+
+4. **Confirm the binding.**
+
+   ```bash
+   kubectl --context $MANAGED_CONTEXT get clusterrolebinding otterscale-agent-cluster-admin -o yaml
+   ```
+
+</Steps>
+
+<Aside type="note" title="Why a UUID and not a username">
+	The subject doubles as the Kubernetes RBAC subject *and* the Harbor identity, so it cannot carry
+	a prefix the way group claims can. Group claims are namespaced: a Keycloak group or client role
+	`admin` arrives as `oidc:admin`, keeping it clear of built-in groups such as `system:masters`.
+	The subject, by contrast, is passed through verbatim, exactly as Keycloak issued it.
+</Aside>
+
+## Create a workspace
+
+A `Workspace` is the multi-tenant unit: the Tenant Operator turns one into a namespace with Pod
+Security Standards labels, RBAC bindings per member, resource quotas and limit ranges, default-deny
+network policies, a Harbor project with its own robot and image-pull secret, and a Flux
+`HelmRepository` pointing at that project.
+
+In the dashboard, pick your cluster and create a workspace from the workspace switcher. You are
+added as its first `admin` member automatically.
+
+Two authorisation layers apply, and it helps to know which one is complaining:
+
+- **Kubernetes RBAC** must allow you to create `workspaces.tenant.otterscale.io` at all. That is
+  what the `clusterAdmin.users` binding above provides.
+- **The operator's admission webhook** then checks that you are either listed as an `admin` member
+  of the workspace being created, or hold cluster-wide access. Creating a workspace you are not an
+  admin of is rejected with *"workspace creator must be listed as a member with the 'admin' role"*.
+
+The same rule governs updates and deletes, evaluated against the *stored* spec, so you cannot
+grant yourself admin and approve it in the same request.
+
+<Aside type="tip" title="Members need to log in once">
+	Harbor creates its users lazily, on their first OIDC login. Until a member has signed in to the
+	dashboard at least once, the operator cannot add them to the workspace's Harbor project. It
+	skips them and retries later, rather than failing the whole reconcile. If a member has no
+	registry access, have them log in.
+</Aside>
+
+## What's next
+
+<CardGrid>
+	<Card icon="puzzle" title="Install modules">
+		The dashboard's **Modules** page lists charts from a Flux `HelmRepository` named `modules` in
+		`otterscale-system` on the target cluster. Neither chart creates it, so point one at
+		`https://otterscale.github.io/helm-charts` to offer GPU Operator, KubeVirt, KServe,
+		Prometheus and the rest.
+	</Card>
+	<Card icon="gitter" title="Add monitoring">
+		The agent proxies read-only Prometheus queries for the dashboard's metrics. Its default
+		target is `http://otterscale-prometheus-kube-prometheus.monitoring.svc:9090`. Install the
+		`prometheus-stack` module, or point `--proxy-prometheus-url` at a Prometheus you already run.
+	</Card>
+	<Card icon="seti:docker" title="Join more clusters">
+		Repeat [Join a cluster](/getting-started/join-cluster/) for each one. Every cluster needs its
+		own join token, its own CA Secret, and its own Harbor robot.
+	</Card>
+	<Card icon="seti:go" title="Explore the API">
+		The ConnectRPC services behind the dashboard are documented under **API**, generated from
+		OtterScale's OpenAPI schema.
+	</Card>
+</CardGrid>
