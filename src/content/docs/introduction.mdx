@@ -104,15 +104,22 @@ The OtterScale platform is composed of several open-source components:
 	/>
 	<LinkCard
 		title="Install the server"
-		description="The hub: API, dashboard, Keycloak and Harbor, in one Helm release."
+		description="The API, dashboard, Keycloak and Harbor, in one Helm release."
 		href="/getting-started/install-server/"
 	/>
 	<LinkCard
-		title="Join a cluster"
-		description="Issue a join token, hand over the CA, and install the agent."
-		href="/getting-started/join-cluster/"
+		title="Self-managed cluster"
+		description="Join the cluster that runs the server to itself, so one cluster is the whole deployment."
+		href="/getting-started/self-managed/"
+	/>
+	<LinkCard
+		title="Multi-cluster"
+		description="Join separate clusters to the hub, each with its own token, CA copy and Harbor robot."
+		href="/getting-started/multi-cluster/"
 	/>
 </CardGrid>
+
+The two deployment modes are alternatives, not stages. Requirements explains which to pick.
 
 Along the way:
 

@@ -3,33 +3,34 @@ title: First login
 description: Sign in to the dashboard, grant yourself cluster access, and create your first workspace.
 slug: getting-started/first-login
 sidebar:
-  order: 5
+  order: 6
 ---
 
 import { Aside, Steps, Card, CardGrid } from '@astrojs/starlight/components';
 
-The hub is running and at least one cluster has joined. What remains is identity: signing in, and
-giving that identity enough authority on the managed cluster to create a workspace.
+The server is running and at least one cluster has joined, whether that is the same cluster or a
+separate one. What remains is identity: signing in, and giving that identity enough authority on
+the joined cluster to create a workspace.
 
 ## Trust the certificate
 
-Under the default `certSource: auto` the hub serves a certificate from a private CA, so browsers
-will warn. Install that CA, the same `ca.crt` you exported in
-[Join a cluster](/getting-started/join-cluster/#2-hand-over-the-ca), into your OS or browser trust
-store, or read it out of the hub directly:
+Under the default `certSource: auto` the server serves a certificate from a private CA, so
+browsers will warn. Install that CA into your OS or browser trust store. It is the same certificate
+the agent trusts, and you can read it straight out of the cluster running the server:
 
 ```bash
 kubectl -n otterscale-system get secret otterscale-ca \
   -o jsonpath='{.data.ca\.crt}' | base64 -d > otterscale-ca.crt
 ```
 
-Clicking through the warning works for a first look, but do trust the CA before real use: Harbor and
-the dashboard exchange OIDC redirects, and a browser that distrusts one of the two hosts can fail
-the login mid-flow.
+Clicking through the warning works for a first look, but do trust the CA before real use: Harbor
+and the dashboard exchange OIDC redirects, and a browser that distrusts one of the two hosts can
+fail the login mid-flow.
 
 ## Sign in
 
-Open `externalURL` in a browser. You are redirected to Keycloak, in the seeded `otterscale` realm.
+Open `externalURL` in a browser. You are redirected to Keycloak, in the seeded `otterscale`
+realm.
 
 The realm ships with one user:
 
@@ -66,8 +67,9 @@ kubectl -n otterscale-system get secret otterscale-keycloak-admin \
 ## Grant yourself cluster access
 
 At this point the dashboard lists your joined cluster but you cannot create anything in it. Every
-request reaches the managed cluster's `kube-apiserver` impersonating *you*, so that cluster's own
-RBAC decides what happens, and nothing has granted your identity anything yet.
+request reaches that cluster's `kube-apiserver` impersonating *you*, so its own RBAC decides what
+happens, and nothing has granted your identity anything yet. That holds for a self-managed cluster
+as much as a remote one: the server carries no authority of its own.
 
 The agent chart's `clusterAdmin.users` exists for exactly this. It takes **OIDC subjects**, not
 usernames: the subject is what the API sends as `Impersonate-User`, and for Keycloak that is the
@@ -88,11 +90,11 @@ user's internal ID.
        - '3f9c1e02-7a45-4b8e-9d21-6c0f5ab7e134'
    ```
 
-3. **Upgrade the agent release.**
+3. **Upgrade the agent release** on the cluster you are granting access to. On a self-managed
+   cluster that is your only cluster; in multi-cluster mode add `--kube-context` for the target.
 
    ```bash
-   helm --kube-context $MANAGED_CONTEXT upgrade --install otterscale-agent \
-     otterscale/otterscale-agent \
+   helm upgrade --install otterscale-agent otterscale/otterscale-agent \
      -f agent-values.yaml \
      -n otterscale-system
    ```
@@ -100,8 +102,11 @@ user's internal ID.
 4. **Confirm the binding.**
 
    ```bash
-   kubectl --context $MANAGED_CONTEXT get clusterrolebinding otterscale-agent-cluster-admin -o yaml
+   kubectl get clusterrolebinding otterscale-agent-cluster-admin -o yaml
    ```
+
+   `clusterAdmin.users` grants access on the cluster whose agent release carries it, and nowhere
+   else, so in multi-cluster mode repeat this for every cluster the user needs.
 
 </Steps>
 
@@ -155,8 +160,9 @@ grant yourself admin and approve it in the same request.
 		`prometheus-stack` module, or point `--proxy-prometheus-url` at a Prometheus you already run.
 	</Card>
 	<Card icon="seti:docker" title="Join more clusters">
-		Repeat [Join a cluster](/getting-started/join-cluster/) for each one. Every cluster needs its
-		own join token, its own CA Secret, and its own Harbor robot.
+		Follow [Multi-cluster](/getting-started/multi-cluster/) for each additional cluster, whether
+		you started self-managed or not. Every cluster needs its own join token, its own CA Secret,
+		and its own Harbor robot.
 	</Card>
 	<Card icon="seti:go" title="Explore the API">
 		The ConnectRPC services behind the dashboard are documented under **API**, generated from

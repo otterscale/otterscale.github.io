@@ -1,40 +1,55 @@
 ---
 title: Requirements
-description: What you need before installing OtterScale, from clusters and cluster APIs to reserved IPs, storage, and client tooling.
+description: Choose a deployment mode, then check the cluster APIs, addresses and ports that mode needs.
 slug: getting-started/requirements
 sidebar:
   order: 1
 ---
 
-import { Aside, Steps, Card, CardGrid } from '@astrojs/starlight/components';
+import { Aside, Steps, Card, CardGrid, LinkCard, Badge } from '@astrojs/starlight/components';
 
-OtterScale is a hub-and-spoke platform: one **server** (the hub) holds the API, the dashboard, the
-identity provider and the registry, and one lightweight **agent** (a spoke) runs inside every
-cluster you want to manage. Requirements differ between the two roles, so this page separates them.
+OtterScale is one binary in two roles. A **server** (the hub) holds the API, the dashboard, the
+identity provider and the registry. A lightweight **agent** (a spoke) runs inside every cluster you
+want to manage and dials out to the hub.
 
-<Aside type="tip" title="Read the architecture first">
-	If you have not yet, [Introduction](/introduction/) explains why agents dial *out* to the hub
-	instead of the hub reaching in. It is worth five minutes, because most of the network
-	requirements below follow directly from that direction of travel.
-</Aside>
+Both roles can live on one cluster, or the hub can sit apart from the clusters it manages. That
+choice changes what you need to reserve, so make it first.
 
-## Clusters
+## Deployment modes
 
-| Role                | Count       | What runs there                                                                                            |
-| :------------------ | :---------- | :--------------------------------------------------------------------------------------------------------- |
-| **Hub cluster**     | 1           | `otterscale` chart: server, dashboard, Keycloak + PostgreSQL, Valkey, Harbor, and the Gateway API routing.  |
-| **Managed cluster** | 1 or more   | `otterscale-agent` chart: agent, Tenant Operator, and Flux.                                                |
+|                        | Self-managed                                                    | Multi-cluster                                                            |
+| :--------------------- | :-------------------------------------------------------------- | :----------------------------------------------------------------------- |
+| **Clusters**           | 1                                                               | 1 hub, plus 1 or more managed clusters                                   |
+| **Server runs on**     | The one cluster                                                 | The hub cluster                                                          |
+| **Agent runs on**      | The same cluster                                                | Each managed cluster                                                     |
+| **Kubectl contexts**   | 1                                                               | 1 per cluster                                                            |
+| **Good for**           | Evaluation, a single site, and any deployment where one cluster is the whole estate | Managing clusters that sit behind NAT, a firewall, or in another network |
 
-There is nothing to manage until at least one cluster has joined, so plan for both roles from the
-start. Every cluster you want to see in the dashboard needs its own agent release, its own join
-token, and its own CA Secret.
+Both are first-class topologies, and neither is a stepping stone to the other. A self-managed
+cluster is not a partial multi-cluster install, and a hub that manages only remote clusters never
+needs an agent of its own.
 
-## Cluster APIs and add-ons
+<CardGrid>
+	<LinkCard
+		title="Self-managed cluster"
+		description="One cluster runs the server and joins itself. Two addresses to reserve, one context to work in."
+		href="/getting-started/self-managed/"
+	/>
+	<LinkCard
+		title="Multi-cluster"
+		description="A hub cluster plus separate managed clusters, each joined with its own token and credentials."
+		href="/getting-started/multi-cluster/"
+	/>
+</CardGrid>
+
+## What both modes need
+
+### Cluster APIs and add-ons
 
 These are prerequisites in the strict sense: the charts render resources from these APIs and fail
 without them.
 
-### On the hub cluster
+On the cluster that runs the **server**:
 
 | Requirement                                    | Why                                                                                                                                                  |
 | :--------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -43,48 +58,21 @@ without them.
 | **cert-manager** (`cert-manager.io/v1`)        | With the default `expose.listener.tls.certSource: auto`, the chart creates a self-signed `Issuer`, a CA `Certificate`, and the listener `Certificate`. |
 | **A default `StorageClass`** (`ReadWriteOnce`) | Keycloak's PostgreSQL claims 20 GiB, and Harbor claims its own volumes for the registry, database, cache, job service and Trivy.                     |
 
-### On every managed cluster
+On every cluster that runs an **agent**:
 
 | Requirement                                            | Why                                                                                                                                       |
 | :----------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
 | **cert-manager** (`cert-manager.io/v1`)                | The Tenant Operator ships its own `Issuer` and `Certificate`, and its admission webhooks are wired with `cert-manager.io/inject-ca-from`.  |
 | **`admissionregistration.k8s.io/v1`** with `ValidatingAdmissionPolicy` | The agent chart installs a policy that pins every `HelmRelease` to a fixed service account, so a workspace cannot deploy with more privilege than its own. |
 
-<Aside type="caution" title="cert-manager is needed twice">
-	It is easy to install cert-manager on the hub, join a cluster, and then find every `Workspace`
-	rejected because the Tenant Operator's webhook has no serving certificate. Install cert-manager
-	on each managed cluster too, before the agent.
+<Aside type="caution" title="In multi-cluster mode, cert-manager is needed on every cluster">
+	In self-managed mode the two lists collapse into one cluster, so installing cert-manager once is
+	enough. In multi-cluster mode it is easy to install it on the hub only, join a cluster, and then
+	find every `Workspace` rejected because the Tenant Operator's webhook has no serving
+	certificate.
 </Aside>
 
-## Network
-
-### Reserved IP addresses
-
-Reserve **two** addresses in the hub cluster's subnet, outside any DHCP range:
-
-| Address                | Used for                                                                                                                      |
-| :--------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| **Gateway IP**         | The `LoadBalancer` address of the Envoy Gateway proxy Service. Every browser-facing URL is built from it: dashboard, API, Keycloak and Harbor. |
-| **Control-plane VIP**  | The cluster's own API server VIP (for example the address `kube-vip` announces), so the control plane keeps one stable address. |
-
-Only the Gateway IP is consumed by OtterScale itself. It is fixed at install time, for the reason
-in [Hostnames](#hostnames-and-tls) below, so pick one you will not have to move.
-
-### Ports on the hub cluster
-
-| Port           | Reached at        | Serves                                                                                                                   |
-| :------------- | :---------------- | :----------------------------------------------------------------------------------------------------------------------- |
-| **443**        | Gateway IP        | Dashboard, the API under `/api/`, and Keycloak under `/auth/`.                                                           |
-| **8443**       | Gateway IP        | Harbor. It needs a listener of its own whenever it shares a hostname with the dashboard.                                  |
-| **30300**      | A node address    | The agent tunnel. A `NodePort` Service, deliberately *not* behind the Gateway: the tunnel is mTLS end to end, and a terminating HTTPS listener would break it. |
-
-### Ports on managed clusters
-
-None. Agents dial out to the hub and keep a reverse tunnel open, so a cluster behind NAT, a
-corporate firewall, or in an otherwise closed network needs no inbound rule. What each managed
-cluster does need is *outbound* reachability to the hub's 443 and 30300.
-
-## Hostnames and TLS
+### Hostnames and TLS
 
 The chart serves HTTPS only, and needs two browser-facing base URLs that differ **by hostname or by
 port**:
@@ -113,32 +101,86 @@ Either shape works:
 	addresses before the first install.
 </Aside>
 
-## GPUs
+### Client tooling
 
-Not required. The hub, the dashboard, workspaces and multi-cluster management all run on ordinary
-CPU nodes.
-
-GPUs come in when you want to serve models. The inference stack (`gpu-operator`, `hami`, `kserve`
-and friends) ships as separate module charts you install per cluster after the platform is up, and
-those need at least one node with a supported GPU. If that is your goal, plan for it; if it is not,
-skip it entirely.
-
-## Client tooling
-
-Run these from wherever you have `kubectl` access to the clusters.
+Run these from wherever you have `kubectl` access.
 
 <Steps>
 
-1. **`kubectl`**, with a context for the hub cluster and one for each cluster you will join.
+1. **`kubectl`**, with a context for the server's cluster and, in multi-cluster mode, one for each
+   cluster you will join.
 
 2. **Helm 3** with OCI support, since some dependencies are pulled from OCI registries.
 
-3. **`curl`, `jq` and `openssl`**, used by the script that provisions Harbor's robot account in
-   [Join a cluster](/getting-started/join-cluster/).
+3. **`curl`, `jq` and `openssl`**, used by the script that provisions Harbor's robot account.
 
 </Steps>
+
+## Self-managed mode: what to reserve
+
+One cluster, so everything is local. Reserve **two** addresses in its subnet, outside any DHCP
+range, and note one existing node address:
+
+| Address               | Reserved? | Used for                                                                                                                                       |
+| :-------------------- | :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Gateway IP**        | Yes       | The `LoadBalancer` address of the Envoy Gateway proxy Service. Every browser-facing URL is built from it: dashboard, API, Keycloak and Harbor.  |
+| **Control-plane VIP** | Yes       | The cluster's own API server VIP, for example the address `kube-vip` announces, so the control plane keeps one stable address.                  |
+| **A node address**    | No        | The agent tunnel on `NodePort` 30300, and the address the dashboard builds `NodePort` workload URLs from.                                       |
+
+Only the Gateway IP is consumed by OtterScale itself, and it is fixed at install time, so pick one
+you will not have to move.
+
+Ports, all on the one cluster:
+
+| Port       | Reached at   | Serves                                                                                                                     |
+| :--------- | :----------- | :------------------------------------------------------------------------------------------------------------------------- |
+| **443**    | Gateway IP   | Dashboard, the API under `/api/`, and Keycloak under `/auth/`.                                                             |
+| **8443**   | Gateway IP   | Harbor. It needs a listener of its own whenever it shares a hostname with the dashboard.                                    |
+| **30300**  | Node address | The agent tunnel. A `NodePort` Service, deliberately *not* behind the Gateway: the tunnel is mTLS end to end, and a terminating HTTPS listener would break it. |
+
+The agent is a pod on this same cluster, so it has to reach the cluster's own Gateway IP on 443 and
+a node address on 30300 from inside the cluster. Nothing has to be reachable from outside except by
+the people using the dashboard.
+
+## Multi-cluster mode: what to reserve
+
+### On the hub cluster
+
+The same two reserved addresses, the same node address, and the same three ports as above. The hub
+is configured identically in both modes; what changes is who connects to it.
+
+### On every managed cluster
+
+| Requirement           | Detail                                                                                                          |
+| :-------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| **Inbound ports**     | None. Agents dial out and keep a reverse tunnel open, so a cluster behind NAT or a firewall needs no ingress.   |
+| **Outbound access**   | To the hub's Gateway IP on 443, and to the hub's node address on 30300.                                         |
+| **A node address**    | Not reserved. The dashboard builds this cluster's `NodePort` workload URLs from it.                             |
+| **cert-manager**      | Installed before the agent, per the table above.                                                                 |
+
+Each managed cluster also needs its own join token, its own copy of the hub's CA, and its own Harbor
+robot account. None of the three is shared between clusters, so revoking one cluster's access leaves
+the others untouched.
+
+## GPUs
+
+<Badge text="Only for AI inference workloads" variant="caution" size="medium" />
+
+**No GPU is required to install or run OtterScale.** The server, the dashboard, workspaces and
+multi-cluster management all run on ordinary CPU nodes, in either deployment mode. Nothing in the
+`otterscale` or `otterscale-agent` charts asks for a GPU.
+
+GPUs become a requirement only when you want to serve models. The inference stack (`gpu-operator`,
+`hami`, `kserve` and the rest) ships as separate module charts you install per cluster after the
+platform is up, and those need at least one node with a supported GPU in the cluster that will run
+the workloads.
+
+If serving models is your goal, plan for it now: it also decides how you install Envoy Gateway in
+[Prepare the cluster](/getting-started/prepare-cluster/), which cannot be changed later without
+reinstalling. If it is not, skip it entirely.
 
 ## Next
 
 [Prepare the cluster](/getting-started/prepare-cluster/) covers cert-manager, a LoadBalancer
-address, Envoy Gateway, and the Gateway that OtterScale attaches its listeners to.
+address, Envoy Gateway, and the Gateway that OtterScale attaches its listeners to. Both modes need
+it, on the cluster that will run the server.

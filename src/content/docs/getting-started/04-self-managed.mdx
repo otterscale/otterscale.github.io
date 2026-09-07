@@ -1,0 +1,297 @@
+---
+title: Self-managed cluster
+description: Join the cluster that runs the server to itself, so one cluster is both hub and spoke.
+slug: getting-started/self-managed
+sidebar:
+  order: 4
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+In a self-managed deployment one cluster plays both roles. The server release you installed in
+[Install the server](/getting-started/install-server/) stays where it is, and you add an agent
+release alongside it in the same namespace. The agent dials the cluster's own tunnel endpoint,
+registers, and from then on the server reaches this cluster's `kube-apiserver` through it, exactly
+as it would a remote one.
+
+<Aside type="note" title="Both releases share one namespace">
+	`otterscale` and `otterscale-agent` both install into `otterscale-system` and share no resource
+	names, so they coexist without colliding. The agent release must be in `otterscale-system`
+	anyway, because the Tenant Operator's install manifest is pre-rendered against that namespace.
+</Aside>
+
+Two pieces of material are needed before you install, one fewer than a remote cluster needs: the
+CA already exists here.
+
+| Material                 | Where it comes from                                                                              |
+| :----------------------- | :------------------------------------------------------------------------------------------------ |
+| **Join token**           | Derived inside the server pod from its root secret.                                               |
+| **Harbor robot account** | Created in the Harbor this same release installed.                                                |
+
+<Aside type="note" title="Variables used below">
+    ```bash
+    export CLUSTER_NAME=devel     # what this cluster is called in OtterScale
+    export GATEWAY_IP=192.0.2.1   # the reserved LoadBalancer address
+    export NODE_IP=192.0.2.10     # a node address, matching tunnel.externalURL
+    ```
+
+    `CLUSTER_NAME` must be a valid Kubernetes label value: `[a-z0-9]([a-z0-9-]*[a-z0-9])?`, at
+    most 63 characters. The server rejects anything else, because the name is used as a label.
+
+</Aside>
+
+## 1. Issue a join token
+
+Registration is the one endpoint an agent reaches before it has any credentials, so a token
+authorises it. The server holds one root secret and derives each cluster's token from that secret
+plus the cluster name. Issuing a token needs nothing but access to the secret, which is why it is
+done inside the server pod, so the secret never leaves it.
+
+```bash
+kubectl -n otterscale-system \
+  exec deploy/otterscale-server -- /otterscale join token --cluster $CLUSTER_NAME
+```
+
+The token is the only output, so it pipes straight into a `helm` invocation if you prefer.
+
+<Aside type="note">
+	`otterscale-server` is the Deployment name when the server's Helm release is called
+	`otterscale`, as in [Install the server](/getting-started/install-server/). A release named
+	differently gets `<release>-otterscale-server`.
+</Aside>
+
+The token authorises **one cluster**: an agent holding `devel`'s token cannot register as anything
+else. Tokens do not expire and cannot be revoked individually; rotating the server's `joinSecret`
+invalidates all of them at once.
+
+## 2. Provision a Harbor robot account
+
+Every `Workspace` gets its own Harbor project, a robot scoped to that project, and an image-pull
+secret built from it. The Tenant Operator does that work through Harbor's REST API, so it needs
+credentials of its own: a **system-level robot account**.
+
+First get a local copy of the CA, so `curl` can verify Harbor's certificate. You are not creating a
+Secret here, only a file on disk. The Secret the agent needs already exists.
+
+```bash
+kubectl -n otterscale-system \
+  exec deploy/otterscale-server -- /otterscale join ca > ca.crt
+```
+
+Naming the robot after the cluster keeps accounts separable later, when a second cluster joins. The
+script creates it, or rotates its secret if it already exists, and prints the credentials. Run it
+from the directory holding `ca.crt`.
+
+```bash title="fetch-robot-secret.sh"
+#!/usr/bin/env bash
+set -euo pipefail
+
+HARBOR_URL="https://${GATEWAY_IP}:8443"
+ROBOT_NAME="${CLUSTER_NAME}"
+
+# Harbor's own admin account, because rotating a robot secret is a PATCH on the
+# robot and Harbor defines no robot:update permission at either scope. No robot
+# account can do it, only an administrator. The password was generated at
+# install time into a Secret the chart keeps on uninstall.
+ADMIN_PASS=$(kubectl -n otterscale-system get secret otterscale-harbor-admin \
+  -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d)
+
+# Drop --cacert when Harbor serves a publicly trusted certificate.
+api() {
+  curl -sfS --cacert ca.crt -u "admin:${ADMIN_PASS}" \
+    -H 'Content-Type: application/json' "$@"
+}
+
+# Robots are addressed cluster-wide even when scoped to a project, so the
+# lookup is a filtered list rather than a path under the project.
+ROBOT_ID=$(api "${HARBOR_URL}/api/v2.0/robots?q=name%3D${ROBOT_NAME}" \
+  | jq -r --arg n "robot\$${ROBOT_NAME}" '.[] | select(.name==$n) | .id' | head -1)
+
+if [ -n "${ROBOT_ID}" ]; then
+  # Harbor reveals a robot secret only at the moment it sets one, so an existing
+  # robot's credentials cannot be read back. Rotate instead.
+  # The A1a prefix satisfies Harbor's complexity rule for robot secrets.
+  SECRET="A1a$(openssl rand -hex 16)"
+  api -X PATCH "${HARBOR_URL}/api/v2.0/robots/${ROBOT_ID}" \
+    -d "{\"secret\":\"${SECRET}\"}" > /dev/null
+else
+  RESP=$(api -X POST "${HARBOR_URL}/api/v2.0/robots" -d @- <<EOF
+{
+  "name": "${ROBOT_NAME}",
+  "description": "otterscale tenant-operator (${CLUSTER_NAME})",
+  "duration": -1,
+  "level": "system",
+  "permissions": [
+    {
+      "kind": "system",
+      "namespace": "/",
+      "access": [
+        { "resource": "project", "action": "create" },
+        { "resource": "robot", "action": "create" },
+        { "resource": "robot", "action": "read" },
+        { "resource": "robot", "action": "list" },
+        { "resource": "robot", "action": "delete" }
+      ]
+    },
+    {
+      "kind": "project",
+      "namespace": "*",
+      "access": [
+        { "resource": "project", "action": "read" },
+        { "resource": "member", "action": "create" },
+        { "resource": "member", "action": "read" },
+        { "resource": "member", "action": "list" },
+        { "resource": "member", "action": "update" },
+        { "resource": "member", "action": "delete" },
+        { "resource": "repository", "action": "pull" },
+        { "resource": "repository", "action": "push" }
+      ]
+    }
+  ]
+}
+EOF
+)
+  SECRET=$(echo "$RESP" | jq -r .secret)
+fi
+
+echo "robot\$${ROBOT_NAME} / ${SECRET}"
+```
+
+Every permission maps to a call the operator actually makes:
+
+| Permission                                         | Operator call                                                                       |
+| :------------------------------------------------- | :---------------------------------------------------------------------------------- |
+| system `project:create`                            | Creating the workspace's project.                                                    |
+| project `project:read`                             | Checking whether the project exists, and resolving its numeric ID.                   |
+| system `robot:create` / `read` / `list` / `delete` | Creating the per-workspace robot, finding it in the cluster-wide robot list, and rebuilding it when its image-pull Secret goes missing. |
+| project `member:*`                                 | Reconciling workspace members onto Harbor project roles as members are added, re-roled or removed. |
+| project `repository:pull` / `push`                 | Held so the operator can *grant* them: Harbor will not let a robot create another robot with permissions it does not hold itself. |
+
+<Aside type="caution" title="If Harbor rejects the permission list">
+	Harbor answers `400` when a permission list names a resource/action pair it does not define, and
+	the response names the pair. Drop it and cross-check the equivalent tick-box in Harbor's **New
+	Robot** dialog, because the permission vocabulary varies a little between Harbor versions.
+</Aside>
+
+## 3. Write the agent values file
+
+```yaml
+# agent-values.yaml
+image:
+  repository: ghcr.io/otterscale/otterscale
+  tag: v1.5.0-rc.4
+  pullPolicy: IfNotPresent
+
+agent:
+  serverURL: 'https://192.0.2.1/api/' # the Gateway IP
+  tunnelServerURL: 'https://192.0.2.10:30300' # a node address
+  cluster: 'devel'
+  joinToken: '' # from step 1
+
+trustedCA:
+  secretName: 'otterscale-ca' # already present, created by the server release
+  key: 'ca.crt'
+
+clusterAdmin:
+  enabled: true
+  users: [] # OIDC subjects to bind cluster-admin to, see below
+
+clusterInfo:
+  enabled: true
+  externalAddress: '192.0.2.10' # a node address, for NodePort workload URLs
+  nodePortRange: '30000-32767'
+
+tenantOperator:
+  enabled: true
+  harbor:
+    url: https://192.0.2.1:8443
+    robot:
+      name: 'robot$devel' # from step 2
+      secret: '' # from step 2
+```
+
+What each value controls:
+
+- **`agent.serverURL`**: keep the `/api/` suffix. That is the path the Gateway rewrites onto the
+  server; without it the agent talks to the dashboard instead. The agent is a pod on this cluster,
+  so it reaches the cluster's own Gateway address.
+- **`agent.tunnelServerURL`**: must equal the server's `tunnel.externalURL` exactly, which is a
+  node address rather than the Gateway IP. The tunnel certificate is issued for that host and the
+  agent verifies it, so a mismatch fails the TLS handshake rather than degrading quietly.
+- **`agent.cluster`**: the name the join token is bound to. A token issued for another name is
+  rejected.
+- **`agent.joinToken`**: inline, the token lands in the Helm release and is readable by anyone who
+  can read Secrets in the namespace. To keep it out, create the Secret yourself and point
+  `agent.existingSecret` at it instead. Either way the chart mounts it as a file rather than putting
+  it in the agent's environment.
+- **`clusterAdmin.users`**: binds `cluster-admin` on this cluster to the listed users. Leave it
+  empty for now; [First login](/getting-started/first-login/) explains how to find your OIDC subject
+  and fill it in. Without at least one entry, nobody can create a `Workspace`.
+- **`clusterInfo`**: how users reach workloads here. The Kubernetes API cannot answer that, so the
+  answers are written to the `otterscale-info` ConfigMap in `kube-public`, which the dashboard
+  reads. `externalAddress` must be a bare address: no scheme, no port. Add `inferenceURL` only if
+  you are serving models.
+- **`tenantOperator.harbor`**: the Harbor this cluster already runs, and the robot from step 2. All
+  three fields are required when the operator is enabled: it refuses to run half-configured rather
+  than leave workspaces without registry access.
+
+<Aside type="tip" title="What else the chart installs">
+	Beyond the agent, this release brings the Tenant Operator, Flux (helm-controller and
+	source-controller), read-only RBAC letting any logged-in user see nodes and storage classes, and
+	a `ValidatingAdmissionPolicy` that pins every `HelmRelease` to a fixed service account, so a
+	workspace cannot deploy with more privilege than its own.
+</Aside>
+
+## 4. Install
+
+```bash
+helm upgrade --install otterscale-agent otterscale/otterscale-agent \
+  -f agent-values.yaml \
+  -n otterscale-system
+```
+
+No `--create-namespace`: the server release already created `otterscale-system`.
+
+## 5. Verify
+
+<Steps>
+
+1. **The agent and operator are running**, alongside the server components.
+
+   ```bash
+   kubectl -n otterscale-system get pods
+   ```
+
+2. **Registration succeeded.** The agent logs the registration and then the tunnel it established.
+
+   ```bash
+   kubectl -n otterscale-system logs deploy/otterscale-agent
+   ```
+
+3. **The dashboard's cluster facts landed.**
+
+   ```bash
+   kubectl -n kube-public get configmap otterscale-info -o yaml
+   ```
+
+</Steps>
+
+## Troubleshooting
+
+| Symptom                                               | Likely cause                                                                                                                             |
+| :---------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| Agent logs a TLS handshake failure against the tunnel | `agent.tunnelServerURL` does not match `tunnel.externalURL`. The certificate is issued for that host and the agent verifies it.           |
+| Agent cannot reach the tunnel at all                  | The node address is wrong, or `NodePort` 30300 is not reachable from inside the cluster.                                                  |
+| Agent logs an `x509` error while registering          | `trustedCA.secretName` is empty or misspelled. It must be `otterscale-ca`, the Secret the server release created.                         |
+| Registration rejected                                 | The token does not match `agent.cluster`, or the server's join secret has been rotated.                                                  |
+| `cluster not registered` from the dashboard           | The agent has not connected yet, or the server is running more than one replica. Run one.                                                |
+| The cluster goes unreachable, then recovers           | The server restarted; its tunnel CA is regenerated at startup and the agent must re-register.                                            |
+| `Workspace` stalls at `Ready=False`                   | Harbor credentials are wrong or the robot lacks a permission. Check the Tenant Operator's logs.                                          |
+
+## Next
+
+[First login](/getting-started/first-login/) covers signing in, granting yourself cluster access,
+and creating a workspace.
+
+To bring further clusters under this same server later, follow
+[Multi-cluster](/getting-started/multi-cluster/). Nothing installed here has to change.

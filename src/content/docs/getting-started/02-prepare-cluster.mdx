@@ -8,13 +8,17 @@ sidebar:
 
 import { Aside, Steps, Tabs, TabItem } from '@astrojs/starlight/components';
 
-Four things have to exist on the hub cluster before the OtterScale chart will install: a certificate
-issuer, a reachable `LoadBalancer` address, a Gateway API controller, and a `Gateway` for OtterScale
-to attach to. This page sets all four up and verifies each one.
+Four things have to exist before the OtterScale chart will install: a certificate issuer, a
+reachable `LoadBalancer` address, a Gateway API controller, and a `Gateway` for OtterScale to attach
+to. This page sets all four up and verifies each one.
+
+Everything here happens on the cluster that will run the **server**. In self-managed mode that is
+your only cluster; in multi-cluster mode it is the hub, and managed clusters need none of it apart
+from cert-manager.
 
 <Aside type="note" title="Environment variables used below">
-	Commands on this page refer to `$GATEWAY_IP`, the address you reserved in
-	[Requirements](/getting-started/requirements/#reserved-ip-addresses). Export it once:
+	Commands on this page refer to `$GATEWAY_IP`, the LoadBalancer address you reserved in
+	[Requirements](/getting-started/requirements/). Export it once:
 
     ```bash
     export GATEWAY_IP=192.0.2.1
@@ -24,8 +28,8 @@ to attach to. This page sets all four up and verifies each one.
 
 ## 1. Install cert-manager
 
-OtterScale's default TLS mode (`expose.listener.tls.certSource: auto`) does not ship
-certificates; it asks cert-manager for them. The chart creates a self-signed `Issuer`, uses it to mint a private
+OtterScale's default TLS mode (`expose.listener.tls.certSource: auto`) does not ship certificates;
+it asks cert-manager for them. The chart creates a self-signed `Issuer`, uses it to mint a private
 CA, and then issues the listener certificate from that CA. That CA is also what agents and the
 Tenant Operator are told to trust, so the whole trust chain starts here.
 
@@ -46,10 +50,10 @@ Any cert-manager release that serves `cert-manager.io/v1` will do; v1.21.1 is a 
 kubectl -n cert-manager rollout status deploy/cert-manager-webhook
 ```
 
-<Aside type="caution">
-	Repeat this step on every cluster you plan to join. The Tenant Operator that ships with the
-	agent has admission webhooks of its own, and they get their serving certificate from
-	cert-manager. See [Requirements](/getting-started/requirements/#on-every-managed-cluster).
+<Aside type="caution" title="In multi-cluster mode, repeat this on each managed cluster">
+	The Tenant Operator that ships with the agent has admission webhooks of its own, and they get
+	their serving certificate from cert-manager. In self-managed mode this one install already
+	covers it, because the agent lands on this same cluster.
 </Aside>
 
 ## 2. Give the cluster a LoadBalancer address
@@ -275,5 +279,5 @@ kubectl -n envoy-gateway-system get svc -l gateway.envoyproxy.io/owning-gateway-
 
 ## Next
 
-[Install the server](/getting-started/install-server/) covers the hub itself: API, dashboard,
-Keycloak and Harbor.
+[Install the server](/getting-started/install-server/) covers the server release itself: API,
+dashboard, Keycloak and Harbor. It is the same in both deployment modes.
